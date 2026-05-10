@@ -163,11 +163,6 @@ export default function HomePage() {
 
         {/* Left hero content */}
         <div className="lux-content lux-hero-content">
-          <div className="lux-badge-row">
-            <span className="lux-badge-pulse" aria-hidden="true" />
-            <span className="lux-badge-text">Premium Vehicles · Parts · Accessories</span>
-          </div>
-
           <h1 className="lux-hero-h1">
             Find Your Dream Car at{' '}
             <span className="lux-gold-text">Biltronix</span>
