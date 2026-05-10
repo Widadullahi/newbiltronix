@@ -1897,16 +1897,59 @@ html {
   .lux-hero-content {
     padding: 0 24px;
     text-align: center;
+    margin-bottom: 0;
   }
 
   .lux-hero-p    { max-width: 100%; }
-  .lux-hero-btns { justify-content: center; }
-  .lux-trust     { justify-content: center; }
+  .lux-hero-btns {
+    justify-content: center;
+    margin-bottom: 24px;
+  }
+  .lux-trust {
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .lux-trust-item {
+    color: rgba(255, 255, 255, 0.94);
+  }
+  .lux-trust-item i {
+    color: #ffd166;
+  }
   .lux-badge-row { margin-left: auto; margin-right: auto; }
+  .lux-stage {
+    margin-top: -28px;
+    height: 260px;
+  }
+  .lux-car-img {
+    object-position: center 70%;
+  }
+  .lux-scroll-hint {
+    display: none;
+  }
 }
 
 @media (max-width: 640px) {
+  .lux-hero {
+    padding-top: 40px;
+  }
+
+  .lux-hero-content {
+    padding: 0 18px;
+  }
+
   .lux-hero-h1 { font-size: clamp(2rem, 9vw, 2.6rem); }
+  .lux-hero-p {
+    margin-bottom: 22px;
+  }
+  .lux-hero-btns {
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  .lux-stage {
+    margin-top: -46px;
+    height: 220px;
+  }
 }
 
 /* =========================================================
