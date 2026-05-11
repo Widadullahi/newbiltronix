@@ -1,11 +1,5 @@
 {
   "version": 2,
-  "projects": [
-    {
-      "name": "biltronix-frontend",
-      "path": "biltronix-react"
-    }
-  ],
   "buildCommand": "cd biltronix-react && npm install && npm run build",
   "outputDirectory": "biltronix-react/dist",
   "installCommand": "cd biltronix-react && npm install"
