@@ -5,8 +5,9 @@ export default function InstallSidePrompt({ visible, onInstall, onClose }) {
   
   return (
     <aside
-      className="fixed right-4 top-1/2 -translate-y-1/2 z-40 w-72 glass-card p-5 animate-slide-up"
+      className="fixed right-4 top-1/2 -translate-y-1/2 z-40 w-72 p-5 animate-slide-up"
       aria-label="Install app prompt"
+      style={{ background: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(40px)', WebkitBackdropFilter: 'blur(40px)', border: '1px solid rgba(255, 255, 255, 0.6)', borderRadius: '16px', boxShadow: '0 8px 32px rgba(0, 0, 0, 0.06)' }}
     >
       <button
         type="button"

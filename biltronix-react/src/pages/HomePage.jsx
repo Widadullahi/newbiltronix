@@ -28,6 +28,51 @@ const featureBoxes = [
   },
 ];
 
+const serviceItems = [
+  {
+    icon: 'fas fa-car',
+    title: 'Vehicle Sales',
+    description: 'Premium used and foreign vehicles, thoroughly inspected and certified for quality. From sedans to SUVs, find your perfect ride.',
+    link: '/sales',
+    linkText: 'Browse Vehicles',
+  },
+  {
+    icon: 'fas fa-cogs',
+    title: 'Genuine Parts',
+    description: 'OEM-quality replacement parts, filters, brakes, batteries, and service kits for all major vehicle makes and models.',
+    link: '/sales',
+    linkText: 'Shop Parts',
+  },
+  {
+    icon: 'fas fa-clipboard-check',
+    title: 'Pre-Purchase Inspection',
+    description: 'Professional 150+ point vehicle inspection service. Get detailed reports with photos before you buy any used car.',
+    link: '/inspection-app',
+    linkText: 'Book Inspection',
+  },
+  {
+    icon: 'fas fa-wrench',
+    title: 'Service & Maintenance',
+    description: 'Scheduled maintenance, oil changes, and repairs by certified technicians. Keep your vehicle running at peak performance.',
+    link: '#',
+    linkText: 'Schedule Service',
+  },
+  {
+    icon: 'fas fa-headset',
+    title: 'Expert Consultation',
+    description: 'Get personalized advice from our automotive experts. We help you make informed decisions on purchases and maintenance.',
+    link: 'https://wa.me/2347060882711',
+    linkText: 'Consult Now',
+  },
+  {
+    icon: 'fas fa-truck',
+    title: 'Delivery Service',
+    description: 'Safe and insured vehicle delivery across Nigeria. We bring your purchase directly to your doorstep.',
+    link: '#',
+    linkText: 'Learn More',
+  },
+];
+
 const highlightCards = [
   {
     title: 'Vehicles',
@@ -351,6 +396,46 @@ export default function HomePage() {
                     </button>
                   </div>
                 </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ── Our Services Section ── */}
+        <section className="container mx-auto px-4 md:px-6">
+          <div className="text-center mb-12">
+            <span className="badge-primary text-xs mb-2 inline-block">What We Offer</span>
+            <h2 className="text-2xl md:text-3xl font-bold text-text-primary">Our Services</h2>
+            <p className="text-text-secondary mt-2">Comprehensive automotive solutions under one roof</p>
+          </div>
+          
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {serviceItems.map((service) => (
+              <div key={service.title} className="glass-card p-6 group hover:shadow-glass-hover transition-all">
+                <div className="w-14 h-14 rounded-xl bg-primary-50 flex items-center justify-center mb-5 group-hover:bg-primary-100 transition-colors">
+                  <i className={`${service.icon} text-primary text-xl`}></i>
+                </div>
+                <h3 className="text-lg font-semibold text-text-primary mb-2">{service.title}</h3>
+                <p className="text-sm text-text-secondary leading-relaxed mb-4">{service.description}</p>
+                {service.link.startsWith('http') ? (
+                  <a
+                    href={service.link}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-primary font-semibold text-sm hover:underline flex items-center gap-1"
+                  >
+                    {service.linkText}
+                    <i className="fas fa-arrow-right text-xs"></i>
+                  </a>
+                ) : (
+                  <Link
+                    to={service.link}
+                    className="text-primary font-semibold text-sm hover:underline flex items-center gap-1"
+                  >
+                    {service.linkText}
+                    <i className="fas fa-arrow-right text-xs"></i>
+                  </Link>
+                )}
               </div>
             ))}
           </div>

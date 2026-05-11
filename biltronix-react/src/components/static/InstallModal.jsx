@@ -4,8 +4,8 @@ export default function InstallModal({ installModal, triggerInstallPrompt, onClo
   if (!installModal.open) return null;
   
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
-      <div className="glass-card max-w-md w-full p-6 animate-slide-up">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-md p-4">
+      <div className="glass-card max-w-md w-full p-6 animate-slide-up" style={{ background: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(40px)', WebkitBackdropFilter: 'blur(40px)' }}>
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-xl bg-primary-50 flex items-center justify-center">
