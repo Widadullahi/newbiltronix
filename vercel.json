@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "cd biltronix-react && npm install && npm run build",
+  "buildCommand": "npm run build --prefix biltronix-react",
   "outputDirectory": "biltronix-react/dist",
-  "installCommand": "cd biltronix-react && npm install"
+  "installCommand": "npm install --prefix biltronix-react"
 }
