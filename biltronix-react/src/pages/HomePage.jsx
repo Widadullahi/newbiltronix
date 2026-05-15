@@ -198,6 +198,7 @@ export default function HomePage() {
       <section
         className={`lux-section lux-hero${heroAnimated ? ' lux-on' : ''}`}
         aria-label="Biltronix hero"
+        style={{ background: '#0d6efd' }}
       >
         <div className="lux-bg" aria-hidden="true" />
 
@@ -260,7 +261,7 @@ export default function HomePage() {
           <div className="lux-car-slide">
             <div className="lux-car-float">
               <img
-                src="https://images.pexels.com/photos/33345481/pexels-photo-33345481.jpeg?auto=compress&cs=tinysrgb&w=1400"
+                src="/hero-car-original.png"
                 alt="Luxury sports car — Biltronix premium collection"
                 className="lux-car-img"
                 loading="eager"
