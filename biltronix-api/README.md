@@ -1,6 +1,6 @@
-# Biltronix API (MySQL)
+# Biltronix API
 
-Express + MySQL backend for:
+Express + SQLite backend for:
 - Admin login
 - Vehicles / car parts / accessories
 - Car tips
@@ -8,17 +8,10 @@ Express + MySQL backend for:
 - Inspector accounts
 - Inspection records
 
-## 1) Create MySQL database
-Create a database named `biltronix_db` (or change `DB_NAME` in `.env`).
-
-## 2) Configure env
+## 1) Configure env
 Copy `.env.example` to `.env` and set:
 - `PORT`
-- `DB_HOST`
-- `DB_PORT`
-- `DB_USER`
-- `DB_PASSWORD`
-- `DB_NAME`
+- `SQLITE_DB_PATH` (optional locally)
 - `API_CORS_ORIGINS` (comma-separated allowed frontend origins)
 - `ADMIN_EMAIL`
 - `ADMIN_PASSWORD`
@@ -27,11 +20,14 @@ Copy `.env.example` to `.env` and set:
 - `REFRESH_TOKEN_EXPIRES_IN`
 - `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASS` / `SMTP_SECURE` / `SMTP_FROM` (for password reset OTP email)
 
-## 3) Install and run
+## 2) Install and run
 - `npm install`
 - `npm run dev`
 
-On startup, schema in `sql/schema.sql` is auto-applied.
+On startup, the SQLite schema is created automatically.
+
+## Render deployment
+This repo includes a root `render.yaml` configured to deploy only this API service from `biltronix-api`.
 
 ## Health check
 `GET http://localhost:4000/api/health`

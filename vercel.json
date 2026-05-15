@@ -1,6 +1,12 @@
 {
   "version": 2,
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "installCommand": "npm install"
+  "installCommand": "npm ci --prefix biltronix-react",
+  "buildCommand": "npm run build --prefix biltronix-react",
+  "outputDirectory": "biltronix-react/dist",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
 }

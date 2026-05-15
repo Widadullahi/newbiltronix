@@ -1,23 +1,20 @@
 services:
   - type: web
-    name: biltronix-sales
+    name: biltronix-api
     runtime: node
-    plan: starter
+    plan: free
     region: oregon
-    buildCommand: npm ci --prefix biltronix-api && npm ci --prefix biltronix-react && npm run build --prefix biltronix-react
-    startCommand: npm start --prefix biltronix-api
+    rootDir: biltronix-api
+    buildCommand: npm ci
+    startCommand: npm start
     healthCheckPath: /api/health
-    disk:
-      name: biltronix-data
-      mountPath: /var/data
-      sizeGB: 1
     envVars:
       - key: NODE_ENV
         value: production
       - key: SQLITE_DB_PATH
-        value: /var/data/biltronix.db
-      - key: VITE_API_BASE_URL
-        value: /api
+        value: /tmp/biltronix.db
+      - key: API_CORS_ORIGINS
+        sync: false
       - key: ACCESS_TOKEN_EXPIRES_IN
         value: 15m
       - key: REFRESH_TOKEN_EXPIRES_IN

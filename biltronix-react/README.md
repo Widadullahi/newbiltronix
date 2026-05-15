@@ -1,6 +1,6 @@
 # Biltronix Automotive (React Frontend)
 
-This frontend now uses the Biltronix MySQL API backend (not Sanity).
+This frontend uses the Biltronix API backend.
 
 ## Frontend setup
 1. Copy `.env.example` to `.env`.
@@ -13,6 +13,12 @@ This frontend now uses the Biltronix MySQL API backend (not Sanity).
 
 ## Backend required
 Start the API in `../biltronix-api` first.
+
+## Vercel deployment
+This repo includes a root `vercel.json` configured to build this Vite app from `biltronix-react` and serve `biltronix-react/dist`.
+
+Set `VITE_API_BASE_URL` in Vercel to your Render API URL, for example:
+`https://your-render-service.onrender.com/api`
 
 ## Data integration
 - API client: `src/lib/sanityClient.js` (kept filename for compatibility)
