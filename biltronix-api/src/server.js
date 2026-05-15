@@ -1,4 +1,4 @@
-import fs from 'node:fs/promises';
+import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash, randomBytes, randomInt } from 'node:crypto';
@@ -778,6 +778,17 @@ app.use((err, _req, res, _next) => {
   const message = err && typeof err.message === 'string' ? err.message : 'Unexpected server error.';
   sendError(res, 500, message);
 });
+
+const clientDistPath = path.resolve(__dirname, '../../biltronix-react/dist');
+const clientIndexPath = path.join(clientDistPath, 'index.html');
+
+if (fs.existsSync(clientIndexPath)) {
+  app.use(express.static(clientDistPath));
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api/')) return next();
+    res.sendFile(clientIndexPath);
+  });
+}
 
 async function bootstrap() {
   initSchema();

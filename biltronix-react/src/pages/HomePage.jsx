@@ -297,11 +297,20 @@ export default function HomePage() {
                 loading="eager"
               />
               <div className="feat-main-overlay">
+                <div className="feat-kicker">
+                  <span>Signature Selection</span>
+                  <span>Verified Stock</span>
+                </div>
                 <span className={`feat-type-badge ${featuredItems[currentSlide].type}`}>
                   {featuredItems[currentSlide].badge}
                 </span>
                 <h3 className="feat-main-name">{featuredItems[currentSlide].name}</h3>
                 <p className="feat-main-price">{featuredItems[currentSlide].price}</p>
+                <div className="feat-main-meta" aria-label="Listing highlights">
+                  <span><i className="fas fa-shield-alt"></i> Certified</span>
+                  <span><i className="fas fa-gem"></i> Premium Grade</span>
+                  <span><i className="fas fa-headset"></i> Concierge Support</span>
+                </div>
               </div>
               <button onClick={prevSlide} className="feat-arrow feat-arrow-prev" aria-label="Previous item">
                 <i className="fas fa-chevron-left"></i>
