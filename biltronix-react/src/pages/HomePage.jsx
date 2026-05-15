@@ -35,6 +35,7 @@ const serviceItems = [
     description: 'Premium used and foreign vehicles, thoroughly inspected and certified for quality. From sedans to SUVs, find your perfect ride.',
     link: '/sales',
     linkText: 'Browse Vehicles',
+    image: 'https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=900&h=600&fit=crop',
   },
   {
     icon: 'fas fa-cogs',
@@ -42,6 +43,7 @@ const serviceItems = [
     description: 'OEM-quality replacement parts, filters, brakes, batteries, and service kits for all major vehicle makes and models.',
     link: '/sales',
     linkText: 'Shop Parts',
+    image: 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=900&h=600&fit=crop',
   },
   {
     icon: 'fas fa-clipboard-check',
@@ -49,6 +51,7 @@ const serviceItems = [
     description: 'Professional 150+ point vehicle inspection service. Get detailed reports with photos before you buy any used car.',
     link: '/inspection-app',
     linkText: 'Book Inspection',
+    image: '/prepurchase-inspection.jpg',
   },
   {
     icon: 'fas fa-wrench',
@@ -56,6 +59,7 @@ const serviceItems = [
     description: 'Scheduled maintenance, oil changes, and repairs by certified technicians. Keep your vehicle running at peak performance.',
     link: '#',
     linkText: 'Schedule Service',
+    image: '/repair-troubleshooting.jpeg',
   },
   {
     icon: 'fas fa-headset',
@@ -63,6 +67,7 @@ const serviceItems = [
     description: 'Get personalized advice from our automotive experts. We help you make informed decisions on purchases and maintenance.',
     link: 'https://wa.me/2347060882711',
     linkText: 'Consult Now',
+    image: '/computerized Diagnostics.jpg',
   },
   {
     icon: 'fas fa-truck',
@@ -70,6 +75,7 @@ const serviceItems = [
     description: 'Safe and insured vehicle delivery across Nigeria. We bring your purchase directly to your doorstep.',
     link: '#',
     linkText: 'Learn More',
+    image: 'https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?w=900&h=600&fit=crop',
   },
 ];
 
@@ -420,31 +426,37 @@ export default function HomePage() {
           
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {serviceItems.map((service) => (
-              <div key={service.title} className="glass-card p-6 group hover:shadow-glass-hover transition-all">
-                <div className="w-14 h-14 rounded-xl bg-primary-50 flex items-center justify-center mb-5 group-hover:bg-primary-100 transition-colors">
-                  <i className={`${service.icon} text-primary text-xl`}></i>
+              <div key={service.title} className="service-card group">
+                <div className="service-card-image-wrap">
+                  <img src={service.image} alt={service.title} className="service-card-image" loading="lazy" />
+                  <div className="service-card-image-shade" />
+                  <div className="service-card-icon">
+                    <i className={`${service.icon}`} aria-hidden="true"></i>
+                  </div>
                 </div>
-                <h3 className="text-lg font-semibold text-text-primary mb-2">{service.title}</h3>
-                <p className="text-sm text-text-secondary leading-relaxed mb-4">{service.description}</p>
-                {service.link.startsWith('http') ? (
-                  <a
-                    href={service.link}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-primary font-semibold text-sm hover:underline flex items-center gap-1"
-                  >
-                    {service.linkText}
-                    <i className="fas fa-arrow-right text-xs"></i>
-                  </a>
-                ) : (
-                  <Link
-                    to={service.link}
-                    className="text-primary font-semibold text-sm hover:underline flex items-center gap-1"
-                  >
-                    {service.linkText}
-                    <i className="fas fa-arrow-right text-xs"></i>
-                  </Link>
-                )}
+                <div className="service-card-body">
+                  <h3 className="service-card-title">{service.title}</h3>
+                  <p className="service-card-copy">{service.description}</p>
+                  {service.link.startsWith('http') ? (
+                    <a
+                      href={service.link}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="service-card-link"
+                    >
+                      {service.linkText}
+                      <i className="fas fa-arrow-right" aria-hidden="true"></i>
+                    </a>
+                  ) : (
+                    <Link
+                      to={service.link}
+                      className="service-card-link"
+                    >
+                      {service.linkText}
+                      <i className="fas fa-arrow-right" aria-hidden="true"></i>
+                    </Link>
+                  )}
+                </div>
               </div>
             ))}
           </div>
