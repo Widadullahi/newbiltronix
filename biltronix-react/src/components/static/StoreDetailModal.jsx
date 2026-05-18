@@ -12,7 +12,7 @@ export default function StoreDetailModal({ productModal, onClose, onPrev, onNext
       onClick={onClose}
     >
       <div
-        className="glass-card max-w-4xl w-full p-6 animate-slide-up"
+        className="rounded-glass border border-glass-border bg-glass-surface shadow-glass backdrop-blur-glass transition hover:-translate-y-0.5 hover:bg-white/85 hover:shadow-glass-hover max-w-4xl w-full p-6 animate-slide-up"
         onClick={(e) => e.stopPropagation()}
       >
         <button
@@ -62,7 +62,7 @@ export default function StoreDetailModal({ productModal, onClose, onPrev, onNext
 
           {/* Content Section */}
           <div className="space-y-4">
-            <span className="badge-primary text-xs inline-block">
+            <span className="inline-block rounded-full border border-primary-300 bg-primary-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary text-xs inline-block">
               {productModal.category || 'Product'}
             </span>
 
@@ -98,12 +98,12 @@ export default function StoreDetailModal({ productModal, onClose, onPrev, onNext
                 href="https://wa.me/2347060882711"
                 target="_blank"
                 rel="noreferrer"
-                className="flex-1 btn-primary py-2.5 text-center"
+                className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-primary text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 py-2.5 text-center"
               >
                 <i className="fab fa-whatsapp mr-2"></i>
                 Inquire Now
               </a>
-              <button className="btn-secondary px-5 py-2.5">
+              <button className="inline-flex items-center justify-center rounded-xl border border-glass-border bg-glass-surface text-text-primary backdrop-blur transition hover:bg-white/85 px-5 py-2.5">
                 <i className="fas fa-bookmark"></i>
               </button>
             </div>

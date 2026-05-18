@@ -15,7 +15,6 @@ import {
   updateCarTip,
 } from '../lib/sanityClient.js';
 import { OTHER_OPTION, VEHICLE_MAKES, VEHICLE_MODELS_BY_MAKE } from '../lib/vehicleOptions.js';
-import './AdminDashboardPage.css';
 
 function toSlug(input) {
   return String(input || '')
@@ -529,12 +528,12 @@ export default function AdminDashboardPage() {
 
   if (!isAuthenticated) {
     return (
-      <main className='admin-main' style={{ maxWidth: 420, margin: '8vh auto', padding: '0 16px' }}>
-        <section className='admin-card'>
+      <main className='mx-auto mt-[8vh] min-h-screen max-w-[420px] bg-glass-bg px-4'>
+        <section className='mb-6 rounded-glass border border-glass-border bg-glass-surface p-6 shadow-glass backdrop-blur-glass [&_h2]:mb-4 [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:text-text-primary'>
           <h2>Admin Login</h2>
           <p>Use your admin email and password to access the dashboard.</p>
-          <form className='admin-basic-modal-form' onSubmit={handleAdminLogin}>
-            <div className='admin-modal-field'>
+          <form className='flex flex-col gap-4' onSubmit={handleAdminLogin}>
+            <div className='flex flex-col gap-1.5 [&_label]:text-sm [&_label]:font-semibold [&_label]:text-text-secondary [&_input]:rounded-xl [&_input]:border [&_input]:border-glass-border [&_input]:bg-glass-surface [&_input]:px-4 [&_input]:py-3 [&_input]:text-[0.9375rem] [&_input]:text-text-primary [&_input]:outline-none [&_input:focus]:border-primary [&_select]:rounded-xl [&_select]:border [&_select]:border-glass-border [&_select]:bg-glass-surface [&_select]:px-4 [&_select]:py-3 [&_select]:outline-none [&_textarea]:rounded-xl [&_textarea]:border [&_textarea]:border-glass-border [&_textarea]:bg-glass-surface [&_textarea]:px-4 [&_textarea]:py-3 [&_textarea]:outline-none'>
               <label htmlFor='admin-email'>Email</label>
               <input
                 id='admin-email'
@@ -545,7 +544,7 @@ export default function AdminDashboardPage() {
                 required
               />
             </div>
-            <div className='admin-modal-field'>
+            <div className='flex flex-col gap-1.5 [&_label]:text-sm [&_label]:font-semibold [&_label]:text-text-secondary [&_input]:rounded-xl [&_input]:border [&_input]:border-glass-border [&_input]:bg-glass-surface [&_input]:px-4 [&_input]:py-3 [&_input]:text-[0.9375rem] [&_input]:text-text-primary [&_input]:outline-none [&_input:focus]:border-primary [&_select]:rounded-xl [&_select]:border [&_select]:border-glass-border [&_select]:bg-glass-surface [&_select]:px-4 [&_select]:py-3 [&_select]:outline-none [&_textarea]:rounded-xl [&_textarea]:border [&_textarea]:border-glass-border [&_textarea]:bg-glass-surface [&_textarea]:px-4 [&_textarea]:py-3 [&_textarea]:outline-none'>
               <label htmlFor='admin-password'>Password</label>
               <input
                 id='admin-password'
@@ -556,8 +555,8 @@ export default function AdminDashboardPage() {
                 required
               />
             </div>
-            {loginError && <p className='admin-error-text'>{loginError}</p>}
-            <button className='admin-refresh-btn' type='submit'>Login</button>
+            {loginError && <p className='mt-2 text-sm text-error'>{loginError}</p>}
+            <button className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0' type='submit'>Login</button>
           </form>
         </section>
       </main>
@@ -565,55 +564,55 @@ export default function AdminDashboardPage() {
   }
 
   return (
-    <div className='admin-shell'>
-      <aside className={`admin-sidebar ${sidebarOpen ? 'open' : ''}`}>
-        <div className='admin-brand'>Biltronix Admin</div>
+    <div className='flex min-h-screen bg-glass-bg'>
+      <aside className={`fixed z-50 h-screen w-[260px] translate-x-0 overflow-y-auto border-r border-glass-border bg-glass-surface px-4 py-6 backdrop-blur-2xl transition-transform duration-300 max-[960px]:-translate-x-full ${sidebarOpen ? 'max-[960px]:translate-x-0' : ''}`}>
+        <div className='mb-8 px-3 font-heading text-xl font-bold text-text-primary'>Biltronix Admin</div>
         <button
-          className={`admin-nav-btn ${activePanel === 'overview' ? 'active' : ''}`}
+          className={`mb-1 flex w-full cursor-pointer items-center gap-3 rounded-xl border-0 px-4 py-3 text-left text-[0.9375rem] font-medium transition [&_i]:w-5 [&_i]:text-center ${activePanel === 'overview' ? 'bg-primary-50 text-primary' : 'bg-transparent text-text-secondary hover:bg-slate-100 hover:text-text-primary'}`}
           onClick={() => handlePanelChange('overview')}
         >
           <i className='fas fa-gauge-high' /> Overview
         </button>
         <button
-          className={`admin-nav-btn ${activePanel === 'vehicle' ? 'active' : ''}`}
+          className={`mb-1 flex w-full cursor-pointer items-center gap-3 rounded-xl border-0 px-4 py-3 text-left text-[0.9375rem] font-medium transition [&_i]:w-5 [&_i]:text-center ${activePanel === 'vehicle' ? 'bg-primary-50 text-primary' : 'bg-transparent text-text-secondary hover:bg-slate-100 hover:text-text-primary'}`}
           onClick={() => handlePanelChange('vehicle')}
         >
           <i className='fas fa-car-side' /> Vehicle
         </button>
         <button
-          className={`admin-nav-btn ${activePanel === 'car-parts' ? 'active' : ''}`}
+          className={`mb-1 flex w-full cursor-pointer items-center gap-3 rounded-xl border-0 px-4 py-3 text-left text-[0.9375rem] font-medium transition [&_i]:w-5 [&_i]:text-center ${activePanel === 'car-parts' ? 'bg-primary-50 text-primary' : 'bg-transparent text-text-secondary hover:bg-slate-100 hover:text-text-primary'}`}
           onClick={() => handlePanelChange('car-parts')}
         >
           <i className='fas fa-cogs' /> Car Parts
         </button>
         <button
-          className={`admin-nav-btn ${activePanel === 'accessories' ? 'active' : ''}`}
+          className={`mb-1 flex w-full cursor-pointer items-center gap-3 rounded-xl border-0 px-4 py-3 text-left text-[0.9375rem] font-medium transition [&_i]:w-5 [&_i]:text-center ${activePanel === 'accessories' ? 'bg-primary-50 text-primary' : 'bg-transparent text-text-secondary hover:bg-slate-100 hover:text-text-primary'}`}
           onClick={() => handlePanelChange('accessories')}
         >
           <i className='fas fa-toolbox' /> Accessories
         </button>
         <button
-          className={`admin-nav-btn ${activePanel === 'car-tips' ? 'active' : ''}`}
+          className={`mb-1 flex w-full cursor-pointer items-center gap-3 rounded-xl border-0 px-4 py-3 text-left text-[0.9375rem] font-medium transition [&_i]:w-5 [&_i]:text-center ${activePanel === 'car-tips' ? 'bg-primary-50 text-primary' : 'bg-transparent text-text-secondary hover:bg-slate-100 hover:text-text-primary'}`}
           onClick={() => handlePanelChange('car-tips')}
         >
           <i className='fas fa-lightbulb' /> Car Tips
         </button>
-        <div className='admin-sidebar-links'>
-          <Link className='admin-link-btn home' to='/' onClick={() => setSidebarOpen(false)}>
+        <div className='mt-auto border-t border-slate-200 pt-6'>
+          <Link className='mb-2 block rounded-xl px-4 py-2.5 text-sm font-medium text-text-secondary no-underline transition hover:bg-slate-100 hover:text-text-primary' to='/' onClick={() => setSidebarOpen(false)}>
             View Home
           </Link>
-          <Link className='admin-link-btn store' to='/sales' onClick={() => setSidebarOpen(false)}>
+          <Link className='mb-2 block rounded-xl px-4 py-2.5 text-sm font-medium text-text-secondary no-underline transition hover:bg-slate-100 hover:text-text-primary' to='/sales' onClick={() => setSidebarOpen(false)}>
             View Store
           </Link>
         </div>
       </aside>
-      {sidebarOpen && <button className='admin-sidebar-backdrop' onClick={() => setSidebarOpen(false)} aria-label='Close navigation' />}
+      {sidebarOpen && <button className='fixed inset-0 z-40 bg-slate-950/30 min-[961px]:hidden' onClick={() => setSidebarOpen(false)} aria-label='Close navigation' />}
 
-      <main className='admin-main'>
-        <header className='admin-header'>
-          <div className='admin-header-top'>
+      <main className='min-h-screen bg-glass-bg p-8 max-[960px]:p-5'>
+        <header className='mb-8 [&_h1]:m-0 [&_h1]:flex-1 [&_h1]:text-[1.75rem] [&_h1]:font-bold [&_h1]:text-text-primary [&_p]:m-0 [&_p]:text-[0.9375rem] [&_p]:text-text-secondary'>
+          <div className='mb-2 flex items-center gap-4'>
             <button
-              className='admin-menu-toggle'
+              className='flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl border border-glass-border bg-glass-surface text-text-secondary transition hover:bg-slate-100 hover:text-text-primary'
               type='button'
               onClick={() => setSidebarOpen((prev) => !prev)}
               aria-label={sidebarOpen ? 'Close navigation' : 'Open navigation'}
@@ -621,25 +620,25 @@ export default function AdminDashboardPage() {
               <i className='fas fa-bars' />
             </button>
             <h1>Operations Dashboard</h1>
-            <button className='admin-refresh-btn' type='button' onClick={handleAdminLogout}>
+            <button className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0' type='button' onClick={handleAdminLogout}>
               Logout
             </button>
           </div>
           <p>Track bookings, orders, and item listings from one place.</p>
-          {error && <p className='admin-error-text'>{error}</p>}
+          {error && <p className='mt-2 text-sm text-error'>{error}</p>}
         </header>
 
         {activePanel === 'overview' && (
           <>
-            <section className='admin-grid'>
+            <section className='mb-6 grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-5 max-[640px]:grid-cols-1'>
               {metrics.map((metric) => (
-                <article key={metric.label} className='admin-card metric'>
-                  <div className='metric-icon'>
+                <article key={metric.label} className='mb-6 flex items-center gap-4 rounded-glass border border-glass-border bg-glass-surface p-6 shadow-glass backdrop-blur-glass'>
+                  <div className='flex h-12 w-12 items-center justify-center rounded-xl bg-primary-50 text-xl text-primary'>
                     <i className={`fas ${metric.icon}`} />
                   </div>
                   <div>
-                    <div className='metric-value'>{metric.value}</div>
-                    <div className='metric-label'>{metric.label}</div>
+                    <div className='text-[1.75rem] font-bold text-text-primary'>{metric.value}</div>
+                    <div className='text-sm font-medium text-text-muted'>{metric.label}</div>
                   </div>
                 </article>
               ))}
@@ -648,9 +647,9 @@ export default function AdminDashboardPage() {
         )}
 
         {activePanel === 'bookings' && (
-          <section className='admin-card'>
+          <section className='mb-6 rounded-glass border border-glass-border bg-glass-surface p-6 shadow-glass backdrop-blur-glass [&_h2]:mb-4 [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:text-text-primary'>
             <h2>Recent Bookings</h2>
-            <div className='admin-controls'>
+            <div className='mb-5 flex gap-3 max-[640px]:flex-col [&_input]:flex-1 [&_input]:rounded-xl [&_input]:border [&_input]:border-glass-border [&_input]:bg-glass-surface [&_input]:px-3.5 [&_input]:py-2.5 [&_input]:text-sm [&_input]:outline-none [&_select]:rounded-xl [&_select]:border [&_select]:border-glass-border [&_select]:bg-glass-surface [&_select]:px-3.5 [&_select]:py-2.5 [&_select]:text-sm [&_select]:outline-none'>
               <input
                 type='search'
                 value={bookingQuery}
@@ -666,7 +665,7 @@ export default function AdminDashboardPage() {
                 ))}
               </select>
             </div>
-            <table className='admin-table'>
+            <table className='w-full border-separate border-spacing-0 [&_th]:border-b [&_th]:border-slate-200 [&_th]:px-4 [&_th]:py-3 [&_th]:text-left [&_th]:text-xs [&_th]:font-semibold [&_th]:uppercase [&_th]:tracking-wide [&_th]:text-text-muted [&_td]:border-b [&_td]:border-slate-100 [&_td]:px-4 [&_td]:py-3.5 [&_td]:text-sm [&_td]:text-text-primary [&_tbody_tr:hover_td]:bg-slate-50'>
               <thead>
                 <tr>
                   <th>ID</th>
@@ -684,13 +683,13 @@ export default function AdminDashboardPage() {
                     <td>{booking.service}</td>
                     <td>{formatDate(booking.date)}</td>
                     <td>
-                      <span className={`pill ${toSlug(booking.status)}`}>{booking.status}</span>
+                      <span className='inline-flex items-center rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary'>{booking.status}</span>
                     </td>
                   </tr>
                 ))}
                 {filteredBookings.length === 0 && (
                   <tr>
-                    <td colSpan={5} className='empty-row'>
+                    <td colSpan={5} className='py-12 text-center text-text-muted'>
                       No bookings found for the selected filters.
                     </td>
                   </tr>
@@ -701,9 +700,9 @@ export default function AdminDashboardPage() {
         )}
 
         {activePanel === 'orders' && (
-          <section className='admin-card'>
+          <section className='mb-6 rounded-glass border border-glass-border bg-glass-surface p-6 shadow-glass backdrop-blur-glass [&_h2]:mb-4 [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:text-text-primary'>
             <h2>Latest Orders</h2>
-            <div className='admin-controls'>
+            <div className='mb-5 flex gap-3 max-[640px]:flex-col [&_input]:flex-1 [&_input]:rounded-xl [&_input]:border [&_input]:border-glass-border [&_input]:bg-glass-surface [&_input]:px-3.5 [&_input]:py-2.5 [&_input]:text-sm [&_input]:outline-none [&_select]:rounded-xl [&_select]:border [&_select]:border-glass-border [&_select]:bg-glass-surface [&_select]:px-3.5 [&_select]:py-2.5 [&_select]:text-sm [&_select]:outline-none'>
               <input
                 type='search'
                 value={orderQuery}
@@ -719,7 +718,7 @@ export default function AdminDashboardPage() {
                 ))}
               </select>
             </div>
-            <table className='admin-table'>
+            <table className='w-full border-separate border-spacing-0 [&_th]:border-b [&_th]:border-slate-200 [&_th]:px-4 [&_th]:py-3 [&_th]:text-left [&_th]:text-xs [&_th]:font-semibold [&_th]:uppercase [&_th]:tracking-wide [&_th]:text-text-muted [&_td]:border-b [&_td]:border-slate-100 [&_td]:px-4 [&_td]:py-3.5 [&_td]:text-sm [&_td]:text-text-primary [&_tbody_tr:hover_td]:bg-slate-50'>
               <thead>
                 <tr>
                   <th>ID</th>
@@ -741,7 +740,7 @@ export default function AdminDashboardPage() {
                 ))}
                 {filteredOrders.length === 0 && (
                   <tr>
-                    <td colSpan={5} className='empty-row'>
+                    <td colSpan={5} className='py-12 text-center text-text-muted'>
                       No orders found for the selected filters.
                     </td>
                   </tr>
@@ -752,9 +751,9 @@ export default function AdminDashboardPage() {
         )}
 
         {(activePanel === 'vehicle' || activePanel === 'car-parts' || activePanel === 'accessories') && (
-          <section className='admin-card'>
+          <section className='mb-6 rounded-glass border border-glass-border bg-glass-surface p-6 shadow-glass backdrop-blur-glass [&_h2]:mb-4 [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:text-text-primary'>
             <h2>{activeStockMeta?.label} Manager</h2>
-            <p className='inv-threshold'>
+            <p className='mb-5 text-[0.9375rem] text-text-secondary'>
               {activePanel === 'vehicle'
                 ? 'Add vehicles.'
                 : activePanel === 'car-parts'
@@ -764,9 +763,9 @@ export default function AdminDashboardPage() {
 
             {activePanel === 'vehicle' ? (
               <>
-                <div className='admin-stock-actions'>
+                <div className='mb-5 flex gap-3 max-[640px]:flex-col'>
                   <button
-                    className='admin-refresh-btn'
+                    className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0'
                     type='button'
                     onClick={() => {
                       setNewPrimaryImageFile(null);
@@ -779,53 +778,53 @@ export default function AdminDashboardPage() {
                   >
                     Add Vehicle
                   </button>
-                  <button className='admin-refresh-btn' type='button' onClick={loadStockItems} disabled={stockLoading}>
+                  <button className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0' type='button' onClick={loadStockItems} disabled={stockLoading}>
                     {stockLoading ? 'Refreshing...' : 'Refresh List'}
                   </button>
                 </div>
-                <section className='admin-grid'>
-                  <article className='admin-card metric'>
-                    <div className='metric-icon'>
+                <section className='mb-6 grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-5 max-[640px]:grid-cols-1'>
+                  <article className='mb-6 flex items-center gap-4 rounded-glass border border-glass-border bg-glass-surface p-6 shadow-glass backdrop-blur-glass'>
+                    <div className='flex h-12 w-12 items-center justify-center rounded-xl bg-primary-50 text-xl text-primary'>
                       <i className='fas fa-car-side' />
                     </div>
                     <div>
-                      <div className='metric-value'>{vehicleStats.totalVehicles}</div>
-                      <div className='metric-label'>Number of Vehicles</div>
+                      <div className='text-[1.75rem] font-bold text-text-primary'>{vehicleStats.totalVehicles}</div>
+                      <div className='text-sm font-medium text-text-muted'>Number of Vehicles</div>
                     </div>
                   </article>
-                  <article className='admin-card metric'>
-                    <div className='metric-icon'>
+                  <article className='mb-6 flex items-center gap-4 rounded-glass border border-glass-border bg-glass-surface p-6 shadow-glass backdrop-blur-glass'>
+                    <div className='flex h-12 w-12 items-center justify-center rounded-xl bg-primary-50 text-xl text-primary'>
                       <i className='fas fa-certificate' />
                     </div>
                     <div>
-                      <div className='metric-value'>{vehicleStats.newCount}</div>
-                      <div className='metric-label'>New</div>
+                      <div className='text-[1.75rem] font-bold text-text-primary'>{vehicleStats.newCount}</div>
+                      <div className='text-sm font-medium text-text-muted'>New</div>
                     </div>
                   </article>
-                  <article className='admin-card metric'>
-                    <div className='metric-icon'>
+                  <article className='mb-6 flex items-center gap-4 rounded-glass border border-glass-border bg-glass-surface p-6 shadow-glass backdrop-blur-glass'>
+                    <div className='flex h-12 w-12 items-center justify-center rounded-xl bg-primary-50 text-xl text-primary'>
                       <i className='fas fa-globe-africa' />
                     </div>
                     <div>
-                      <div className='metric-value'>{vehicleStats.foreignUsedCount}</div>
-                      <div className='metric-label'>Foreign Used</div>
+                      <div className='text-[1.75rem] font-bold text-text-primary'>{vehicleStats.foreignUsedCount}</div>
+                      <div className='text-sm font-medium text-text-muted'>Foreign Used</div>
                     </div>
                   </article>
-                  <article className='admin-card metric'>
-                    <div className='metric-icon'>
+                  <article className='mb-6 flex items-center gap-4 rounded-glass border border-glass-border bg-glass-surface p-6 shadow-glass backdrop-blur-glass'>
+                    <div className='flex h-12 w-12 items-center justify-center rounded-xl bg-primary-50 text-xl text-primary'>
                       <i className='fas fa-flag' />
                     </div>
                     <div>
-                      <div className='metric-value'>{vehicleStats.nigerianUsedCount}</div>
-                      <div className='metric-label'>Nigerian Used</div>
+                      <div className='text-[1.75rem] font-bold text-text-primary'>{vehicleStats.nigerianUsedCount}</div>
+                      <div className='text-sm font-medium text-text-muted'>Nigerian Used</div>
                     </div>
                   </article>
                 </section>
               </>
             ) : (
-              <div className='admin-stock-actions'>
+              <div className='mb-5 flex gap-3 max-[640px]:flex-col'>
                 <button
-                  className='admin-refresh-btn'
+                  className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0'
                   type='button'
                   onClick={() => {
                     setNewPrimaryImageFile(null);
@@ -843,16 +842,16 @@ export default function AdminDashboardPage() {
                 >
                   {activeStockMeta?.addLabel || 'Add Item'}
                 </button>
-                <button className='admin-refresh-btn' type='button' onClick={loadStockItems} disabled={stockLoading}>
+                <button className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0' type='button' onClick={loadStockItems} disabled={stockLoading}>
                   {stockLoading ? 'Refreshing...' : 'Refresh List'}
                 </button>
               </div>
             )}
 
-            {stockMessage && <p className='admin-success-text'>{stockMessage}</p>}
-            {stockError && <p className='admin-error-text'>{stockError}</p>}
+            {stockMessage && <p className='mt-2 text-sm text-success'>{stockMessage}</p>}
+            {stockError && <p className='mt-2 text-sm text-error'>{stockError}</p>}
 
-            <table className='admin-table'>
+            <table className='w-full border-separate border-spacing-0 [&_th]:border-b [&_th]:border-slate-200 [&_th]:px-4 [&_th]:py-3 [&_th]:text-left [&_th]:text-xs [&_th]:font-semibold [&_th]:uppercase [&_th]:tracking-wide [&_th]:text-text-muted [&_td]:border-b [&_td]:border-slate-100 [&_td]:px-4 [&_td]:py-3.5 [&_td]:text-sm [&_td]:text-text-primary [&_tbody_tr:hover_td]:bg-slate-50'>
               <thead>
                 {activePanel === 'vehicle' ? (
                   <tr>
@@ -885,16 +884,16 @@ export default function AdminDashboardPage() {
                       <td>{item.transmission || '-'}</td>
                       <td>{item.fuelType || '-'}</td>
                       <td>
-                        <span className={`pill ${item.soldOut ? 'critical' : 'healthy'}`}>{item.soldOut ? 'Sold' : 'Available'}</span>
+                        <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${item.soldOut ? 'bg-error-light text-error' : 'bg-success-light text-success'}`}>{item.soldOut ? 'Sold' : 'Available'}</span>
                       </td>
                       <td>{naira.format(item.unitPrice || 0)}</td>
                       <td>
-                        <div className='admin-row-actions'>
-                          <button className='admin-refresh-btn' type='button' onClick={() => toggleSoldStatus(item)} disabled={savingItemId === item._id}>
+                        <div className='flex gap-2 max-[640px]:flex-col'>
+                          <button className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0' type='button' onClick={() => toggleSoldStatus(item)} disabled={savingItemId === item._id}>
                             {savingItemId === item._id ? 'Saving...' : item.soldOut ? 'Mark Available' : 'Mark Sold'}
                           </button>
                           <button
-                            className='admin-refresh-btn danger'
+                            className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-error px-5 py-2.5 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(239,68,68,0.2)] transition hover:-translate-y-px hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0'
                             type='button'
                             onClick={() => openDeleteModal('stock', item._id, item.name || 'this item')}
                             disabled={savingItemId === item._id}
@@ -909,16 +908,16 @@ export default function AdminDashboardPage() {
                       <td>{item.name}</td>
                       <td>{item.description || '-'}</td>
                       <td>
-                        <span className={`pill ${item.soldOut ? 'critical' : 'healthy'}`}>{item.soldOut ? 'Sold' : 'Available'}</span>
+                        <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${item.soldOut ? 'bg-error-light text-error' : 'bg-success-light text-success'}`}>{item.soldOut ? 'Sold' : 'Available'}</span>
                       </td>
                       <td>{naira.format(item.unitPrice || 0)}</td>
                       <td>
-                        <div className='admin-row-actions'>
-                          <button className='admin-refresh-btn' type='button' onClick={() => toggleSoldStatus(item)} disabled={savingItemId === item._id}>
+                        <div className='flex gap-2 max-[640px]:flex-col'>
+                          <button className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0' type='button' onClick={() => toggleSoldStatus(item)} disabled={savingItemId === item._id}>
                             {savingItemId === item._id ? 'Saving...' : item.soldOut ? 'Mark Available' : 'Mark Sold'}
                           </button>
                           <button
-                            className='admin-refresh-btn danger'
+                            className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-error px-5 py-2.5 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(239,68,68,0.2)] transition hover:-translate-y-px hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0'
                             type='button'
                             onClick={() => openDeleteModal('stock', item._id, item.name || 'this item')}
                             disabled={savingItemId === item._id}
@@ -932,7 +931,7 @@ export default function AdminDashboardPage() {
                 ))}
                 {stockItemsByCategory.length === 0 && !stockLoading && (
                   <tr>
-                    <td colSpan={activePanel === 'vehicle' ? 8 : 5} className='empty-row'>
+                    <td colSpan={activePanel === 'vehicle' ? 8 : 5} className='py-12 text-center text-text-muted'>
                       No items yet for this category.
                     </td>
                   </tr>
@@ -943,13 +942,13 @@ export default function AdminDashboardPage() {
         )}
 
         {activePanel === 'car-tips' && (
-          <section className='admin-card'>
+          <section className='mb-6 rounded-glass border border-glass-border bg-glass-surface p-6 shadow-glass backdrop-blur-glass [&_h2]:mb-4 [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:text-text-primary'>
             <h2>Car Tips Manager</h2>
-            <p className='inv-threshold'>Add and update tips shown on the landing page. One image per tip.</p>
+            <p className='mb-5 text-[0.9375rem] text-text-secondary'>Add and update tips shown on the landing page. One image per tip.</p>
 
-            <div className='admin-stock-actions'>
+            <div className='mb-5 flex gap-3 max-[640px]:flex-col'>
               <button
-                className='admin-refresh-btn'
+                className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0'
                 type='button'
                 onClick={() => {
                   setEditingTipId('');
@@ -963,15 +962,15 @@ export default function AdminDashboardPage() {
               >
                 Add Tip
               </button>
-              <button className='admin-refresh-btn' type='button' onClick={loadCarTips} disabled={tipsLoading}>
+              <button className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0' type='button' onClick={loadCarTips} disabled={tipsLoading}>
                 {tipsLoading ? 'Refreshing...' : 'Refresh Tips'}
               </button>
             </div>
 
-            {tipsMessage && <p className='admin-success-text'>{tipsMessage}</p>}
-            {tipsError && <p className='admin-error-text'>{tipsError}</p>}
+            {tipsMessage && <p className='mt-2 text-sm text-success'>{tipsMessage}</p>}
+            {tipsError && <p className='mt-2 text-sm text-error'>{tipsError}</p>}
 
-            <table className='admin-table'>
+            <table className='w-full border-separate border-spacing-0 [&_th]:border-b [&_th]:border-slate-200 [&_th]:px-4 [&_th]:py-3 [&_th]:text-left [&_th]:text-xs [&_th]:font-semibold [&_th]:uppercase [&_th]:tracking-wide [&_th]:text-text-muted [&_td]:border-b [&_td]:border-slate-100 [&_td]:px-4 [&_td]:py-3.5 [&_td]:text-sm [&_td]:text-text-primary [&_tbody_tr:hover_td]:bg-slate-50'>
               <thead>
                 <tr>
                   <th>Title</th>
@@ -987,15 +986,15 @@ export default function AdminDashboardPage() {
                     <td>{tip.title}</td>
                     <td>{tip.category || 'General'}</td>
                     <td>
-                      <div className='admin-tip-image-cell'>
+                      <div className='h-10 w-[60px] overflow-hidden rounded-lg bg-slate-100 [&_img]:h-full [&_img]:w-full [&_img]:object-cover [&_span]:flex [&_span]:h-full [&_span]:items-center [&_span]:justify-center [&_span]:text-[0.625rem] [&_span]:text-text-muted'>
                         {tip.imageUrl ? <img src={tip.imageUrl} alt={tip.title || 'Tip image'} /> : <span>No image</span>}
                       </div>
                     </td>
                     <td>{tip.body ? `${tip.body.slice(0, 90)}${tip.body.length > 90 ? '...' : ''}` : '-'}</td>
                     <td>
-                      <div className='admin-row-actions'>
+                      <div className='flex gap-2 max-[640px]:flex-col'>
                         <button
-                          className='admin-refresh-btn'
+                          className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0'
                           type='button'
                           onClick={() => {
                             setEditingTipId(tip._id);
@@ -1010,7 +1009,7 @@ export default function AdminDashboardPage() {
                           Edit
                         </button>
                         <button
-                          className='admin-refresh-btn danger'
+                          className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-error px-5 py-2.5 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(239,68,68,0.2)] transition hover:-translate-y-px hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0'
                           type='button'
                           onClick={() => openDeleteModal('tip', tip._id, tip.title || 'this tip')}
                           disabled={savingTipId === tip._id}
@@ -1023,7 +1022,7 @@ export default function AdminDashboardPage() {
                 ))}
                 {!tipsLoading && carTips.length === 0 && (
                   <tr>
-                    <td colSpan={5} className='empty-row'>
+                    <td colSpan={5} className='py-12 text-center text-text-muted'>
                       No car tips yet.
                     </td>
                   </tr>
@@ -1034,13 +1033,13 @@ export default function AdminDashboardPage() {
         )}
       </main>
       {showTipForm && activePanel === 'car-tips' && (
-        <div className='admin-modal-overlay' onClick={() => (isTipSaving ? null : setShowTipForm(false))}>
-          <div className='admin-modal-card' onClick={(event) => event.stopPropagation()}>
-            <div className='admin-modal-head'>
+        <div className='fixed inset-0 z-[1000] flex items-center justify-center bg-slate-900/50 p-6 backdrop-blur' onClick={() => (isTipSaving ? null : setShowTipForm(false))}>
+          <div className='max-h-[90vh] w-full max-w-[560px] overflow-y-auto rounded-glass-lg border border-glass-border bg-white/95 p-8 shadow-glass-xl backdrop-blur-3xl max-[960px]:p-6' onClick={(event) => event.stopPropagation()}>
+            <div className='mb-4 flex items-center justify-between [&_h3]:m-0 [&_h3]:text-xl [&_h3]:font-semibold [&_h3]:text-text-primary'>
               <h3>{editingTipId ? 'Edit Car Tip' : 'Add Car Tip'}</h3>
               <button
                 type='button'
-                className='admin-modal-close'
+                className='flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl border-0 bg-slate-100 text-text-secondary transition hover:bg-slate-200 hover:text-text-primary'
                 onClick={() => setShowTipForm(false)}
                 disabled={isTipSaving}
                 aria-label='Close tip form'
@@ -1049,8 +1048,8 @@ export default function AdminDashboardPage() {
               </button>
             </div>
             <p>Enter tip details and optional image.</p>
-            <div className='admin-basic-modal-form'>
-              <div className='admin-modal-field'>
+            <div className='flex flex-col gap-4'>
+              <div className='flex flex-col gap-1.5 [&_label]:text-sm [&_label]:font-semibold [&_label]:text-text-secondary [&_input]:rounded-xl [&_input]:border [&_input]:border-glass-border [&_input]:bg-glass-surface [&_input]:px-4 [&_input]:py-3 [&_input]:text-[0.9375rem] [&_input]:text-text-primary [&_input]:outline-none [&_input:focus]:border-primary [&_select]:rounded-xl [&_select]:border [&_select]:border-glass-border [&_select]:bg-glass-surface [&_select]:px-4 [&_select]:py-3 [&_select]:outline-none [&_textarea]:rounded-xl [&_textarea]:border [&_textarea]:border-glass-border [&_textarea]:bg-glass-surface [&_textarea]:px-4 [&_textarea]:py-3 [&_textarea]:outline-none'>
                 <label>Title</label>
                 <input
                   type='text'
@@ -1060,7 +1059,7 @@ export default function AdminDashboardPage() {
                   disabled={isTipSaving}
                 />
               </div>
-              <div className='admin-modal-field'>
+              <div className='flex flex-col gap-1.5 [&_label]:text-sm [&_label]:font-semibold [&_label]:text-text-secondary [&_input]:rounded-xl [&_input]:border [&_input]:border-glass-border [&_input]:bg-glass-surface [&_input]:px-4 [&_input]:py-3 [&_input]:text-[0.9375rem] [&_input]:text-text-primary [&_input]:outline-none [&_input:focus]:border-primary [&_select]:rounded-xl [&_select]:border [&_select]:border-glass-border [&_select]:bg-glass-surface [&_select]:px-4 [&_select]:py-3 [&_select]:outline-none [&_textarea]:rounded-xl [&_textarea]:border [&_textarea]:border-glass-border [&_textarea]:bg-glass-surface [&_textarea]:px-4 [&_textarea]:py-3 [&_textarea]:outline-none'>
                 <label>Category</label>
                 <select
                   value={newTipCategory}
@@ -1074,7 +1073,7 @@ export default function AdminDashboardPage() {
                   ))}
                 </select>
               </div>
-              <div className='admin-modal-field'>
+              <div className='flex flex-col gap-1.5 [&_label]:text-sm [&_label]:font-semibold [&_label]:text-text-secondary [&_input]:rounded-xl [&_input]:border [&_input]:border-glass-border [&_input]:bg-glass-surface [&_input]:px-4 [&_input]:py-3 [&_input]:text-[0.9375rem] [&_input]:text-text-primary [&_input]:outline-none [&_input:focus]:border-primary [&_select]:rounded-xl [&_select]:border [&_select]:border-glass-border [&_select]:bg-glass-surface [&_select]:px-4 [&_select]:py-3 [&_select]:outline-none [&_textarea]:rounded-xl [&_textarea]:border [&_textarea]:border-glass-border [&_textarea]:bg-glass-surface [&_textarea]:px-4 [&_textarea]:py-3 [&_textarea]:outline-none'>
                 <label>Image</label>
                 <input
                   type='file'
@@ -1083,7 +1082,7 @@ export default function AdminDashboardPage() {
                   disabled={isTipSaving}
                 />
               </div>
-              <div className='admin-modal-field'>
+              <div className='flex flex-col gap-1.5 [&_label]:text-sm [&_label]:font-semibold [&_label]:text-text-secondary [&_input]:rounded-xl [&_input]:border [&_input]:border-glass-border [&_input]:bg-glass-surface [&_input]:px-4 [&_input]:py-3 [&_input]:text-[0.9375rem] [&_input]:text-text-primary [&_input]:outline-none [&_input:focus]:border-primary [&_select]:rounded-xl [&_select]:border [&_select]:border-glass-border [&_select]:bg-glass-surface [&_select]:px-4 [&_select]:py-3 [&_select]:outline-none [&_textarea]:rounded-xl [&_textarea]:border [&_textarea]:border-glass-border [&_textarea]:bg-glass-surface [&_textarea]:px-4 [&_textarea]:py-3 [&_textarea]:outline-none'>
                 <label>Content</label>
                 <textarea
                   placeholder='Tip content'
@@ -1093,9 +1092,9 @@ export default function AdminDashboardPage() {
                 />
               </div>
             </div>
-            <div className='admin-modal-actions'>
+            <div className='mt-6 flex gap-3'>
               <button
-                className='admin-refresh-btn'
+                className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0'
                 type='button'
                 onClick={editingTipId ? saveEditingTip : addCarTip}
                 disabled={isTipSaving}
@@ -1108,7 +1107,7 @@ export default function AdminDashboardPage() {
                   ? 'Save Changes'
                   : 'Add Tip'}
               </button>
-              <button className='admin-refresh-btn' type='button' onClick={() => setShowTipForm(false)} disabled={isTipSaving}>
+              <button className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0' type='button' onClick={() => setShowTipForm(false)} disabled={isTipSaving}>
                 Cancel
               </button>
             </div>
@@ -1116,13 +1115,13 @@ export default function AdminDashboardPage() {
         </div>
       )}
       {showVehicleForm && activePanel === 'vehicle' && (
-        <div className='admin-modal-overlay' onClick={() => (savingItemId === 'new' ? null : setShowVehicleForm(false))}>
-          <div className='admin-modal-card' onClick={(event) => event.stopPropagation()}>
-            <div className='admin-modal-head'>
+        <div className='fixed inset-0 z-[1000] flex items-center justify-center bg-slate-900/50 p-6 backdrop-blur' onClick={() => (savingItemId === 'new' ? null : setShowVehicleForm(false))}>
+          <div className='max-h-[90vh] w-full max-w-[560px] overflow-y-auto rounded-glass-lg border border-glass-border bg-white/95 p-8 shadow-glass-xl backdrop-blur-3xl max-[960px]:p-6' onClick={(event) => event.stopPropagation()}>
+            <div className='mb-4 flex items-center justify-between [&_h3]:m-0 [&_h3]:text-xl [&_h3]:font-semibold [&_h3]:text-text-primary'>
               <h3>Add New Vehicle</h3>
               <button
                 type='button'
-                className='admin-modal-close'
+                className='flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl border-0 bg-slate-100 text-text-secondary transition hover:bg-slate-200 hover:text-text-primary'
                 onClick={() => setShowVehicleForm(false)}
                 disabled={savingItemId === 'new'}
                 aria-label='Close vehicle form'
@@ -1131,7 +1130,7 @@ export default function AdminDashboardPage() {
               </button>
             </div>
             <p>Enter vehicle details and unit price.</p>
-            <div className='admin-vehicle-modal-form'>
+            <div className='grid grid-cols-2 gap-4 max-[960px]:grid-cols-1 [&_textarea]:col-span-2 max-[960px]:[&_textarea]:col-span-1'>
               <select
                 value={newVehicleMake}
                 onChange={(event) => {
@@ -1193,7 +1192,7 @@ export default function AdminDashboardPage() {
                 onChange={(event) => setNewVehicleYear(event.target.value)}
                 disabled={savingItemId === 'new'}
               />
-              <div className='admin-modal-field'>
+              <div className='flex flex-col gap-1.5 [&_label]:text-sm [&_label]:font-semibold [&_label]:text-text-secondary [&_input]:rounded-xl [&_input]:border [&_input]:border-glass-border [&_input]:bg-glass-surface [&_input]:px-4 [&_input]:py-3 [&_input]:text-[0.9375rem] [&_input]:text-text-primary [&_input]:outline-none [&_input:focus]:border-primary [&_select]:rounded-xl [&_select]:border [&_select]:border-glass-border [&_select]:bg-glass-surface [&_select]:px-4 [&_select]:py-3 [&_select]:outline-none [&_textarea]:rounded-xl [&_textarea]:border [&_textarea]:border-glass-border [&_textarea]:bg-glass-surface [&_textarea]:px-4 [&_textarea]:py-3 [&_textarea]:outline-none'>
                 <label>Description</label>
                 <textarea
                   placeholder='Short vehicle description'
@@ -1223,7 +1222,7 @@ export default function AdminDashboardPage() {
                   </option>
                 ))}
               </select>
-              <div className='admin-modal-field'>
+              <div className='flex flex-col gap-1.5 [&_label]:text-sm [&_label]:font-semibold [&_label]:text-text-secondary [&_input]:rounded-xl [&_input]:border [&_input]:border-glass-border [&_input]:bg-glass-surface [&_input]:px-4 [&_input]:py-3 [&_input]:text-[0.9375rem] [&_input]:text-text-primary [&_input]:outline-none [&_input:focus]:border-primary [&_select]:rounded-xl [&_select]:border [&_select]:border-glass-border [&_select]:bg-glass-surface [&_select]:px-4 [&_select]:py-3 [&_select]:outline-none [&_textarea]:rounded-xl [&_textarea]:border [&_textarea]:border-glass-border [&_textarea]:bg-glass-surface [&_textarea]:px-4 [&_textarea]:py-3 [&_textarea]:outline-none'>
                 <label>Unit Price (NGN)</label>
                 <input
                   type='number'
@@ -1234,7 +1233,7 @@ export default function AdminDashboardPage() {
                   disabled={savingItemId === 'new'}
                 />
               </div>
-              <div className='admin-modal-field'>
+              <div className='flex flex-col gap-1.5 [&_label]:text-sm [&_label]:font-semibold [&_label]:text-text-secondary [&_input]:rounded-xl [&_input]:border [&_input]:border-glass-border [&_input]:bg-glass-surface [&_input]:px-4 [&_input]:py-3 [&_input]:text-[0.9375rem] [&_input]:text-text-primary [&_input]:outline-none [&_input:focus]:border-primary [&_select]:rounded-xl [&_select]:border [&_select]:border-glass-border [&_select]:bg-glass-surface [&_select]:px-4 [&_select]:py-3 [&_select]:outline-none [&_textarea]:rounded-xl [&_textarea]:border [&_textarea]:border-glass-border [&_textarea]:bg-glass-surface [&_textarea]:px-4 [&_textarea]:py-3 [&_textarea]:outline-none'>
                 <label>Primary Image</label>
                 <input
                   type='file'
@@ -1243,7 +1242,7 @@ export default function AdminDashboardPage() {
                   disabled={savingItemId === 'new'}
                 />
               </div>
-              <div className='admin-modal-field'>
+              <div className='flex flex-col gap-1.5 [&_label]:text-sm [&_label]:font-semibold [&_label]:text-text-secondary [&_input]:rounded-xl [&_input]:border [&_input]:border-glass-border [&_input]:bg-glass-surface [&_input]:px-4 [&_input]:py-3 [&_input]:text-[0.9375rem] [&_input]:text-text-primary [&_input]:outline-none [&_input:focus]:border-primary [&_select]:rounded-xl [&_select]:border [&_select]:border-glass-border [&_select]:bg-glass-surface [&_select]:px-4 [&_select]:py-3 [&_select]:outline-none [&_textarea]:rounded-xl [&_textarea]:border [&_textarea]:border-glass-border [&_textarea]:bg-glass-surface [&_textarea]:px-4 [&_textarea]:py-3 [&_textarea]:outline-none'>
                 <label>Other Images</label>
                 <input
                   type='file'
@@ -1254,9 +1253,9 @@ export default function AdminDashboardPage() {
                 />
               </div>
             </div>
-            <div className='admin-modal-actions'>
+            <div className='mt-6 flex gap-3'>
               <button
-                className='admin-refresh-btn'
+                className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0'
                 type='button'
                 onClick={addStockItem}
                 disabled={savingItemId === 'new'}
@@ -1264,7 +1263,7 @@ export default function AdminDashboardPage() {
                 {savingItemId === 'new' ? 'Adding...' : activeStockMeta?.addLabel || 'Add Item'}
               </button>
               <button
-                className='admin-refresh-btn'
+                className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0'
                 type='button'
                 onClick={() => setShowVehicleForm(false)}
                 disabled={savingItemId === 'new'}
@@ -1276,13 +1275,13 @@ export default function AdminDashboardPage() {
         </div>
       )}
       {showCarPartForm && activePanel === 'car-parts' && (
-        <div className='admin-modal-overlay' onClick={() => (savingItemId === 'new' ? null : setShowCarPartForm(false))}>
-          <div className='admin-modal-card' onClick={(event) => event.stopPropagation()}>
-            <div className='admin-modal-head'>
+        <div className='fixed inset-0 z-[1000] flex items-center justify-center bg-slate-900/50 p-6 backdrop-blur' onClick={() => (savingItemId === 'new' ? null : setShowCarPartForm(false))}>
+          <div className='max-h-[90vh] w-full max-w-[560px] overflow-y-auto rounded-glass-lg border border-glass-border bg-white/95 p-8 shadow-glass-xl backdrop-blur-3xl max-[960px]:p-6' onClick={(event) => event.stopPropagation()}>
+            <div className='mb-4 flex items-center justify-between [&_h3]:m-0 [&_h3]:text-xl [&_h3]:font-semibold [&_h3]:text-text-primary'>
               <h3>Add Car Part</h3>
               <button
                 type='button'
-                className='admin-modal-close'
+                className='flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl border-0 bg-slate-100 text-text-secondary transition hover:bg-slate-200 hover:text-text-primary'
                 onClick={() => setShowCarPartForm(false)}
                 disabled={savingItemId === 'new'}
                 aria-label='Close car part form'
@@ -1291,8 +1290,8 @@ export default function AdminDashboardPage() {
               </button>
             </div>
             <p>Enter car part details and unit price.</p>
-            <div className='admin-basic-modal-form'>
-              <div className='admin-modal-field'>
+            <div className='flex flex-col gap-4'>
+              <div className='flex flex-col gap-1.5 [&_label]:text-sm [&_label]:font-semibold [&_label]:text-text-secondary [&_input]:rounded-xl [&_input]:border [&_input]:border-glass-border [&_input]:bg-glass-surface [&_input]:px-4 [&_input]:py-3 [&_input]:text-[0.9375rem] [&_input]:text-text-primary [&_input]:outline-none [&_input:focus]:border-primary [&_select]:rounded-xl [&_select]:border [&_select]:border-glass-border [&_select]:bg-glass-surface [&_select]:px-4 [&_select]:py-3 [&_select]:outline-none [&_textarea]:rounded-xl [&_textarea]:border [&_textarea]:border-glass-border [&_textarea]:bg-glass-surface [&_textarea]:px-4 [&_textarea]:py-3 [&_textarea]:outline-none'>
                 <label>Part Name</label>
                 <input
                   type='text'
@@ -1302,7 +1301,7 @@ export default function AdminDashboardPage() {
                   disabled={savingItemId === 'new'}
                 />
               </div>
-              <div className='admin-modal-field'>
+              <div className='flex flex-col gap-1.5 [&_label]:text-sm [&_label]:font-semibold [&_label]:text-text-secondary [&_input]:rounded-xl [&_input]:border [&_input]:border-glass-border [&_input]:bg-glass-surface [&_input]:px-4 [&_input]:py-3 [&_input]:text-[0.9375rem] [&_input]:text-text-primary [&_input]:outline-none [&_input:focus]:border-primary [&_select]:rounded-xl [&_select]:border [&_select]:border-glass-border [&_select]:bg-glass-surface [&_select]:px-4 [&_select]:py-3 [&_select]:outline-none [&_textarea]:rounded-xl [&_textarea]:border [&_textarea]:border-glass-border [&_textarea]:bg-glass-surface [&_textarea]:px-4 [&_textarea]:py-3 [&_textarea]:outline-none'>
                 <label>Description</label>
                 <textarea
                   placeholder='Part description'
@@ -1311,7 +1310,7 @@ export default function AdminDashboardPage() {
                   disabled={savingItemId === 'new'}
                 />
               </div>
-              <div className='admin-modal-field'>
+              <div className='flex flex-col gap-1.5 [&_label]:text-sm [&_label]:font-semibold [&_label]:text-text-secondary [&_input]:rounded-xl [&_input]:border [&_input]:border-glass-border [&_input]:bg-glass-surface [&_input]:px-4 [&_input]:py-3 [&_input]:text-[0.9375rem] [&_input]:text-text-primary [&_input]:outline-none [&_input:focus]:border-primary [&_select]:rounded-xl [&_select]:border [&_select]:border-glass-border [&_select]:bg-glass-surface [&_select]:px-4 [&_select]:py-3 [&_select]:outline-none [&_textarea]:rounded-xl [&_textarea]:border [&_textarea]:border-glass-border [&_textarea]:bg-glass-surface [&_textarea]:px-4 [&_textarea]:py-3 [&_textarea]:outline-none'>
                 <label>Unit Price (NGN)</label>
                 <input
                   type='number'
@@ -1322,7 +1321,7 @@ export default function AdminDashboardPage() {
                   disabled={savingItemId === 'new'}
                 />
               </div>
-              <div className='admin-modal-field'>
+              <div className='flex flex-col gap-1.5 [&_label]:text-sm [&_label]:font-semibold [&_label]:text-text-secondary [&_input]:rounded-xl [&_input]:border [&_input]:border-glass-border [&_input]:bg-glass-surface [&_input]:px-4 [&_input]:py-3 [&_input]:text-[0.9375rem] [&_input]:text-text-primary [&_input]:outline-none [&_input:focus]:border-primary [&_select]:rounded-xl [&_select]:border [&_select]:border-glass-border [&_select]:bg-glass-surface [&_select]:px-4 [&_select]:py-3 [&_select]:outline-none [&_textarea]:rounded-xl [&_textarea]:border [&_textarea]:border-glass-border [&_textarea]:bg-glass-surface [&_textarea]:px-4 [&_textarea]:py-3 [&_textarea]:outline-none'>
                 <label>Primary Image</label>
                 <input
                   type='file'
@@ -1331,7 +1330,7 @@ export default function AdminDashboardPage() {
                   disabled={savingItemId === 'new'}
                 />
               </div>
-              <div className='admin-modal-field'>
+              <div className='flex flex-col gap-1.5 [&_label]:text-sm [&_label]:font-semibold [&_label]:text-text-secondary [&_input]:rounded-xl [&_input]:border [&_input]:border-glass-border [&_input]:bg-glass-surface [&_input]:px-4 [&_input]:py-3 [&_input]:text-[0.9375rem] [&_input]:text-text-primary [&_input]:outline-none [&_input:focus]:border-primary [&_select]:rounded-xl [&_select]:border [&_select]:border-glass-border [&_select]:bg-glass-surface [&_select]:px-4 [&_select]:py-3 [&_select]:outline-none [&_textarea]:rounded-xl [&_textarea]:border [&_textarea]:border-glass-border [&_textarea]:bg-glass-surface [&_textarea]:px-4 [&_textarea]:py-3 [&_textarea]:outline-none'>
                 <label>Other Images</label>
                 <input
                   type='file'
@@ -1342,11 +1341,11 @@ export default function AdminDashboardPage() {
                 />
               </div>
             </div>
-            <div className='admin-modal-actions'>
-              <button className='admin-refresh-btn' type='button' onClick={addStockItem} disabled={savingItemId === 'new'}>
+            <div className='mt-6 flex gap-3'>
+              <button className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0' type='button' onClick={addStockItem} disabled={savingItemId === 'new'}>
                 {savingItemId === 'new' ? 'Adding...' : 'Add Car Part'}
               </button>
-              <button className='admin-refresh-btn' type='button' onClick={() => setShowCarPartForm(false)} disabled={savingItemId === 'new'}>
+              <button className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0' type='button' onClick={() => setShowCarPartForm(false)} disabled={savingItemId === 'new'}>
                 Cancel
               </button>
             </div>
@@ -1354,13 +1353,13 @@ export default function AdminDashboardPage() {
         </div>
       )}
       {showAccessoriesForm && activePanel === 'accessories' && (
-        <div className='admin-modal-overlay' onClick={() => (savingItemId === 'new' ? null : setShowAccessoriesForm(false))}>
-          <div className='admin-modal-card' onClick={(event) => event.stopPropagation()}>
-            <div className='admin-modal-head'>
+        <div className='fixed inset-0 z-[1000] flex items-center justify-center bg-slate-900/50 p-6 backdrop-blur' onClick={() => (savingItemId === 'new' ? null : setShowAccessoriesForm(false))}>
+          <div className='max-h-[90vh] w-full max-w-[560px] overflow-y-auto rounded-glass-lg border border-glass-border bg-white/95 p-8 shadow-glass-xl backdrop-blur-3xl max-[960px]:p-6' onClick={(event) => event.stopPropagation()}>
+            <div className='mb-4 flex items-center justify-between [&_h3]:m-0 [&_h3]:text-xl [&_h3]:font-semibold [&_h3]:text-text-primary'>
               <h3>Add Accessories</h3>
               <button
                 type='button'
-                className='admin-modal-close'
+                className='flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl border-0 bg-slate-100 text-text-secondary transition hover:bg-slate-200 hover:text-text-primary'
                 onClick={() => setShowAccessoriesForm(false)}
                 disabled={savingItemId === 'new'}
                 aria-label='Close accessories form'
@@ -1369,8 +1368,8 @@ export default function AdminDashboardPage() {
               </button>
             </div>
             <p>Enter accessories details and unit price.</p>
-            <div className='admin-basic-modal-form'>
-              <div className='admin-modal-field'>
+            <div className='flex flex-col gap-4'>
+              <div className='flex flex-col gap-1.5 [&_label]:text-sm [&_label]:font-semibold [&_label]:text-text-secondary [&_input]:rounded-xl [&_input]:border [&_input]:border-glass-border [&_input]:bg-glass-surface [&_input]:px-4 [&_input]:py-3 [&_input]:text-[0.9375rem] [&_input]:text-text-primary [&_input]:outline-none [&_input:focus]:border-primary [&_select]:rounded-xl [&_select]:border [&_select]:border-glass-border [&_select]:bg-glass-surface [&_select]:px-4 [&_select]:py-3 [&_select]:outline-none [&_textarea]:rounded-xl [&_textarea]:border [&_textarea]:border-glass-border [&_textarea]:bg-glass-surface [&_textarea]:px-4 [&_textarea]:py-3 [&_textarea]:outline-none'>
                 <label>Accessory Name</label>
                 <input
                   type='text'
@@ -1380,7 +1379,7 @@ export default function AdminDashboardPage() {
                   disabled={savingItemId === 'new'}
                 />
               </div>
-              <div className='admin-modal-field'>
+              <div className='flex flex-col gap-1.5 [&_label]:text-sm [&_label]:font-semibold [&_label]:text-text-secondary [&_input]:rounded-xl [&_input]:border [&_input]:border-glass-border [&_input]:bg-glass-surface [&_input]:px-4 [&_input]:py-3 [&_input]:text-[0.9375rem] [&_input]:text-text-primary [&_input]:outline-none [&_input:focus]:border-primary [&_select]:rounded-xl [&_select]:border [&_select]:border-glass-border [&_select]:bg-glass-surface [&_select]:px-4 [&_select]:py-3 [&_select]:outline-none [&_textarea]:rounded-xl [&_textarea]:border [&_textarea]:border-glass-border [&_textarea]:bg-glass-surface [&_textarea]:px-4 [&_textarea]:py-3 [&_textarea]:outline-none'>
                 <label>Description</label>
                 <textarea
                   placeholder='Accessory description'
@@ -1389,7 +1388,7 @@ export default function AdminDashboardPage() {
                   disabled={savingItemId === 'new'}
                 />
               </div>
-              <div className='admin-modal-field'>
+              <div className='flex flex-col gap-1.5 [&_label]:text-sm [&_label]:font-semibold [&_label]:text-text-secondary [&_input]:rounded-xl [&_input]:border [&_input]:border-glass-border [&_input]:bg-glass-surface [&_input]:px-4 [&_input]:py-3 [&_input]:text-[0.9375rem] [&_input]:text-text-primary [&_input]:outline-none [&_input:focus]:border-primary [&_select]:rounded-xl [&_select]:border [&_select]:border-glass-border [&_select]:bg-glass-surface [&_select]:px-4 [&_select]:py-3 [&_select]:outline-none [&_textarea]:rounded-xl [&_textarea]:border [&_textarea]:border-glass-border [&_textarea]:bg-glass-surface [&_textarea]:px-4 [&_textarea]:py-3 [&_textarea]:outline-none'>
                 <label>Unit Price (NGN)</label>
                 <input
                   type='number'
@@ -1400,7 +1399,7 @@ export default function AdminDashboardPage() {
                   disabled={savingItemId === 'new'}
                 />
               </div>
-              <div className='admin-modal-field'>
+              <div className='flex flex-col gap-1.5 [&_label]:text-sm [&_label]:font-semibold [&_label]:text-text-secondary [&_input]:rounded-xl [&_input]:border [&_input]:border-glass-border [&_input]:bg-glass-surface [&_input]:px-4 [&_input]:py-3 [&_input]:text-[0.9375rem] [&_input]:text-text-primary [&_input]:outline-none [&_input:focus]:border-primary [&_select]:rounded-xl [&_select]:border [&_select]:border-glass-border [&_select]:bg-glass-surface [&_select]:px-4 [&_select]:py-3 [&_select]:outline-none [&_textarea]:rounded-xl [&_textarea]:border [&_textarea]:border-glass-border [&_textarea]:bg-glass-surface [&_textarea]:px-4 [&_textarea]:py-3 [&_textarea]:outline-none'>
                 <label>Primary Image</label>
                 <input
                   type='file'
@@ -1409,7 +1408,7 @@ export default function AdminDashboardPage() {
                   disabled={savingItemId === 'new'}
                 />
               </div>
-              <div className='admin-modal-field'>
+              <div className='flex flex-col gap-1.5 [&_label]:text-sm [&_label]:font-semibold [&_label]:text-text-secondary [&_input]:rounded-xl [&_input]:border [&_input]:border-glass-border [&_input]:bg-glass-surface [&_input]:px-4 [&_input]:py-3 [&_input]:text-[0.9375rem] [&_input]:text-text-primary [&_input]:outline-none [&_input:focus]:border-primary [&_select]:rounded-xl [&_select]:border [&_select]:border-glass-border [&_select]:bg-glass-surface [&_select]:px-4 [&_select]:py-3 [&_select]:outline-none [&_textarea]:rounded-xl [&_textarea]:border [&_textarea]:border-glass-border [&_textarea]:bg-glass-surface [&_textarea]:px-4 [&_textarea]:py-3 [&_textarea]:outline-none'>
                 <label>Other Images</label>
                 <input
                   type='file'
@@ -1420,11 +1419,11 @@ export default function AdminDashboardPage() {
                 />
               </div>
             </div>
-            <div className='admin-modal-actions'>
-              <button className='admin-refresh-btn' type='button' onClick={addStockItem} disabled={savingItemId === 'new'}>
+            <div className='mt-6 flex gap-3'>
+              <button className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0' type='button' onClick={addStockItem} disabled={savingItemId === 'new'}>
                 {savingItemId === 'new' ? 'Adding...' : 'Add Accessories'}
               </button>
-              <button className='admin-refresh-btn' type='button' onClick={() => setShowAccessoriesForm(false)} disabled={savingItemId === 'new'}>
+              <button className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0' type='button' onClick={() => setShowAccessoriesForm(false)} disabled={savingItemId === 'new'}>
                 Cancel
               </button>
             </div>
@@ -1432,13 +1431,13 @@ export default function AdminDashboardPage() {
         </div>
       )}
       {deleteModal.open && (
-        <div className='admin-modal-overlay' onClick={closeDeleteModal}>
-          <div className='admin-modal-card' onClick={(event) => event.stopPropagation()}>
-            <div className='admin-modal-head'>
+        <div className='fixed inset-0 z-[1000] flex items-center justify-center bg-slate-900/50 p-6 backdrop-blur' onClick={closeDeleteModal}>
+          <div className='max-h-[90vh] w-full max-w-[560px] overflow-y-auto rounded-glass-lg border border-glass-border bg-white/95 p-8 shadow-glass-xl backdrop-blur-3xl max-[960px]:p-6' onClick={(event) => event.stopPropagation()}>
+            <div className='mb-4 flex items-center justify-between [&_h3]:m-0 [&_h3]:text-xl [&_h3]:font-semibold [&_h3]:text-text-primary'>
               <h3>Confirm Delete</h3>
               <button
                 type='button'
-                className='admin-modal-close'
+                className='flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl border-0 bg-slate-100 text-text-secondary transition hover:bg-slate-200 hover:text-text-primary'
                 onClick={closeDeleteModal}
                 disabled={deleteModal.processing}
                 aria-label='Close delete confirmation'
@@ -1449,11 +1448,11 @@ export default function AdminDashboardPage() {
             <p>
               Delete "{deleteModal.label}"? This action cannot be undone.
             </p>
-            <div className='admin-modal-actions'>
-              <button className='admin-refresh-btn danger' type='button' onClick={confirmDelete} disabled={deleteModal.processing}>
+            <div className='mt-6 flex gap-3'>
+              <button className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-error px-5 py-2.5 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(239,68,68,0.2)] transition hover:-translate-y-px hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0' type='button' onClick={confirmDelete} disabled={deleteModal.processing}>
                 {deleteModal.processing ? 'Deleting...' : 'Delete'}
               </button>
-              <button className='admin-refresh-btn' type='button' onClick={closeDeleteModal} disabled={deleteModal.processing}>
+              <button className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0' type='button' onClick={closeDeleteModal} disabled={deleteModal.processing}>
                 Cancel
               </button>
             </div>

@@ -59,7 +59,7 @@ export default function LuxuryShowcase() {
         <span className="lux-tag">PREMIUM COLLECTION</span>
         <h2 className="lux-h2">
           Drive the<br />
-          <span className="lux-gold-text">Extraordinary</span>
+          <span className="animate-[luxGoldShimmer_4s_linear_infinite] bg-[linear-gradient(90deg,#60a5fa,#93c5fd,#ffffff,#bfdbfe,#60a5fa)] bg-[length:300%_auto] bg-clip-text text-transparent">Extraordinary</span>
         </h2>
         <p className="lux-p">
           World-class vehicles, certified and curated — engineered to

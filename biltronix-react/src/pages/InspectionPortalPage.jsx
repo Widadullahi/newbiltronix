@@ -13,7 +13,6 @@ import {
   updateInspectorAccount,
 } from '../lib/sanityClient.js';
 import { OTHER_OPTION, VEHICLE_MAKES, VEHICLE_MODELS_BY_MAKE } from '../lib/vehicleOptions.js';
-import './InspectionPortalPage.css';
 
 const CHECK_SECTIONS = [
   { title: 'Exterior Inspection', items: ['Body Condition', 'Headlights', 'Glass & Mirrors', 'Tires', 'License Plates'] },
@@ -567,26 +566,26 @@ export default function InspectionPortalPage() {
 
   if (!account) {
     return (
-      <div className='inspection-page'>
-        <header className='inspection-topbar'>
-          <div className='topbar-main'>
+      <div className='min-h-screen bg-glass-bg'>
+        <header className='border-b border-glass-border bg-glass-surface px-6 py-4 backdrop-blur-2xl'>
+          <div className='mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 [&_h1]:m-0 [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:text-text-primary [&_p]:mt-1 [&_p]:text-sm [&_p]:text-text-secondary'>
             <Link to='/'>Back to Home</Link>
             <div>
               <h1>Pre-Purchase Inspection App</h1>
               <p>Generate branded, professional reports your clients can trust.</p>
             </div>
           </div>
-          <span className='topbar-pill'>Inspector Workspace</span>
+          <span className='inline-flex rounded-full bg-primary-50 px-4 py-1.5 text-xs font-semibold text-primary'>Inspector Workspace</span>
         </header>
 
-        <main className='inspection-container auth-layout'>
-          <section className='inspection-card auth-copy'>
+        <main className='mx-auto grid max-w-7xl grid-cols-2 items-start gap-8 px-6 py-8 max-[960px]:grid-cols-1'>
+          <section className='rounded-glass border border-glass-border bg-glass-surface p-8 shadow-glass backdrop-blur-glass max-[640px]:p-5 [&_h2]:mb-2 [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:text-text-primary [&_p]:leading-relaxed [&_p]:text-text-secondary [&_ul]:m-0 [&_ul]:mt-5 [&_ul]:list-disc [&_ul]:pl-5 [&_li]:py-2 [&_li]:text-text-secondary'>
             <h2>Professional Pre-Purchase Inspection Reports</h2>
             <p>
               Generate clean, branded, client-ready vehicle inspection reports in minutes. Your company details,
               watermark, and optional signature are included automatically.
             </p>
-            <p className='lead-note'>
+            <p className='rounded-xl border-l-[3px] border-primary bg-primary-50 p-4 font-medium text-primary'>
               Create a secure account once, then log in any time with your email and password to continue from your
               dashboard.
             </p>
@@ -598,18 +597,18 @@ export default function InspectionPortalPage() {
             </ul>
           </section>
 
-          <section className='inspection-card auth-panel'>
+          <section className='rounded-glass border border-glass-border bg-glass-surface p-8 shadow-glass backdrop-blur-glass max-[640px]:p-5 [&_h3]:mb-4 [&_h3]:text-xl [&_h3]:font-semibold [&_h3]:text-text-primary'>
             <h3>Access Inspection Workspace</h3>
-            <p className='auth-subtext'>
+            <p className='mb-5 text-[0.9375rem] text-text-secondary'>
               New users can create an account. Returning users should log in with their existing email and password.
             </p>
-            <div className='auth-toggle'>
-              <button className={authMode === 'register' ? 'active' : ''} onClick={() => setAuthMode('register')} type='button'>Create Account</button>
-              <button className={authMode === 'login' ? 'active' : ''} onClick={() => setAuthMode('login')} type='button'>Login</button>
+            <div className='mb-6 flex rounded-xl bg-slate-100 p-1 [&_button]:flex-1 [&_button]:cursor-pointer [&_button]:rounded-lg [&_button]:border-0 [&_button]:bg-transparent [&_button]:px-4 [&_button]:py-2.5 [&_button]:text-[0.9375rem] [&_button]:font-medium [&_button]:text-text-secondary [&_button]:transition'>
+              <button className={authMode === 'register' ? 'bg-white text-text-primary shadow-sm' : ''} onClick={() => setAuthMode('register')} type='button'>Create Account</button>
+              <button className={authMode === 'login' ? 'bg-white text-text-primary shadow-sm' : ''} onClick={() => setAuthMode('login')} type='button'>Login</button>
             </div>
 
             {authMode === 'register' ? (
-              <form className='inspection-form' onSubmit={registerAccount}>
+              <form className='flex flex-col gap-4 [&_button]:cursor-pointer [&_button]:rounded-xl [&_button]:border-0 [&_button]:bg-primary [&_button]:px-6 [&_button]:py-3.5 [&_button]:font-semibold [&_button]:text-white [&_button]:shadow-float [&_input]:rounded-xl [&_input]:border [&_input]:border-glass-border [&_input]:bg-glass-surface [&_input]:px-4 [&_input]:py-3 [&_input]:outline-none [&_select]:rounded-xl [&_select]:border [&_select]:border-glass-border [&_select]:bg-glass-surface [&_select]:px-4 [&_select]:py-3 [&_select]:outline-none [&_textarea]:rounded-xl [&_textarea]:border [&_textarea]:border-glass-border [&_textarea]:bg-glass-surface [&_textarea]:px-4 [&_textarea]:py-3 [&_textarea]:outline-none' onSubmit={registerAccount}>
                 <input required placeholder='Full Name' value={registration.fullName} onChange={(e) => setRegistration((p) => ({ ...p, fullName: e.target.value }))} />
                 <input required type='email' placeholder='Email' value={registration.email} onChange={(e) => setRegistration((p) => ({ ...p, email: e.target.value }))} />
                 <input required type='password' placeholder='Password' value={registration.password} onChange={(e) => setRegistration((p) => ({ ...p, password: e.target.value }))} />
@@ -617,26 +616,26 @@ export default function InspectionPortalPage() {
                 <input required placeholder='WhatsApp Number' value={registration.phone} onChange={(e) => setRegistration((p) => ({ ...p, phone: e.target.value }))} />
                 <input required placeholder='Company Name' value={registration.companyName} onChange={(e) => setRegistration((p) => ({ ...p, companyName: e.target.value }))} />
                 <textarea required placeholder='Company Address' value={registration.companyAddress} onChange={(e) => setRegistration((p) => ({ ...p, companyAddress: e.target.value }))} />
-                <label className='file-label'>
+                <label className='flex cursor-pointer flex-col gap-2 rounded-xl border-2 border-dashed border-slate-200 p-4 text-sm font-medium text-text-secondary transition hover:border-primary hover:bg-primary-50 [&_input]:hidden'>
                   Company Logo Upload
                   <input type='file' accept='image/*' onChange={(e) => uploadCompanyLogo(e.target.files?.[0])} />
                 </label>
-                {registration.companyLogoDataUrl && <img className='logo-preview' src={registration.companyLogoDataUrl} alt='Company logo preview' />}
-                <label className='file-label'>
+                {registration.companyLogoDataUrl && <img className='h-20 w-20 rounded-xl border border-slate-200 bg-slate-50 object-contain' src={registration.companyLogoDataUrl} alt='Company logo preview' />}
+                <label className='flex cursor-pointer flex-col gap-2 rounded-xl border-2 border-dashed border-slate-200 p-4 text-sm font-medium text-text-secondary transition hover:border-primary hover:bg-primary-50 [&_input]:hidden'>
                   Optional Signature Upload
                   <input type='file' accept='image/*' onChange={(e) => uploadSignature(e.target.files?.[0])} />
                 </label>
-                {registration.signatureDataUrl && <img className='signature-preview' src={registration.signatureDataUrl} alt='Signature preview' />}
+                {registration.signatureDataUrl && <img className='h-20 w-20 rounded-xl border border-slate-200 bg-slate-50 object-contain' src={registration.signatureDataUrl} alt='Signature preview' />}
                 <button type='submit'>Create Account</button>
               </form>
             ) : (
               <>
-                <form className='inspection-form' onSubmit={loginAccount}>
+                <form className='flex flex-col gap-4 [&_button]:cursor-pointer [&_button]:rounded-xl [&_button]:border-0 [&_button]:bg-primary [&_button]:px-6 [&_button]:py-3.5 [&_button]:font-semibold [&_button]:text-white [&_button]:shadow-float [&_input]:rounded-xl [&_input]:border [&_input]:border-glass-border [&_input]:bg-glass-surface [&_input]:px-4 [&_input]:py-3 [&_input]:outline-none [&_select]:rounded-xl [&_select]:border [&_select]:border-glass-border [&_select]:bg-glass-surface [&_select]:px-4 [&_select]:py-3 [&_select]:outline-none [&_textarea]:rounded-xl [&_textarea]:border [&_textarea]:border-glass-border [&_textarea]:bg-glass-surface [&_textarea]:px-4 [&_textarea]:py-3 [&_textarea]:outline-none' onSubmit={loginAccount}>
                   <input required type='email' placeholder='Email' value={loginData.email} onChange={(e) => setLoginData((p) => ({ ...p, email: e.target.value }))} />
                   <input required type='password' placeholder='Password' value={loginData.password} onChange={(e) => setLoginData((p) => ({ ...p, password: e.target.value }))} />
                   <button type='submit'>Login to Dashboard</button>
                 </form>
-                <div className='inspection-form' style={{ marginTop: 12 }}>
+                <div className='flex flex-col gap-4 [&_button]:cursor-pointer [&_button]:rounded-xl [&_button]:border-0 [&_button]:bg-primary [&_button]:px-6 [&_button]:py-3.5 [&_button]:font-semibold [&_button]:text-white [&_button]:shadow-float [&_input]:rounded-xl [&_input]:border [&_input]:border-glass-border [&_input]:bg-glass-surface [&_input]:px-4 [&_input]:py-3 [&_input]:outline-none [&_select]:rounded-xl [&_select]:border [&_select]:border-glass-border [&_select]:bg-glass-surface [&_select]:px-4 [&_select]:py-3 [&_select]:outline-none [&_textarea]:rounded-xl [&_textarea]:border [&_textarea]:border-glass-border [&_textarea]:bg-glass-surface [&_textarea]:px-4 [&_textarea]:py-3 [&_textarea]:outline-none' style={{ marginTop: 12 }}>
                   <h4 style={{ marginBottom: 8 }}>Forgot Password</h4>
                   <input
                     type='email'
@@ -676,8 +675,8 @@ export default function InspectionPortalPage() {
               </>
             )}
 
-            {message && <p className='msg'>{message}</p>}
-            {error && <p className='err'>{error}</p>}
+            {message && <p className='mb-4 rounded-xl bg-success-light px-4 py-3 text-sm font-medium text-success'>{message}</p>}
+            {error && <p className='mb-4 rounded-xl bg-error-light px-4 py-3 text-sm font-medium text-error'>{error}</p>}
           </section>
         </main>
       </div>
@@ -685,43 +684,43 @@ export default function InspectionPortalPage() {
   }
 
   return (
-    <div className='inspection-page'>
-      <header className='inspection-topbar'>
-        <div className='topbar-main'>
+    <div className='min-h-screen bg-glass-bg'>
+      <header className='border-b border-glass-border bg-glass-surface px-6 py-4 backdrop-blur-2xl'>
+        <div className='mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 [&_h1]:m-0 [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:text-text-primary [&_p]:mt-1 [&_p]:text-sm [&_p]:text-text-secondary'>
           <Link to='/'>Back to Home</Link>
           <div>
             <h1>Inspection Dashboard</h1>
             <p>Manage reports, review records, and export polished PDFs.</p>
           </div>
         </div>
-        <span className='topbar-pill'>{account.companyName || 'Inspection Team'}</span>
+        <span className='inline-flex rounded-full bg-primary-50 px-4 py-1.5 text-xs font-semibold text-primary'>{account.companyName || 'Inspection Team'}</span>
       </header>
-      <div className='inspection-layout'>
-        <aside className='inspection-sidebar'>
+      <div className='mx-auto flex max-w-7xl gap-8 px-6 py-8 max-[960px]:flex-col'>
+        <aside className='w-[260px] shrink-0 max-[960px]:w-full [&_h3]:m-0 [&_h3]:mb-1 [&_h3]:text-lg [&_h3]:font-bold [&_h3]:text-text-primary [&_p]:m-0 [&_p]:mb-5 [&_p]:text-sm [&_p]:text-text-secondary [&_button]:mb-1 [&_button]:block [&_button]:w-full [&_button]:cursor-pointer [&_button]:rounded-xl [&_button]:border-0 [&_button]:bg-transparent [&_button]:px-4 [&_button]:py-3 [&_button]:text-left [&_button]:text-[0.9375rem] [&_button]:font-medium [&_button]:text-text-secondary [&_button]:transition [&_button:hover]:bg-slate-100 [&_button:hover]:text-text-primary max-[960px]:[&_button]:mr-2 max-[960px]:[&_button]:inline-block max-[960px]:[&_button]:w-auto'>
           <h3>{account.companyName}</h3>
           <p>{account.fullName}</p>
-          <div className='stat-box'>
+          <div className='mb-5 rounded-xl bg-primary-50 p-4 text-center [&_span]:text-xs [&_span]:uppercase [&_span]:tracking-wide [&_span]:text-text-muted [&_strong]:block [&_strong]:text-3xl [&_strong]:font-bold [&_strong]:text-primary'>
             <strong>{inspectionCount}</strong>
             <span>Inspections Completed</span>
           </div>
-          <button className={activeTab === 'new' ? 'active' : ''} onClick={() => setActiveTab('new')}>New Pre-Purchase Inspection</button>
-          <button className={activeTab === 'records' ? 'active' : ''} onClick={() => setActiveTab('records')}>Records</button>
-          <button className={activeTab === 'settings' ? 'active' : ''} onClick={() => setActiveTab('settings')}>Settings</button>
+          <button className={activeTab === 'new' ? 'bg-primary-50 text-primary' : ''} onClick={() => setActiveTab('new')}>New Pre-Purchase Inspection</button>
+          <button className={activeTab === 'records' ? 'bg-primary-50 text-primary' : ''} onClick={() => setActiveTab('records')}>Records</button>
+          <button className={activeTab === 'settings' ? 'bg-primary-50 text-primary' : ''} onClick={() => setActiveTab('settings')}>Settings</button>
           <button onClick={logout}>Logout</button>
         </aside>
 
-        <main className='inspection-content'>
-          {message && <p className='msg'>{message}</p>}
-          {error && <p className='err'>{error}</p>}
+        <main className='min-w-0 flex-1'>
+          {message && <p className='mb-4 rounded-xl bg-success-light px-4 py-3 text-sm font-medium text-success'>{message}</p>}
+          {error && <p className='mb-4 rounded-xl bg-error-light px-4 py-3 text-sm font-medium text-error'>{error}</p>}
 
           {activeTab === 'new' && (
-            <section className='inspection-card'>
+            <section className='mb-6 rounded-glass border border-glass-border bg-glass-surface p-8 shadow-glass backdrop-blur-glass max-[640px]:p-5 [&_h2]:mb-2 [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:text-text-primary [&_h3]:mb-4 [&_h3]:text-xl [&_h3]:font-semibold [&_h3]:text-text-primary [&_h4]:mb-3 [&_h4]:text-base [&_h4]:font-semibold [&_h4]:text-text-primary'>
               <h2>New Pre-Purchase Inspection</h2>
-              <p className='section-note'>
+              <p className='mb-6 text-[0.9375rem] text-text-secondary'>
                 Complete the vehicle details, run the full checklist, attach clear photos, and generate a polished PDF
                 report for your client.
               </p>
-              <div className='quick-stats'>
+              <div className='mb-8 grid grid-cols-3 gap-4 max-[640px]:grid-cols-1 [&_article]:rounded-xl [&_article]:border [&_article]:border-glass-border [&_article]:bg-glass-surface [&_article]:p-4 [&_article]:text-center [&_span]:mb-1 [&_span]:block [&_span]:text-xs [&_span]:text-text-muted [&_strong]:text-xl [&_strong]:font-bold [&_strong]:text-text-primary'>
                 <article>
                   <span>Checklist Items</span>
                   <strong>{inspection.checklist.length}</strong>
@@ -735,9 +734,9 @@ export default function InspectionPortalPage() {
                   <strong>Letterhead PDF</strong>
                 </article>
               </div>
-              <form className='inspection-form' onSubmit={submitInspection}>
+              <form className='flex flex-col gap-4 [&_button]:cursor-pointer [&_button]:rounded-xl [&_button]:border-0 [&_button]:bg-primary [&_button]:px-6 [&_button]:py-3.5 [&_button]:font-semibold [&_button]:text-white [&_button]:shadow-float [&_input]:rounded-xl [&_input]:border [&_input]:border-glass-border [&_input]:bg-glass-surface [&_input]:px-4 [&_input]:py-3 [&_input]:outline-none [&_select]:rounded-xl [&_select]:border [&_select]:border-glass-border [&_select]:bg-glass-surface [&_select]:px-4 [&_select]:py-3 [&_select]:outline-none [&_textarea]:rounded-xl [&_textarea]:border [&_textarea]:border-glass-border [&_textarea]:bg-glass-surface [&_textarea]:px-4 [&_textarea]:py-3 [&_textarea]:outline-none' onSubmit={submitInspection}>
                 <h3>Vehicle Information</h3>
-                <div className='grid-2'>
+                <div className='grid grid-cols-2 gap-4 max-[640px]:grid-cols-1'>
                   <select
                     required
                     value={inspection.vehicleMake}
@@ -827,13 +826,13 @@ export default function InspectionPortalPage() {
                 </div>
 
                 <h3>Inspection Checklist</h3>
-                <p className='section-note'>Rate each item and add comments where faults or concerns are observed.</p>
+                <p className='mb-6 text-[0.9375rem] text-text-secondary'>Rate each item and add comments where faults or concerns are observed.</p>
                 {groupedChecklist.map((group) => (
-                  <section key={group.title} className='check-section'>
+                  <section key={group.title} className='mb-8 [&_h4]:mb-3 [&_h4]:rounded-xl [&_h4]:bg-primary-50 [&_h4]:px-4 [&_h4]:py-3 [&_h4]:text-primary'>
                     <h4>{group.title}</h4>
-                    <div className='checklist'>
+                    <div className='flex flex-col gap-2'>
                       {group.rows.map((item, idx) => (
-                        <article key={`${group.title}-${item.label}`} className='check-row'>
+                        <article key={`${group.title}-${item.label}`} className='grid grid-cols-[1fr_auto_auto] items-center gap-3 rounded-xl border border-glass-border bg-glass-surface px-4 py-3 transition hover:bg-white/85 max-[640px]:grid-cols-1 [&_input]:w-[180px] max-[640px]:[&_input]:w-full [&_strong]:text-[0.9375rem] [&_strong]:font-medium [&_strong]:text-text-primary'>
                           <strong>{item.label}</strong>
                           <select value={item.status} onChange={(e) => updateChecklist(group.title, idx, 'status', e.target.value)}>
                             <option>Good</option>
@@ -849,41 +848,41 @@ export default function InspectionPortalPage() {
 
                 <textarea placeholder='Final Recommendation' value={inspection.recommendation} onChange={(e) => setInspection((p) => ({ ...p, recommendation: e.target.value }))} />
 
-                <label className='file-label'>
+                <label className='flex cursor-pointer flex-col gap-2 rounded-xl border-2 border-dashed border-slate-200 p-4 text-sm font-medium text-text-secondary transition hover:border-primary hover:bg-primary-50 [&_input]:hidden'>
                   Upload Inspection Images (max 10)
                   <input type='file' accept='image/*' multiple onChange={(e) => uploadInspectionImages(e.target.files)} />
                 </label>
-                <p className='section-note'>Tip: Use bright, sharp images of defects, VIN plate, engine bay, and tires.</p>
+                <p className='mb-6 text-[0.9375rem] text-text-secondary'>Tip: Use bright, sharp images of defects, VIN plate, engine bay, and tires.</p>
                 {inspection.images.length > 0 && (
-                  <div className='image-preview-grid'>
+                  <div className='grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-3 [&_img]:aspect-square [&_img]:w-full [&_img]:rounded-xl [&_img]:border [&_img]:border-slate-200 [&_img]:object-cover'>
                     {inspection.images.map((img, idx) => (
                       <img key={`preview-${idx}`} src={img} alt={`Inspection preview ${idx + 1}`} />
                     ))}
                   </div>
                 )}
 
-                <button className='primary-btn' type='submit'>Save Inspection & Download PDF</button>
+                <button className='cursor-pointer rounded-xl border-0 bg-primary px-6 py-3.5 font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-60' type='submit'>Save Inspection & Download PDF</button>
               </form>
             </section>
           )}
 
           {activeTab === 'records' && (
-            <section className='inspection-card'>
+            <section className='mb-6 rounded-glass border border-glass-border bg-glass-surface p-8 shadow-glass backdrop-blur-glass max-[640px]:p-5 [&_h2]:mb-2 [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:text-text-primary [&_h3]:mb-4 [&_h3]:text-xl [&_h3]:font-semibold [&_h3]:text-text-primary [&_h4]:mb-3 [&_h4]:text-base [&_h4]:font-semibold [&_h4]:text-text-primary'>
               <h2>Inspection Records</h2>
               {loadingReports ? (
                 <p>Loading records...</p>
               ) : reports.length === 0 ? (
                 <p>No inspections yet.</p>
               ) : (
-                <div className='records'>
+                <div className='grid gap-4'>
                   {reports.map((report) => (
-                    <article key={report._id} className='record-card'>
-                      <div className='record-head'>
+                    <article key={report._id} className='flex items-center justify-between gap-4 rounded-xl border border-glass-border bg-glass-surface p-5 max-[640px]:flex-col max-[640px]:items-start [&_p]:m-0 [&_p]:text-sm [&_p]:text-text-muted'>
+                      <div className='[&_h4]:m-0 [&_h4]:text-base [&_h4]:text-text-primary'>
                         <h4>{report.vehicleLabel}</h4>
-                        <span className='record-tag'>{report.overallVerdict}</span>
+                        <span className='inline-flex rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary'>{report.overallVerdict}</span>
                       </div>
                       <p>{new Date(report.inspectedAt).toLocaleString()}</p>
-                      <button className='primary-btn' type='button' onClick={() => createReportPdf(report, account)}>Download PDF</button>
+                      <button className='cursor-pointer rounded-xl border-0 bg-primary px-6 py-3.5 font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-60' type='button' onClick={() => createReportPdf(report, account)}>Download PDF</button>
                     </article>
                   ))}
                 </div>
@@ -892,28 +891,28 @@ export default function InspectionPortalPage() {
           )}
 
           {activeTab === 'settings' && (
-            <section className='inspection-card'>
+            <section className='mb-6 rounded-glass border border-glass-border bg-glass-surface p-8 shadow-glass backdrop-blur-glass max-[640px]:p-5 [&_h2]:mb-2 [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:text-text-primary [&_h3]:mb-4 [&_h3]:text-xl [&_h3]:font-semibold [&_h3]:text-text-primary [&_h4]:mb-3 [&_h4]:text-base [&_h4]:font-semibold [&_h4]:text-text-primary'>
               <h2>Account Settings</h2>
-              <p className='section-note'>
+              <p className='mb-6 text-[0.9375rem] text-text-secondary'>
                 Update your company details and signature. These details appear on your generated PDF reports.
               </p>
-              <form className='inspection-form settings-grid' onSubmit={saveSettings}>
+              <form className='grid grid-cols-2 gap-4 max-[640px]:grid-cols-1 [&_button]:cursor-pointer [&_button]:rounded-xl [&_button]:border-0 [&_button]:bg-primary [&_button]:px-6 [&_button]:py-3.5 [&_button]:font-semibold [&_button]:text-white [&_button]:shadow-float [&_input]:rounded-xl [&_input]:border [&_input]:border-glass-border [&_input]:bg-glass-surface [&_input]:px-4 [&_input]:py-3 [&_textarea]:col-span-2 [&_textarea]:rounded-xl [&_textarea]:border [&_textarea]:border-glass-border [&_textarea]:bg-glass-surface [&_textarea]:px-4 [&_textarea]:py-3 max-[640px]:[&_textarea]:col-span-1' onSubmit={saveSettings}>
                 <input required placeholder='Full Name' value={settings.fullName} onChange={(e) => setSettings((prev) => ({ ...prev, fullName: e.target.value }))} />
                 <input required type='email' placeholder='Email' value={settings.email} onChange={(e) => setSettings((prev) => ({ ...prev, email: e.target.value }))} />
                 <input required placeholder='WhatsApp Number' value={settings.phone} onChange={(e) => setSettings((prev) => ({ ...prev, phone: e.target.value }))} />
                 <input required placeholder='Company Name' value={settings.companyName} onChange={(e) => setSettings((prev) => ({ ...prev, companyName: e.target.value }))} />
                 <textarea required placeholder='Company Address' value={settings.companyAddress} onChange={(e) => setSettings((prev) => ({ ...prev, companyAddress: e.target.value }))} />
-                <label className='file-label'>
+                <label className='flex cursor-pointer flex-col gap-2 rounded-xl border-2 border-dashed border-slate-200 p-4 text-sm font-medium text-text-secondary transition hover:border-primary hover:bg-primary-50 [&_input]:hidden'>
                   Update Company Logo
                   <input type='file' accept='image/*' onChange={(e) => uploadSettingsCompanyLogo(e.target.files?.[0])} />
                 </label>
-                {settings.companyLogoDataUrl && <img className='logo-preview' src={settings.companyLogoDataUrl} alt='Updated company logo preview' />}
-                <label className='file-label'>
+                {settings.companyLogoDataUrl && <img className='h-20 w-20 rounded-xl border border-slate-200 bg-slate-50 object-contain' src={settings.companyLogoDataUrl} alt='Updated company logo preview' />}
+                <label className='flex cursor-pointer flex-col gap-2 rounded-xl border-2 border-dashed border-slate-200 p-4 text-sm font-medium text-text-secondary transition hover:border-primary hover:bg-primary-50 [&_input]:hidden'>
                   Update Signature
                   <input type='file' accept='image/*' onChange={(e) => uploadSettingsSignature(e.target.files?.[0])} />
                 </label>
-                {settings.signatureDataUrl && <img className='signature-preview' src={settings.signatureDataUrl} alt='Updated signature preview' />}
-                <button className='primary-btn' type='submit' disabled={savingSettings}>
+                {settings.signatureDataUrl && <img className='h-20 w-20 rounded-xl border border-slate-200 bg-slate-50 object-contain' src={settings.signatureDataUrl} alt='Updated signature preview' />}
+                <button className='cursor-pointer rounded-xl border-0 bg-primary px-6 py-3.5 font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-60' type='submit' disabled={savingSettings}>
                   {savingSettings ? 'Saving...' : 'Save Settings'}
                 </button>
               </form>

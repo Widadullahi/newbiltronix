@@ -11,6 +11,8 @@ export default {
         'glass-shadow': 'rgba(0, 0, 0, 0.08)',
         
         // Primary - Professional Blue
+        'primary': '#0d6efd',
+        'primary-light': '#3b82f6',
         'primary-50': '#eff6ff',
         'primary-100': '#dbeafe',
         'primary-200': '#bfdbfe',
@@ -78,6 +80,38 @@ export default {
         slideUp: {
           '0%': { opacity: '0', transform: 'translateY(20px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        luxLine: {
+          '0%': { transform: 'translateX(0)', opacity: '0' },
+          '6%': { opacity: '1' },
+          '94%': { opacity: '0.8' },
+          '100%': { transform: 'translateX(-155vw)', opacity: '0' },
+        },
+        luxGoldShimmer: {
+          '0%': { backgroundPosition: '0% center' },
+          '100%': { backgroundPosition: '300% center' },
+        },
+        luxBeamPulse: {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.55' },
+        },
+        luxGroundPulse: {
+          '0%, 100%': { transform: 'scaleX(0.88)', opacity: '0.7' },
+          '50%': { transform: 'scaleX(1.12)', opacity: '1' },
+        },
+        luxSlideIn: {
+          '0%': { transform: 'translateX(115%)', opacity: '0' },
+          '55%': { transform: 'translateX(-2.5%)', opacity: '1' },
+          '78%': { transform: 'translateX(1.2%)' },
+          '100%': { transform: 'translateX(0)', opacity: '1' },
+        },
+        luxFloat: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-13px)' },
+        },
+        luxScrollBounce: {
+          '0%, 100%': { transform: 'translateY(0)', opacity: '0.35' },
+          '50%': { transform: 'translateY(9px)', opacity: '0.8' },
         },
       },
     },

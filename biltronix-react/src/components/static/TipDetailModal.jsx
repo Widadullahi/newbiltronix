@@ -12,11 +12,11 @@ export default function TipDetailModal({ modal, onClose }) {
       onClick={onClose}
     >
       <div
-        className="glass-card max-w-lg w-full p-6 animate-slide-up"
+        className="rounded-glass border border-glass-border bg-glass-surface shadow-glass backdrop-blur-glass transition hover:-translate-y-0.5 hover:bg-white/85 hover:shadow-glass-hover max-w-lg w-full p-6 animate-slide-up"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start justify-between mb-4">
-          <span className="badge-primary text-xs">
+          <span className="inline-block rounded-full border border-primary-300 bg-primary-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary text-xs">
             {modal.category || 'General'}
           </span>
           <button
@@ -51,7 +51,7 @@ export default function TipDetailModal({ modal, onClose }) {
         <div className="mt-6 pt-5 border-t border-slate-100 flex justify-end">
           <button
             onClick={onClose}
-            className="btn-secondary px-6 py-2"
+            className="inline-flex items-center justify-center rounded-xl border border-glass-border bg-glass-surface text-text-primary backdrop-blur transition hover:bg-white/85 px-6 py-2"
           >
             Close
           </button>

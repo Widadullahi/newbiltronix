@@ -22,7 +22,7 @@ export default function PopupOverlay({ popup, onClose }) {
         <button
           type="button"
           onClick={onClose}
-          className="w-full btn-primary py-2.5"
+          className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-primary text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 py-2.5"
         >
           Got it
         </button>

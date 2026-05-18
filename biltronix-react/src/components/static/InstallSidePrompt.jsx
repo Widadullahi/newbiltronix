@@ -32,7 +32,7 @@ export default function InstallSidePrompt({ visible, onInstall, onClose }) {
       <button
         type="button"
         onClick={onInstall}
-        className="w-full btn-primary mt-4 py-2.5 text-sm"
+        className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-primary text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 mt-4 py-2.5 text-sm"
       >
         <i className="fas fa-download mr-2"></i>
         Install Now

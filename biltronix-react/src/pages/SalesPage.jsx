@@ -112,50 +112,50 @@ export default function SalesPage() {
   }, [activeFilter, search]);
 
   return (
-    <div className="sales-dark-page">
+    <div className="min-h-screen bg-[#030712] text-white">
       <SiteHeader />
 
       {/* ── Luxury Header Panel ── */}
-      <div className="sales-header-panel">
+      <div className="relative overflow-hidden border-b border-blue-300/10 bg-gradient-to-br from-slate-950 via-[#071225] to-[#020617] px-0 py-16">
         <div className="container mx-auto px-4 md:px-6">
-          <span className="sales-header-badge">
-            <span className="sales-header-pulse" aria-hidden="true" />
+          <span className="mb-5 inline-flex items-center gap-2 rounded-full border border-blue-300/20 bg-blue-400/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-blue-100">
+            <span className="h-2 w-2 animate-pulse rounded-full bg-blue-300" aria-hidden="true" />
             Biltronix Store
           </span>
 
-          <h1 className="sales-header-h1">
+          <h1 className="m-0 max-w-3xl font-heading text-[clamp(2.3rem,5vw,4.5rem)] font-extrabold leading-[1.05] tracking-[-0.04em] text-white">
             Premium Vehicles &amp;{' '}
-            <span className="lux-gold-text">Parts</span>
+            <span className="animate-[luxGoldShimmer_4s_linear_infinite] bg-[linear-gradient(90deg,#60a5fa,#93c5fd,#ffffff,#bfdbfe,#60a5fa)] bg-[length:300%_auto] bg-clip-text text-transparent">Parts</span>
           </h1>
 
-          <p className="sales-header-sub">
+          <p className="mt-5 max-w-2xl text-base leading-8 text-slate-300/80">
             Browse our curated selection of inspected vehicles, genuine parts,
             and premium accessories — every product backed by our quality guarantee.
           </p>
 
           {/* Filters + Search */}
-          <div className="sales-filter-row">
-            <div className="sales-filters">
+          <div className="mt-8 flex flex-wrap items-center justify-between gap-4">
+            <div className="flex flex-wrap gap-2">
               {productFilters.map((filter) => (
                 <button
                   key={filter.value}
                   type="button"
                   onClick={() => setActiveFilter(filter.value)}
-                  className={`sales-filter-btn${activeFilter === filter.value ? ' active' : ''}`}
+                  className={`rounded-md border border-white/10 px-4 py-2 text-sm font-bold transition ${activeFilter === filter.value ? 'bg-blue-500 text-white' : 'bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white'}`}
                 >
                   {filter.label}
                 </button>
               ))}
             </div>
 
-            <div className="sales-search-wrap">
+            <div className="flex min-w-[260px] items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-slate-300">
               <i className="fas fa-search" aria-hidden="true"></i>
               <input
                 type="search"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search vehicles, parts, accessories…"
-                className="sales-search"
+                className="w-full border-0 bg-transparent text-sm text-white outline-none placeholder:text-slate-500"
                 aria-label="Search products"
               />
             </div>
@@ -166,10 +166,10 @@ export default function SalesPage() {
       {/* ── Products Grid ── */}
       <main>
         <div className="container mx-auto px-4 md:px-6">
-          <div className="sales-grid">
+          <div className="grid gap-6 py-14 md:grid-cols-2 lg:grid-cols-3">
             {filteredProducts.length === 0 ? (
-              <div className="sales-empty">
-                <div className="sales-empty-icon">
+              <div className="col-span-full rounded-lg border border-white/10 bg-white/5 p-10 text-center text-slate-300">
+                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-white/10">
                   <i className="fas fa-search" style={{ color: 'rgba(255,255,255,0.3)', fontSize: '1.2rem' }}></i>
                 </div>
                 <h3>No products found</h3>
@@ -177,37 +177,37 @@ export default function SalesPage() {
               </div>
             ) : (
               filteredProducts.map((product) => (
-                <article key={product.title} className="store-card">
+                <article key={product.title} className="group relative flex flex-col overflow-hidden rounded-lg border border-slate-400/20 bg-gradient-to-b from-slate-900 to-[#030a18] shadow-[0_22px_58px_rgba(2,6,23,0.36)] transition duration-300 hover:-translate-y-2 hover:border-blue-400/30 hover:shadow-[0_34px_80px_rgba(2,6,23,0.5)]">
                   {/* Image */}
-                  <div className="store-card-img-wrap">
+                  <div className="relative h-56 shrink-0 overflow-hidden bg-slate-950 after:pointer-events-none after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[120px] after:bg-[linear-gradient(to_bottom,transparent_0%,rgba(2,6,23,0.2)_45%,#071225_100%)]">
                     <img
                       src={product.image}
                       alt={product.title}
-                      className="store-card-img"
+                      className="block h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.06]"
                     />
-                    <span className={`store-card-badge store-card-badge--${product.category}`}>
+                    <span className={`absolute right-3.5 top-3.5 z-[2] rounded border px-3 py-1 text-[0.65rem] font-bold uppercase tracking-[0.08em] backdrop-blur ${product.category === 'vehicle' ? 'border-blue-300/40 bg-blue-600/80 text-white' : product.category === 'part' ? 'border-green-300/40 bg-green-600/80 text-white' : 'border-violet-300/40 bg-violet-600/80 text-white'}`}>
                       {product.badge}
                     </span>
                   </div>
 
                   {/* Body */}
-                  <div className="store-card-body">
-                    <h2 className="store-card-name">{product.title}</h2>
-                    <p className="store-card-price">{product.price}</p>
-                    <div className="store-card-divider" />
-                    <p className="store-card-desc">{product.description}</p>
+                  <div className="flex flex-1 flex-col px-[22px] pb-[22px]">
+                    <h2 className="m-0 mb-1.5 text-[1.08rem] font-bold tracking-[-0.01em] text-slate-50">{product.title}</h2>
+                    <p className="m-0 mb-4 text-[1.45rem] font-extrabold tracking-[-0.02em] text-blue-200">{product.price}</p>
+                    <div className="mb-3.5 h-px bg-gradient-to-r from-blue-400/30 to-white/5" />
+                    <p className="mb-5 text-sm leading-relaxed text-slate-300/70">{product.description}</p>
 
-                    <div className="store-card-cta">
+                    <div className="mt-auto flex gap-2.5">
                       <a
                         href="https://wa.me/2347060882711"
                         target="_blank"
                         rel="noreferrer"
-                        className="vcard-btn-primary"
+                        className="inline-flex flex-1 items-center justify-center gap-[7px] rounded-md bg-gradient-to-br from-blue-700 to-blue-500 px-4 py-[11px] text-[0.82rem] font-bold tracking-[0.03em] text-white no-underline shadow-[0_12px_30px_rgba(37,99,235,0.3)] transition hover:-translate-y-px hover:text-white hover:brightness-110"
                       >
                         <i className="fab fa-whatsapp" aria-hidden="true"></i>
                         Inquire Now
                       </a>
-                      <button className="vcard-btn-ghost">
+                      <button className="inline-flex items-center justify-center gap-1.5 rounded-md border border-white/10 bg-transparent px-4 py-[11px] text-[0.82rem] font-semibold text-white/55 transition hover:border-blue-400/40 hover:text-blue-200">
                         Details
                       </button>
                     </div>
@@ -222,9 +222,9 @@ export default function SalesPage() {
       <FloatingWhatsApp />
 
       {/* ── Dark Footer ── */}
-      <footer className="sales-footer">
+      <footer className="border-t border-white/10 bg-slate-950 py-6 text-sm text-slate-400">
         <div className="container mx-auto px-4">
-          <div className="sales-footer-inner">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <span>Biltronix Store · Premium Vehicles &amp; Parts</span>
             <span>© {new Date().getFullYear()} Biltronix Automotive. All rights reserved.</span>
           </div>

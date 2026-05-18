@@ -43,7 +43,7 @@ export default function SiteHeader() {
       </div>
 
       {/* Navigation */}
-      <nav className="nav-glass" ref={menuRef}>
+      <nav className="sticky top-0 z-[100] border-b border-glass-border bg-white/80 backdrop-blur-2xl" ref={menuRef}>
         <div className="container mx-auto flex items-center justify-between px-4 py-3">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
@@ -69,7 +69,7 @@ export default function SiteHeader() {
                 {link.label}
               </Link>
             ))}
-            <a href="#install" className="ml-2 btn-primary px-5 py-2 text-sm">
+            <a href="#install" className="ml-2 inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500">
               <i className="fas fa-download mr-1.5"></i>
               Install App
             </a>
@@ -79,7 +79,7 @@ export default function SiteHeader() {
           <button
             type="button"
             onClick={() => setMobileMenuOpen((o) => !o)}
-            className="lg:hidden mobile-hamburger"
+            className="flex h-10 w-10 items-center justify-center rounded-[9px] border border-black/10 bg-white/10 text-text-primary lg:hidden"
             aria-label="Toggle menu"
             aria-expanded={mobileMenuOpen}
           >
@@ -89,21 +89,21 @@ export default function SiteHeader() {
 
         {/* Mobile Dropdown — compact absolute overlay */}
         {mobileMenuOpen && (
-          <div className="mobile-menu-dropdown lg:hidden" role="menu">
+          <div className="absolute left-4 right-4 top-[calc(100%+8px)] z-[120] overflow-hidden rounded-xl border border-slate-200 bg-white shadow-glass-xl lg:hidden" role="menu">
             {navLinks.map((link) => (
               <Link
                 key={link.to}
                 to={link.to}
                 role="menuitem"
                 onClick={() => setMobileMenuOpen(false)}
-                className={`mobile-menu-link${location.pathname === link.to ? ' active' : ''}`}
+                className={`flex items-center gap-3 px-4 py-3 text-sm font-semibold no-underline transition ${location.pathname === link.to ? 'bg-primary-50 text-primary' : 'text-text-secondary hover:bg-slate-50 hover:text-text-primary'}`}
               >
-                <i className={`fas ${link.icon} mobile-menu-icon`} aria-hidden="true"></i>
+                <i className={`fas ${link.icon} w-5 text-center`} aria-hidden="true"></i>
                 {link.label}
               </Link>
             ))}
-            <div className="mobile-menu-divider" aria-hidden="true" />
-            <a href="#install" className="mobile-menu-install" onClick={() => setMobileMenuOpen(false)}>
+            <div className="h-px bg-slate-200" aria-hidden="true" />
+            <a href="#install" className="flex items-center gap-3 bg-primary px-4 py-3 text-sm font-semibold text-white no-underline" onClick={() => setMobileMenuOpen(false)}>
               <i className="fas fa-download" aria-hidden="true"></i>
               Install App
             </a>

@@ -114,6 +114,18 @@ const HERO_LINES = [
   { top: '80%', width: '180px', delay: '0.10s', dur: '1.00s', opacity: 0.7 },
 ];
 
+const typeBadgeClasses = {
+  vehicle: 'bg-gradient-to-br from-blue-700/95 to-blue-400/80 text-white',
+  part: 'bg-green-600/85 text-white',
+  accessory: 'bg-violet-600/85 text-white',
+};
+
+const itemTagClasses = {
+  vehicle: 'bg-blue-600/20 text-blue-200',
+  part: 'bg-green-600/20 text-green-300',
+  accessory: 'bg-violet-600/20 text-violet-200',
+};
+
 // Featured items for hero carousel - includes vehicles, parts, and accessories
 const featuredItems = [
   {
@@ -196,56 +208,55 @@ export default function HomePage() {
 
       {/* ── Dark Luxury Hero ── */}
       <section
-        className={`lux-section lux-hero${heroAnimated ? ' lux-on' : ''}`}
+        className={`relative flex min-h-[calc(100vh-96px)] w-full items-center overflow-hidden bg-slate-900 xl:min-h-[90vh] max-[900px]:min-h-0 max-[900px]:flex-col max-[900px]:justify-start max-[900px]:pt-10${heroAnimated ? ' lux-on' : ''}`}
         aria-label="Biltronix hero"
-        style={{ background: '#0d6efd' }}
       >
-        <div className="lux-bg" aria-hidden="true" />
+        <div className="absolute inset-0 z-0 bg-slate-900" aria-hidden="true" />
 
         {/* Speed lines */}
-        <div className="lux-lines" aria-hidden="true">
+        <div className="pointer-events-none absolute inset-0 z-[1] overflow-hidden" aria-hidden="true">
           {HERO_LINES.map((l, i) => (
             <div
               key={i}
-              className="lux-line"
+              className="absolute right-0 h-px w-[var(--lw,200px)] opacity-0 [background:linear-gradient(to_left,transparent_0%,rgba(96,165,250,var(--lo,0.7))_38%,rgba(219,234,254,var(--lo,0.7))_66%,transparent_100%)] [.lux-on_&]:animate-[luxLine_var(--ldur,1s)_ease-out_var(--ld,0s)_infinite] motion-reduce:animate-none"
               style={{ top: l.top, '--lw': l.width, '--ld': l.delay, '--ldur': l.dur, '--lo': l.opacity }}
             />
           ))}
         </div>
 
         {/* Left hero content */}
-        <div className="lux-content lux-hero-content">
-          <h1 className="lux-hero-h1">
+        <div className="relative z-20 w-full flex-[0_0_48%] translate-x-[-36px] pl-[7%] pr-4 opacity-0 transition-[opacity,transform] delay-500 duration-1000 ease-out [.lux-on_&]:translate-x-0 [.lux-on_&]:opacity-100 max-[1100px]:flex-[0_0_52%] max-[900px]:mx-auto max-[900px]:max-w-3xl max-[900px]:flex-none max-[900px]:translate-y-4 max-[900px]:px-6 max-[900px]:text-center [.lux-on_&]:max-[900px]:translate-y-0 max-[640px]:px-[18px]">
+          <h1 className="m-0 mb-5 max-w-[680px] font-heading text-[clamp(2.5rem,5vw,4.2rem)] font-extrabold leading-[1.08] tracking-[-0.04em] text-white max-[900px]:mx-auto max-[640px]:text-[clamp(2rem,10vw,2.75rem)]">
             Find Your Dream Car at{' '}
-            <span className="lux-gold-text">Biltronix</span>
+            <span className="animate-[luxGoldShimmer_4s_linear_infinite] bg-[linear-gradient(90deg,#60a5fa,#93c5fd,#ffffff,#bfdbfe,#60a5fa)] bg-[length:300%_auto] bg-clip-text text-transparent motion-reduce:animate-none motion-reduce:bg-none motion-reduce:text-blue-300">Biltronix</span>
           </h1>
 
-          <p className="lux-hero-p">
+          <p className="mb-8 max-w-[430px] text-base leading-[1.78] text-white/55 max-[900px]:mx-auto max-[900px]:max-w-[620px] max-[640px]:mb-[22px] max-[640px]:text-[0.95rem] max-[640px]:leading-7">
             Browse our curated selection of premium vehicles, genuine parts, and
             expert guidance — every vehicle thoroughly inspected and backed by our
             quality guarantee.
           </p>
 
-          <div className="lux-hero-btns">
-            <Link to="/sales" className="lux-btn">
+          <div className="mb-9 flex flex-wrap items-center gap-3.5 max-[900px]:mb-6 max-[900px]:justify-center max-[640px]:mb-[18px] max-[640px]:grid max-[640px]:grid-cols-1 max-[640px]:gap-2.5">
+            <Link to="/sales" className="inline-flex items-center justify-center gap-2.5 rounded px-[26px] py-[13px] text-[0.82rem] font-bold uppercase tracking-[0.08em] text-white no-underline shadow-[0_12px_34px_rgba(37,99,235,0.42)] transition hover:-translate-y-0.5 hover:text-white hover:shadow-[0_16px_48px_rgba(37,99,235,0.58)] [background:linear-gradient(135deg,#1d4ed8_0%,#3b82f6_52%,#60a5fa_100%)] [background-size:200%_auto] hover:[background-position:right_center] max-[640px]:w-full">
               <i className="fas fa-car" aria-hidden="true"></i>
               Browse Inventory
             </Link>
-            <Link to="/car-tips" className="lux-btn-ghost">
+            <Link to="/car-tips" className="inline-flex items-center justify-center gap-2 rounded border border-white/20 px-6 py-[13px] text-[0.82rem] font-semibold tracking-[0.05em] text-white/80 no-underline transition hover:border-white/50 hover:bg-white/10 hover:text-white max-[640px]:w-full">
               Expert Tips
             </Link>
           </div>
 
-          <div className="lux-trust">
-            <span className="lux-trust-item">
+          <div className="flex flex-wrap gap-5 max-[900px]:mb-0 max-[900px]:justify-center max-[900px]:gap-3 max-[520px]:grid max-[520px]:grid-cols-1">
+            <span className="flex items-center gap-[7px] text-[0.8rem] text-slate-200/70 max-[900px]:text-white/95 [&_i]:text-[0.85rem] [&_i]:text-blue-400 max-[900px]:[&_i]:text-[#ffd166]">
               <i className="fas fa-shield-alt" aria-hidden="true"></i>
               Certified Quality
             </span>
-            <span className="lux-trust-item">
+            <span className="flex items-center gap-[7px] text-[0.8rem] text-slate-200/70 max-[900px]:text-white/95 [&_i]:text-[0.85rem] [&_i]:text-blue-400 max-[900px]:[&_i]:text-[#ffd166]">
               <i className="fas fa-truck" aria-hidden="true"></i>
               Fast Delivery
             </span>
-            <span className="lux-trust-item">
+            <span className="flex items-center gap-[7px] text-[0.8rem] text-slate-200/70 max-[900px]:text-white/95 [&_i]:text-[0.85rem] [&_i]:text-blue-400 max-[900px]:[&_i]:text-[#ffd166]">
               <i className="fas fa-headset" aria-hidden="true"></i>
               Expert Support
             </span>
@@ -253,17 +264,17 @@ export default function HomePage() {
         </div>
 
         {/* Car stage */}
-        <div className="lux-stage" aria-hidden="true">
-          <div className="lux-spotlight" />
-          <div className="lux-beam lux-beam-top" />
-          <div className="lux-beam lux-beam-bot" />
-          <div className="lux-glow" />
-          <div className="lux-car-slide">
-            <div className="lux-car-float">
+        <div className="absolute right-0 top-0 z-[5] h-full w-[62%] max-[1100px]:w-[58%] max-[900px]:relative max-[900px]:right-auto max-[900px]:top-auto max-[900px]:mt-3 max-[900px]:h-[340px] max-[900px]:w-full max-[640px]:mt-0 max-[640px]:h-[260px] max-[420px]:h-[220px]" aria-hidden="true">
+          <div className="pointer-events-none absolute left-[20%] top-[-30%] z-[1] h-[80%] w-[60%] bg-[radial-gradient(ellipse,rgba(147,197,253,0.16)_0%,transparent_60%)]" />
+          <div className="pointer-events-none absolute bottom-[44%] left-0 z-[2] h-[60px] w-[38%] opacity-0 transition-opacity delay-[1900ms] duration-700 [background:linear-gradient(to_left,rgba(191,219,254,0.18),transparent)] [clip-path:polygon(100%_45%,0%_0%,0%_25%)] [.lux-on_&]:animate-[luxBeamPulse_5s_ease-in-out_infinite] [.lux-on_&]:opacity-100 max-[900px]:hidden motion-reduce:animate-none" />
+          <div className="pointer-events-none absolute bottom-[33%] left-0 z-[2] h-[60px] w-[38%] opacity-0 transition-opacity delay-[1900ms] duration-700 [background:linear-gradient(to_left,rgba(147,197,253,0.12),transparent)] [clip-path:polygon(100%_55%,0%_75%,0%_100%)] [.lux-on_&]:animate-[luxBeamPulse_5s_ease-in-out_0.5s_infinite] [.lux-on_&]:opacity-100 max-[900px]:hidden motion-reduce:animate-none" />
+          <div className="pointer-events-none absolute bottom-0 left-[5%] right-0 z-[2] h-[90px] bg-[radial-gradient(ellipse_at_center_bottom,rgba(37,99,235,0.55)_0%,transparent_68%)] opacity-0 blur-[22px] transition-opacity delay-[1700ms] duration-1000 [.lux-on_&]:animate-[luxGroundPulse_4.5s_ease-in-out_infinite] [.lux-on_&]:opacity-100 motion-reduce:animate-none" />
+          <div className="absolute inset-0 translate-x-[115%] opacity-0 [.lux-on_&]:animate-[luxSlideIn_1.4s_cubic-bezier(0.22,1,0.36,1)_0.25s_forwards] motion-reduce:translate-x-0 motion-reduce:animate-none motion-reduce:opacity-100">
+            <div className="absolute inset-0 [.lux-on_&]:animate-[luxFloat_5.5s_ease-in-out_1.7s_infinite] motion-reduce:animate-none">
               <img
                 src="/hero-car-original.png"
                 alt="Luxury sports car — Biltronix premium collection"
-                className="lux-car-img"
+                className="absolute inset-0 h-full w-full object-contain object-[center_bottom] max-[900px]:px-6 max-[900px]:object-[center_bottom] max-[640px]:px-2 [filter:brightness(1.12)_contrast(1.14)_saturate(1.08)_drop-shadow(0_28px_70px_rgba(2,6,23,0.34))_drop-shadow(0_0_54px_rgba(147,197,253,0.36))]"
                 loading="eager"
               />
             </div>
@@ -271,13 +282,13 @@ export default function HomePage() {
         </div>
 
         {/* Scroll indicator */}
-        <div className="lux-scroll-hint" aria-hidden="true">
-          <span>Scroll</span>
-          <div className="lux-scroll-dot" />
+        <div className="absolute bottom-9 left-1/2 z-[16] flex -translate-x-1/2 flex-col items-center gap-2 opacity-0 transition-opacity delay-[2600ms] duration-700 [.lux-on_&]:opacity-100 max-[900px]:hidden" aria-hidden="true">
+          <span className="text-[0.6rem] uppercase tracking-[0.25em] text-black/45">Scroll</span>
+          <div className="h-[5px] w-[5px] animate-[luxScrollBounce_1.6s_ease-in-out_infinite] rounded-full bg-black/35" />
         </div>
 
         {/* Fade into page background */}
-        <div className="lux-hero-fade" aria-hidden="true" />
+        <div className="pointer-events-none absolute bottom-0 left-0 right-0 z-[15] h-[140px] bg-gradient-to-b from-transparent to-[#f8fafc]" aria-hidden="true" />
       </section>
 
       <main className="relative z-10 space-y-16 pt-16 pb-20">
@@ -294,55 +305,55 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <div className="feat-showcase">
+          <div className="relative grid min-h-[500px] grid-cols-[1fr_320px] overflow-hidden rounded-lg border border-blue-300/20 bg-slate-950 shadow-[0_36px_110px_rgba(2,6,23,0.45),0_0_0_1px_rgba(255,255,255,0.04),inset_0_1px_0_rgba(255,255,255,0.12)] before:pointer-events-none before:absolute before:inset-0 before:z-[3] before:bg-[linear-gradient(110deg,transparent_0%,rgba(96,165,250,0.08)_42%,transparent_72%)] after:pointer-events-none after:absolute after:inset-3.5 after:z-[4] after:border after:border-blue-100/10 max-md:grid-cols-1 max-md:after:inset-2.5">
             {/* Main image */}
-            <div className="feat-main">
+            <div className="group relative overflow-hidden">
               <img
                 src={featuredItems[currentSlide].image}
                 alt={featuredItems[currentSlide].name}
-                className="feat-main-img"
+                className="block h-full min-h-[420px] w-full object-cover transition-transform duration-500 group-hover:scale-[1.03] max-md:min-h-[340px] [filter:saturate(0.92)_contrast(1.08)]"
                 loading="eager"
               />
-              <div className="feat-main-overlay">
-                <div className="feat-kicker">
+              <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-[#01050e]/95 via-[#081631]/70 via-[44%] to-transparent p-[34px] max-md:p-7">
+                <div className="absolute left-[34px] right-[34px] top-7 flex justify-between gap-3 text-[0.62rem] font-extrabold uppercase tracking-[0.16em] text-blue-100/70 max-md:left-7 max-md:right-7 max-md:top-[22px] max-md:text-[0.55rem] max-md:tracking-[0.12em]">
                   <span>Signature Selection</span>
                   <span>Verified Stock</span>
                 </div>
-                <span className={`feat-type-badge ${featuredItems[currentSlide].type}`}>
+                <span className={`mb-3 inline-block w-fit rounded border border-white/20 px-3.5 py-1.5 text-[0.68rem] font-bold uppercase tracking-[0.06em] backdrop-blur ${typeBadgeClasses[featuredItems[currentSlide].type]}`}>
                   {featuredItems[currentSlide].badge}
                 </span>
-                <h3 className="feat-main-name">{featuredItems[currentSlide].name}</h3>
-                <p className="feat-main-price">{featuredItems[currentSlide].price}</p>
-                <div className="feat-main-meta" aria-label="Listing highlights">
-                  <span><i className="fas fa-shield-alt"></i> Certified</span>
-                  <span><i className="fas fa-gem"></i> Premium Grade</span>
-                  <span><i className="fas fa-headset"></i> Concierge Support</span>
+                <h3 className="m-0 mb-1.5 text-[clamp(2rem,4vw,3.35rem)] font-extrabold leading-[1.15] tracking-[-0.03em] text-white max-md:text-[2rem]">{featuredItems[currentSlide].name}</h3>
+                <p className="m-0 mb-[18px] text-[clamp(1.2rem,2vw,1.65rem)] font-extrabold tracking-[-0.01em] text-blue-200">{featuredItems[currentSlide].price}</p>
+                <div className="flex flex-wrap gap-2.5" aria-label="Listing highlights">
+                  <span className="inline-flex items-center gap-[7px] rounded-[5px] border border-blue-300/20 bg-slate-950/70 px-[11px] py-2 text-[0.72rem] font-bold text-slate-100/80 max-md:px-2.5 max-md:py-[7px] max-md:text-[0.68rem]"><i className="fas fa-shield-alt text-blue-300"></i> Certified</span>
+                  <span className="inline-flex items-center gap-[7px] rounded-[5px] border border-blue-300/20 bg-slate-950/70 px-[11px] py-2 text-[0.72rem] font-bold text-slate-100/80 max-md:px-2.5 max-md:py-[7px] max-md:text-[0.68rem]"><i className="fas fa-gem text-blue-300"></i> Premium Grade</span>
+                  <span className="inline-flex items-center gap-[7px] rounded-[5px] border border-blue-300/20 bg-slate-950/70 px-[11px] py-2 text-[0.72rem] font-bold text-slate-100/80 max-md:px-2.5 max-md:py-[7px] max-md:text-[0.68rem]"><i className="fas fa-headset text-blue-300"></i> Concierge Support</span>
                 </div>
               </div>
-              <button onClick={prevSlide} className="feat-arrow feat-arrow-prev" aria-label="Previous item">
+              <button onClick={prevSlide} className="absolute left-3.5 top-1/2 z-[5] flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-blue-300/20 bg-slate-950/60 text-[0.85rem] text-white backdrop-blur transition hover:border-blue-100/60 hover:bg-blue-600/90" aria-label="Previous item">
                 <i className="fas fa-chevron-left"></i>
               </button>
-              <button onClick={nextSlide} className="feat-arrow feat-arrow-next" aria-label="Next item">
+              <button onClick={nextSlide} className="absolute right-3.5 top-1/2 z-[5] flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-blue-300/20 bg-slate-950/60 text-[0.85rem] text-white backdrop-blur transition hover:border-blue-100/60 hover:bg-blue-600/90" aria-label="Next item">
                 <i className="fas fa-chevron-right"></i>
               </button>
             </div>
 
             {/* Item list */}
-            <div className="feat-list">
-              <p className="feat-list-header">All Items</p>
+            <div className="flex flex-col overflow-y-auto border-l border-blue-300/15 bg-gradient-to-b from-[#081631] to-slate-950 max-md:max-h-[280px] max-md:border-l-0 max-md:border-t max-md:border-white/10">
+              <p className="border-b border-slate-400/10 px-5 pb-4 pt-[22px] text-[0.68rem] font-bold uppercase tracking-[0.1em] text-blue-100/50">All Items</p>
               {featuredItems.map((item, index) => (
                 <button
                   key={item.name}
                   onClick={() => goToSlide(index)}
-                  className={`feat-item${currentSlide === index ? ' feat-item-active' : ''}`}
+                  className={`flex w-full cursor-pointer items-center gap-3 border-0 border-b border-slate-400/10 border-l-[3px] px-5 py-4 text-left transition hover:bg-blue-400/10 ${currentSlide === index ? 'border-l-blue-400 bg-gradient-to-r from-blue-600/20 to-slate-900/20' : 'border-l-transparent bg-transparent'}`}
                 >
-                  <img src={item.image} alt={item.name} className="feat-item-thumb" />
-                  <div className="feat-item-info">
-                    <span className={`feat-item-tag feat-item-tag--${item.type}`}>{item.badge}</span>
-                    <p className="feat-item-name">{item.name}</p>
-                    <p className="feat-item-price">{item.price}</p>
+                  <img src={item.image} alt={item.name} className={`h-[50px] w-[68px] shrink-0 rounded-[5px] object-cover transition ${currentSlide === index ? 'scale-[1.02] opacity-100' : 'opacity-75 hover:opacity-100'}`} />
+                  <div className="min-w-0 flex-1">
+                    <span className={`mb-[3px] inline-block rounded px-[7px] py-px text-[0.58rem] font-bold uppercase tracking-[0.05em] ${itemTagClasses[item.type]}`}>{item.badge}</span>
+                    <p className={`m-0 mb-0.5 truncate text-[0.84rem] font-semibold transition ${currentSlide === index ? 'text-white' : 'text-slate-300'}`}>{item.name}</p>
+                    <p className={`m-0 text-[0.72rem] ${currentSlide === index ? 'text-blue-300' : 'text-slate-500'}`}>{item.price}</p>
                   </div>
-                  <i className="fas fa-chevron-right feat-chevron"></i>
+                  <i className={`fas fa-chevron-right shrink-0 text-[0.65rem] transition ${currentSlide === index ? 'text-blue-300' : 'text-white/15'}`}></i>
                 </button>
               ))}
             </div>
@@ -377,37 +388,37 @@ export default function HomePage() {
           
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {featuredItems.filter(item => item.type === 'vehicle').map((vehicle) => (
-              <div key={vehicle.name} className="vcard">
+              <div key={vehicle.name} className="group relative flex flex-col overflow-hidden rounded-lg border border-slate-400/20 bg-gradient-to-b from-slate-900 to-[#030a18] shadow-[0_22px_58px_rgba(2,6,23,0.36)] transition duration-300 before:pointer-events-none before:absolute before:inset-0 before:z-[2] before:border-t before:border-white/10 hover:-translate-y-2 hover:border-blue-400/30 hover:shadow-[0_34px_80px_rgba(2,6,23,0.5),0_0_0_1px_rgba(96,165,250,0.18)]">
                 {/* Image with gradient bleed */}
-                <div className="vcard-img-wrap">
-                  <img src={vehicle.image} alt={vehicle.name} className="vcard-img" />
-                  <span className="vcard-badge">Available</span>
+                <div className="relative h-56 shrink-0 overflow-hidden bg-slate-950 after:pointer-events-none after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[120px] after:bg-[linear-gradient(to_bottom,transparent_0%,rgba(2,6,23,0.2)_45%,#071225_100%)]">
+                  <img src={vehicle.image} alt={vehicle.name} className="block h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.06] [filter:saturate(0.92)_contrast(1.06)]" />
+                  <span className="absolute right-3.5 top-3.5 z-[2] rounded border border-blue-300/40 bg-slate-950/75 px-3 py-1 text-[0.65rem] font-bold uppercase tracking-[0.08em] text-blue-100 backdrop-blur">Available</span>
                 </div>
 
                 {/* Card body */}
-                <div className="vcard-body">
-                  <h3 className="vcard-name">{vehicle.name}</h3>
-                  <p className="vcard-price">{vehicle.price}</p>
+                <div className="flex flex-1 flex-col px-[22px] pb-[22px]">
+                  <h3 className="m-0 mb-1.5 text-[1.08rem] font-bold tracking-[-0.01em] text-slate-50">{vehicle.name}</h3>
+                  <p className="m-0 mb-4 text-[1.45rem] font-extrabold tracking-[-0.02em] text-blue-200">{vehicle.price}</p>
 
-                  <div className="vcard-divider" />
+                  <div className="mb-3.5 h-px bg-gradient-to-r from-blue-400/30 to-white/5" />
 
-                  <div className="vcard-specs">
-                    <span className="vcard-spec"><i className="fas fa-gas-pump"></i> Petrol</span>
-                    <span className="vcard-spec"><i className="fas fa-cog"></i> Automatic</span>
-                    <span className="vcard-spec"><i className="fas fa-car"></i> Used</span>
+                  <div className="mb-[18px] flex flex-wrap gap-2">
+                    <span className="inline-flex items-center gap-1 rounded-[5px] border border-slate-400/15 bg-slate-900/70 px-2.5 py-1 text-[0.7rem] text-slate-200/65 [&_i]:text-[0.65rem] [&_i]:text-blue-400"><i className="fas fa-gas-pump"></i> Petrol</span>
+                    <span className="inline-flex items-center gap-1 rounded-[5px] border border-slate-400/15 bg-slate-900/70 px-2.5 py-1 text-[0.7rem] text-slate-200/65 [&_i]:text-[0.65rem] [&_i]:text-blue-400"><i className="fas fa-cog"></i> Automatic</span>
+                    <span className="inline-flex items-center gap-1 rounded-[5px] border border-slate-400/15 bg-slate-900/70 px-2.5 py-1 text-[0.7rem] text-slate-200/65 [&_i]:text-[0.65rem] [&_i]:text-blue-400"><i className="fas fa-car"></i> Used</span>
                   </div>
 
-                  <div className="vcard-cta">
+                  <div className="mt-auto flex gap-2.5">
                     <a
                       href="https://wa.me/2347060882711"
                       target="_blank"
                       rel="noreferrer"
-                      className="vcard-btn-primary"
+                      className="inline-flex flex-1 items-center justify-center gap-[7px] rounded-md bg-gradient-to-br from-blue-700 to-blue-500 px-4 py-[11px] text-[0.82rem] font-bold tracking-[0.03em] text-white no-underline shadow-[0_12px_30px_rgba(37,99,235,0.3)] transition hover:-translate-y-px hover:text-white hover:brightness-110 hover:shadow-[0_16px_38px_rgba(37,99,235,0.42)]"
                     >
                       <i className="fab fa-whatsapp"></i>
                       Inquire Now
                     </a>
-                    <button className="vcard-btn-ghost">
+                    <button className="inline-flex items-center justify-center gap-1.5 rounded-md border border-white/10 bg-transparent px-4 py-[11px] text-[0.82rem] font-semibold text-white/55 transition hover:border-blue-400/40 hover:text-blue-200">
                       Details
                     </button>
                   </div>
@@ -427,23 +438,23 @@ export default function HomePage() {
           
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {serviceItems.map((service) => (
-              <div key={service.title} className="service-card group">
-                <div className="service-card-image-wrap">
-                  <img src={service.image} alt={service.title} className="service-card-image" loading="lazy" />
-                  <div className="service-card-image-shade" />
-                  <div className="service-card-icon">
+              <div key={service.title} className="group overflow-hidden rounded-lg border border-slate-200/90 bg-white/80 shadow-[0_18px_48px_rgba(15,23,42,0.08)] transition duration-300 hover:-translate-y-[5px] hover:border-blue-600/30 hover:shadow-[0_26px_64px_rgba(15,23,42,0.14)]">
+                <div className="relative h-[178px] overflow-hidden bg-slate-900">
+                  <img src={service.image} alt={service.title} className="block h-full w-full scale-[1.01] object-cover transition duration-500 group-hover:scale-[1.07] [filter:saturate(0.96)_contrast(1.04)]" loading="lazy" />
+                  <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(2,6,23,0.72),rgba(2,6,23,0.05)_68%),linear-gradient(120deg,rgba(37,99,235,0.28),transparent_58%)]" />
+                  <div className="absolute bottom-4 left-[18px] inline-flex h-[46px] w-[46px] items-center justify-center rounded-lg border border-white/75 bg-white/95 text-primary shadow-[0_12px_30px_rgba(2,6,23,0.18)]">
                     <i className={`${service.icon}`} aria-hidden="true"></i>
                   </div>
                 </div>
-                <div className="service-card-body">
-                  <h3 className="service-card-title">{service.title}</h3>
-                  <p className="service-card-copy">{service.description}</p>
+                <div className="p-5">
+                  <h3 className="m-0 mb-2 text-[1.05rem] font-extrabold tracking-normal text-text-primary">{service.title}</h3>
+                  <p className="m-0 mb-[18px] min-h-[72px] text-[0.88rem] leading-[1.65] text-text-secondary">{service.description}</p>
                   {service.link.startsWith('http') ? (
                     <a
                       href={service.link}
                       target="_blank"
                       rel="noreferrer"
-                      className="service-card-link"
+                      className="inline-flex items-center gap-[7px] text-[0.86rem] font-extrabold text-primary no-underline [&_i]:text-[0.72rem] [&_i]:transition-transform hover:[&_i]:translate-x-[3px]"
                     >
                       {service.linkText}
                       <i className="fas fa-arrow-right" aria-hidden="true"></i>
@@ -451,7 +462,7 @@ export default function HomePage() {
                   ) : (
                     <Link
                       to={service.link}
-                      className="service-card-link"
+                      className="inline-flex items-center gap-[7px] text-[0.86rem] font-extrabold text-primary no-underline [&_i]:text-[0.72rem] [&_i]:transition-transform hover:[&_i]:translate-x-[3px]"
                     >
                       {service.linkText}
                       <i className="fas fa-arrow-right" aria-hidden="true"></i>
@@ -726,3 +737,4 @@ export default function HomePage() {
     </div>
   );
 }
+

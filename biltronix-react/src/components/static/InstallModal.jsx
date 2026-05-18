@@ -5,7 +5,7 @@ export default function InstallModal({ installModal, triggerInstallPrompt, onClo
   
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-md p-4">
-      <div className="glass-card max-w-md w-full p-6 animate-slide-up" style={{ background: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(40px)', WebkitBackdropFilter: 'blur(40px)' }}>
+      <div className="rounded-glass border border-glass-border bg-glass-surface shadow-glass backdrop-blur-glass transition hover:-translate-y-0.5 hover:bg-white/85 hover:shadow-glass-hover max-w-md w-full p-6 animate-slide-up" style={{ background: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(40px)', WebkitBackdropFilter: 'blur(40px)' }}>
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-xl bg-primary-50 flex items-center justify-center">
@@ -33,7 +33,7 @@ export default function InstallModal({ installModal, triggerInstallPrompt, onClo
             <button
               type="button"
               onClick={triggerInstallPrompt}
-              className="flex-1 btn-primary py-2.5"
+              className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-primary text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 py-2.5"
             >
               <i className="fas fa-download mr-2"></i>
               Install Now
@@ -42,7 +42,7 @@ export default function InstallModal({ installModal, triggerInstallPrompt, onClo
           <button
             type="button"
             onClick={onClose}
-            className="btn-secondary px-5 py-2.5"
+            className="inline-flex items-center justify-center rounded-xl border border-glass-border bg-glass-surface text-text-primary backdrop-blur transition hover:bg-white/85 px-5 py-2.5"
           >
             {installModal.canInstall ? 'Maybe Later' : 'Close'}
           </button>
