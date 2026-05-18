@@ -233,7 +233,7 @@ export default function HomePage() {
 
           <p className="mb-8 max-w-[430px] text-base leading-[1.78] text-white/55 max-[900px]:mx-auto max-[900px]:max-w-[620px] max-[640px]:mb-[22px] max-[640px]:text-[0.95rem] max-[640px]:leading-7">
             Browse our curated selection of premium vehicles, genuine parts, and
-            expert guidance — every vehicle thoroughly inspected and backed by our
+            expert guidance every vehicle thoroughly inspected and backed by our
             quality guarantee.
           </p>
 
