@@ -4,26 +4,26 @@ import FloatingWhatsApp from '../components/static/FloatingWhatsApp.jsx';
 import { Link } from 'react-router-dom';
 
 const quickStats = [
-  { value: '120+', label: 'Vehicles Ready', detail: 'Inspected & certified' },
-  { value: '360+', label: 'Expert Tips', detail: 'Daily automotive advice' },
-  { value: '15', label: 'Premium Brands', detail: 'Curated selection' },
-  { value: '24/7', label: 'Support', detail: 'Always here to help' },
+  { value: '120+', label: 'Ready Vehicles', detail: 'Checked before listing' },
+  { value: '360+', label: 'Advisory Guides', detail: 'Practical ownership notes' },
+  { value: '15', label: 'Trusted Brands', detail: 'Selected for reliability' },
+  { value: '24/7', label: 'Buyer Support', detail: 'Guidance when you need it' },
 ];
 
 const featureBoxes = [
   {
-    title: 'Transparent Sourcing',
-    copy: 'Every listing includes complete history, inspection reports, and high-quality imagery.',
+    title: 'Clear Sourcing',
+    copy: 'Listings are presented with the details buyers need before committing.',
     icon: 'fas fa-search',
   },
   {
-    title: 'Smart Alerts',
-    copy: 'Get instantly notified when your desired make, model, or parts arrive in stock.',
+    title: 'Stock Guidance',
+    copy: 'Get directed to vehicles, parts, and accessories that fit your brief.',
     icon: 'fas fa-bell',
   },
   {
-    title: 'Expert Guidance',
-    copy: 'Professional maintenance advice written by certified automotive technicians.',
+    title: 'Technical Advice',
+    copy: 'Maintenance and inspection guidance written for real ownership decisions.',
     icon: 'fas fa-cogs',
   },
 ];
@@ -35,7 +35,7 @@ const serviceItems = [
     description: 'Premium used and foreign vehicles, thoroughly inspected and certified for quality. From sedans to SUVs, find your perfect ride.',
     link: '/sales',
     linkText: 'Browse Vehicles',
-    image: 'https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=900&h=600&fit=crop',
+    image: '/hero-car-original-withbackground.jpeg',
   },
   {
     icon: 'fas fa-cogs',
@@ -43,7 +43,7 @@ const serviceItems = [
     description: 'OEM-quality replacement parts, filters, brakes, batteries, and service kits for all major vehicle makes and models.',
     link: '/sales',
     linkText: 'Shop Parts',
-    image: 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=900&h=600&fit=crop',
+    image: '/repair-troubleshooting.jpeg',
   },
   {
     icon: 'fas fa-clipboard-check',
@@ -75,28 +75,28 @@ const serviceItems = [
     description: 'Safe and insured vehicle delivery across Nigeria. We bring your purchase directly to your doorstep.',
     link: '#',
     linkText: 'Learn More',
-    image: 'https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?w=900&h=600&fit=crop',
+    image: '/hero-car-original-withbackground.jpeg',
   },
 ];
 
 const highlightCards = [
   {
     title: 'Vehicles',
-    desc: 'Premium sedans, SUVs, and trucks — all inspected and road-ready.',
     emphasis: 'Certified Quality',
-    image: 'https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=600&h=400&fit=crop',
+    desc: 'Premium sedans, SUVs, and trucks selected for confident ownership.',
+    image: '/hero-car-original-withbackground.jpeg',
   },
   {
     title: 'Parts',
     desc: 'OEM-grade replacements, filters, brakes, batteries, and service kits.',
     emphasis: 'Genuine Parts',
-    image: 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=600&h=400&fit=crop',
+    image: '/repair-troubleshooting.jpeg',
   },
   {
     title: 'Accessories',
     desc: 'Dash cams, seat covers, audio systems, and premium travel gear.',
     emphasis: 'Premium Selection',
-    image: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=600&h=400&fit=crop',
+    image: '/computerized Diagnostics.jpg',
   },
 ];
 
@@ -126,48 +126,55 @@ const itemTagClasses = {
   accessory: 'bg-violet-600/20 text-violet-200',
 };
 
+const heroServices = [
+  { icon: 'fas fa-car', label: 'Vehicle Sales' },
+  { icon: 'fas fa-cogs', label: 'Genuine Parts' },
+  { icon: 'fas fa-clipboard-check', label: 'Pre-Purchase Inspection' },
+  { icon: 'fas fa-wrench', label: 'Service & Maintenance' },
+];
+
 // Featured items for hero carousel - includes vehicles, parts, and accessories
 const featuredItems = [
   {
     type: 'vehicle',
     name: 'Lexus RX 350',
     price: 'NGN 28,500,000',
-    image: 'https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=800&h=500&fit=crop',
+    image: '/hero-car-original-withbackground.jpeg',
     badge: 'Vehicle',
   },
   {
     type: 'vehicle',
     name: 'Mercedes-Benz GLE',
     price: 'NGN 45,000,000',
-    image: 'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=800&h=500&fit=crop',
+    image: '/hero-car-original-withbackground.jpeg',
     badge: 'Vehicle',
   },
   {
     type: 'vehicle',
     name: 'Toyota Land Cruiser',
     price: 'NGN 52,000,000',
-    image: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=800&h=500&fit=crop',
+    image: '/hero-car-original-withbackground.jpeg',
     badge: 'Vehicle',
   },
   {
     type: 'part',
     name: 'OEM Brake Pad Set',
     price: 'NGN 62,000',
-    image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&h=500&fit=crop',
+    image: '/repair-troubleshooting.jpeg',
     badge: 'Parts',
   },
   {
     type: 'part',
     name: 'Synthetic Motor Oil',
     price: 'NGN 28,500',
-    image: 'https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=800&h=500&fit=crop',
+    image: '/computerized Diagnostics.jpg',
     badge: 'Parts',
   },
   {
     type: 'accessory',
     name: '4K Dash Camera',
     price: 'NGN 85,000',
-    image: 'https://images.unsplash.com/photo-1591488320449-011701bb6704?w=800&h=500&fit=crop',
+    image: '/ecu-trouble-shooting-repair.jpeg',
     badge: 'Accessories',
   },
 ];
@@ -208,13 +215,13 @@ export default function HomePage() {
 
       {/* ── Dark Luxury Hero ── */}
       <section
-        className={`relative flex min-h-[calc(100vh-96px)] w-full items-center overflow-hidden bg-slate-900 xl:min-h-[90vh] max-[900px]:min-h-0 max-[900px]:flex-col max-[900px]:justify-start max-[900px]:pt-10${heroAnimated ? ' lux-on' : ''}`}
+        className={`relative flex min-h-[calc(100vh-96px)] w-full items-center overflow-hidden bg-slate-900 xl:min-h-[90vh] max-[900px]:min-h-0 max-[900px]:flex-col max-[900px]:justify-start max-[900px]:pt-9${heroAnimated ? ' lux-on' : ''}`}
         aria-label="Biltronix hero"
       >
         <div className="absolute inset-0 z-0 bg-slate-900" aria-hidden="true" />
 
         {/* Speed lines */}
-        <div className="pointer-events-none absolute inset-0 z-[1] overflow-hidden" aria-hidden="true">
+        <div className="pointer-events-none absolute inset-0 z-[1] overflow-hidden max-[900px]:hidden" aria-hidden="true">
           {HERO_LINES.map((l, i) => (
             <div
               key={i}
@@ -225,19 +232,29 @@ export default function HomePage() {
         </div>
 
         {/* Left hero content */}
-        <div className="relative z-20 w-full flex-[0_0_48%] translate-x-[-36px] pl-[7%] pr-4 opacity-0 transition-[opacity,transform] delay-500 duration-1000 ease-out [.lux-on_&]:translate-x-0 [.lux-on_&]:opacity-100 max-[1100px]:flex-[0_0_52%] max-[900px]:mx-auto max-[900px]:max-w-3xl max-[900px]:flex-none max-[900px]:translate-y-4 max-[900px]:px-6 max-[900px]:text-center [.lux-on_&]:max-[900px]:translate-y-0 max-[640px]:px-[18px]">
-          <h1 className="m-0 mb-5 max-w-[680px] font-heading text-[clamp(2.5rem,5vw,4.2rem)] font-extrabold leading-[1.08] tracking-[-0.04em] text-white max-[900px]:mx-auto max-[640px]:text-[clamp(2rem,10vw,2.75rem)]">
+        <div className="relative z-20 w-full flex-[0_0_48%] pl-[7%] pr-4 max-[1100px]:flex-[0_0_52%] max-[900px]:mx-auto max-[900px]:max-w-3xl max-[900px]:flex-none max-[900px]:px-6 max-[900px]:text-center max-[640px]:px-[18px]">
+          <p className="mb-4 hidden text-[0.68rem] font-bold uppercase tracking-[0.22em] text-blue-200/70 max-[900px]:block">Automotive Sales & Services</p>
+          <h1 className="m-0 mb-5 max-w-[680px] font-heading text-[clamp(2.5rem,5vw,4.2rem)] font-extrabold leading-[1.08] text-white max-[900px]:mx-auto max-[640px]:text-[clamp(2rem,10vw,2.75rem)]">
             Find Your Dream Car at{' '}
             <span className="animate-[luxGoldShimmer_4s_linear_infinite] bg-[linear-gradient(90deg,#60a5fa,#93c5fd,#ffffff,#bfdbfe,#60a5fa)] bg-[length:300%_auto] bg-clip-text text-transparent motion-reduce:animate-none motion-reduce:bg-none motion-reduce:text-blue-300">Biltronix</span>
           </h1>
 
-          <p className="mb-8 max-w-[430px] text-base leading-[1.78] text-white/55 max-[900px]:mx-auto max-[900px]:max-w-[620px] max-[640px]:mb-[22px] max-[640px]:text-[0.95rem] max-[640px]:leading-7">
+          <p className="mb-5 max-w-[470px] text-base leading-[1.78] text-slate-300/85 max-[900px]:mx-auto max-[900px]:max-w-[620px] max-[640px]:mb-[18px] max-[640px]:text-[0.95rem] max-[640px]:leading-7">
             Browse our curated selection of premium vehicles, genuine parts, and
-            expert guidance every vehicle thoroughly inspected and backed by our
-            quality guarantee.
+            expert guidance. Every vehicle is thoroughly inspected and backed by
+            our quality guarantee.
           </p>
 
-          <div className="mb-9 flex flex-wrap items-center gap-3.5 max-[900px]:mb-6 max-[900px]:justify-center max-[640px]:mb-[18px] max-[640px]:grid max-[640px]:grid-cols-1 max-[640px]:gap-2.5">
+          <div className="mb-7 grid max-w-[560px] grid-cols-2 gap-2.5 max-[900px]:mx-auto max-[640px]:mb-5">
+            {heroServices.map((service) => (
+              <span key={service.label} className="inline-flex min-h-10 items-center gap-2 rounded-md border border-blue-200/15 bg-white/[0.055] px-3 py-2 text-[0.75rem] font-semibold text-slate-100/85 backdrop-blur max-[420px]:text-[0.68rem]">
+                <i className={`${service.icon} w-4 text-center text-blue-300`} aria-hidden="true"></i>
+                {service.label}
+              </span>
+            ))}
+          </div>
+
+          <div className="mb-8 flex flex-wrap items-center gap-3.5 max-[900px]:mb-6 max-[900px]:justify-center max-[640px]:mb-[18px] max-[640px]:grid max-[640px]:grid-cols-1 max-[640px]:gap-2.5">
             <Link to="/sales" className="inline-flex items-center justify-center gap-2.5 rounded px-[26px] py-[13px] text-[0.82rem] font-bold uppercase tracking-[0.08em] text-white no-underline shadow-[0_12px_34px_rgba(37,99,235,0.42)] transition hover:-translate-y-0.5 hover:text-white hover:shadow-[0_16px_48px_rgba(37,99,235,0.58)] [background:linear-gradient(135deg,#1d4ed8_0%,#3b82f6_52%,#60a5fa_100%)] [background-size:200%_auto] hover:[background-position:right_center] max-[640px]:w-full">
               <i className="fas fa-car" aria-hidden="true"></i>
               Browse Inventory
@@ -247,24 +264,24 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <div className="flex flex-wrap gap-5 max-[900px]:mb-0 max-[900px]:justify-center max-[900px]:gap-3 max-[520px]:grid max-[520px]:grid-cols-1">
-            <span className="flex items-center gap-[7px] text-[0.8rem] text-slate-200/70 max-[900px]:text-white/95 [&_i]:text-[0.85rem] [&_i]:text-blue-400 max-[900px]:[&_i]:text-[#ffd166]">
+          <div className="flex flex-wrap gap-5 max-[900px]:mb-0 max-[900px]:grid max-[900px]:grid-cols-3 max-[900px]:gap-2.5">
+            <span className="flex items-center gap-[7px] text-[0.8rem] text-slate-200/70 max-[900px]:justify-center max-[900px]:rounded-md max-[900px]:border max-[900px]:border-white/10 max-[900px]:bg-white/[0.04] max-[900px]:px-2 max-[900px]:py-2 max-[900px]:text-[0.72rem] max-[900px]:text-white/90 [&_i]:text-[0.85rem] [&_i]:text-blue-400 max-[900px]:[&_i]:text-blue-300">
               <i className="fas fa-shield-alt" aria-hidden="true"></i>
-              Certified Quality
+              Certified
             </span>
-            <span className="flex items-center gap-[7px] text-[0.8rem] text-slate-200/70 max-[900px]:text-white/95 [&_i]:text-[0.85rem] [&_i]:text-blue-400 max-[900px]:[&_i]:text-[#ffd166]">
+            <span className="flex items-center gap-[7px] text-[0.8rem] text-slate-200/70 max-[900px]:justify-center max-[900px]:rounded-md max-[900px]:border max-[900px]:border-white/10 max-[900px]:bg-white/[0.04] max-[900px]:px-2 max-[900px]:py-2 max-[900px]:text-[0.72rem] max-[900px]:text-white/90 [&_i]:text-[0.85rem] [&_i]:text-blue-400 max-[900px]:[&_i]:text-blue-300">
               <i className="fas fa-truck" aria-hidden="true"></i>
-              Fast Delivery
+              Delivery
             </span>
-            <span className="flex items-center gap-[7px] text-[0.8rem] text-slate-200/70 max-[900px]:text-white/95 [&_i]:text-[0.85rem] [&_i]:text-blue-400 max-[900px]:[&_i]:text-[#ffd166]">
+            <span className="flex items-center gap-[7px] text-[0.8rem] text-slate-200/70 max-[900px]:justify-center max-[900px]:rounded-md max-[900px]:border max-[900px]:border-white/10 max-[900px]:bg-white/[0.04] max-[900px]:px-2 max-[900px]:py-2 max-[900px]:text-[0.72rem] max-[900px]:text-white/90 [&_i]:text-[0.85rem] [&_i]:text-blue-400 max-[900px]:[&_i]:text-blue-300">
               <i className="fas fa-headset" aria-hidden="true"></i>
-              Expert Support
+              Support
             </span>
           </div>
         </div>
 
         {/* Car stage */}
-        <div className="absolute right-0 top-0 z-[5] h-full w-[62%] max-[1100px]:w-[58%] max-[900px]:relative max-[900px]:right-auto max-[900px]:top-auto max-[900px]:mt-3 max-[900px]:h-[340px] max-[900px]:w-full max-[640px]:mt-0 max-[640px]:h-[260px] max-[420px]:h-[220px]" aria-hidden="true">
+        <div className="absolute right-0 top-0 z-[5] h-full w-[62%] max-[1100px]:w-[58%] max-[900px]:relative max-[900px]:right-auto max-[900px]:top-auto max-[900px]:mt-1 max-[900px]:h-[260px] max-[900px]:w-full max-[640px]:mt-0 max-[640px]:h-[180px] max-[420px]:h-[160px]" aria-hidden="true">
           <div className="pointer-events-none absolute left-[20%] top-[-30%] z-[1] h-[80%] w-[60%] bg-[radial-gradient(ellipse,rgba(147,197,253,0.16)_0%,transparent_60%)]" />
           <div className="pointer-events-none absolute bottom-[44%] left-0 z-[2] h-[60px] w-[38%] opacity-0 transition-opacity delay-[1900ms] duration-700 [background:linear-gradient(to_left,rgba(191,219,254,0.18),transparent)] [clip-path:polygon(100%_45%,0%_0%,0%_25%)] [.lux-on_&]:animate-[luxBeamPulse_5s_ease-in-out_infinite] [.lux-on_&]:opacity-100 max-[900px]:hidden motion-reduce:animate-none" />
           <div className="pointer-events-none absolute bottom-[33%] left-0 z-[2] h-[60px] w-[38%] opacity-0 transition-opacity delay-[1900ms] duration-700 [background:linear-gradient(to_left,rgba(147,197,253,0.12),transparent)] [clip-path:polygon(100%_55%,0%_75%,0%_100%)] [.lux-on_&]:animate-[luxBeamPulse_5s_ease-in-out_0.5s_infinite] [.lux-on_&]:opacity-100 max-[900px]:hidden motion-reduce:animate-none" />
@@ -297,8 +314,8 @@ export default function HomePage() {
           <div className="flex items-center justify-between mb-6">
             <div>
               <span className="badge-primary text-xs mb-2 inline-block">Our Collection</span>
-              <h2 className="text-2xl md:text-3xl font-bold text-text-primary">Featured Items</h2>
-              <p className="text-text-secondary text-sm mt-1">Vehicles, parts &amp; accessories</p>
+              <h2 className="text-2xl md:text-3xl font-bold text-text-primary">Featured Stock</h2>
+              <p className="text-text-secondary text-sm mt-1">Vehicles, parts, and accessories in one place</p>
             </div>
             <Link to="/sales" className="text-primary font-semibold text-sm hover:underline flex items-center gap-1">
               View All <i className="fas fa-arrow-right text-xs"></i>
@@ -362,12 +379,12 @@ export default function HomePage() {
 
         {/* Stats Section */}
         <section className="container mx-auto px-4 md:px-6">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
             {quickStats.map((stat) => (
-              <div key={stat.label} className="glass-card p-6">
-                <p className="text-3xl font-bold text-text-primary">{stat.value}</p>
-                <p className="mt-2 text-sm font-semibold text-text-primary">{stat.label}</p>
-                <p className="text-xs text-text-muted mt-1">{stat.detail}</p>
+              <div key={stat.label} className="glass-card p-4 text-center sm:p-6">
+                <p className="text-2xl font-bold text-text-primary sm:text-3xl">{stat.value}</p>
+                <p className="mt-2 text-[0.8rem] font-semibold leading-tight text-text-primary sm:text-sm">{stat.label}</p>
+                <p className="mt-1 text-[0.68rem] leading-snug text-text-muted sm:text-xs">{stat.detail}</p>
               </div>
             ))}
           </div>
@@ -379,7 +396,7 @@ export default function HomePage() {
             <div>
               <span className="badge-primary text-xs mb-2 inline-block">Premium Inventory</span>
               <h2 className="text-2xl md:text-3xl font-bold text-text-primary">Featured Vehicles</h2>
-              <p className="text-text-secondary text-sm mt-1">Handpicked selection of quality automobiles</p>
+              <p className="text-text-secondary text-sm mt-1">Selected options for buyers who want fewer surprises</p>
             </div>
             <Link to="/sales" className="text-primary font-semibold text-sm hover:underline flex items-center gap-1">
               View All Inventory <i className="fas fa-arrow-right text-xs"></i>
@@ -432,8 +449,8 @@ export default function HomePage() {
         <section className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-12">
             <span className="badge-primary text-xs mb-2 inline-block">What We Offer</span>
-            <h2 className="text-2xl md:text-3xl font-bold text-text-primary">Our Services</h2>
-            <p className="text-text-secondary mt-2">Comprehensive automotive solutions under one roof</p>
+            <h2 className="text-2xl md:text-3xl font-bold text-text-primary">What We Handle</h2>
+            <p className="text-text-secondary mt-2">Sales, parts, inspections, and ownership support</p>
           </div>
           
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -478,7 +495,7 @@ export default function HomePage() {
         <section className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-10">
             <h2 className="text-2xl md:text-3xl font-bold text-text-primary">Why Choose Biltronix</h2>
-            <p className="text-text-secondary mt-2">Built on trust, powered by expertise</p>
+            <p className="text-text-secondary mt-2">A calmer way to buy, maintain, and inspect</p>
           </div>
           
           <div className="grid gap-6 md:grid-cols-3">
@@ -578,8 +595,8 @@ export default function HomePage() {
         <section className="container mx-auto px-4 md:px-6">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h2 className="text-2xl font-bold text-text-primary">Explore Our Range</h2>
-              <p className="text-text-secondary text-sm mt-1">Quality products, competitive prices</p>
+              <h2 className="text-2xl font-bold text-text-primary">Explore the Range</h2>
+              <p className="text-text-secondary text-sm mt-1">Essentials selected for reliability and finish</p>
             </div>
             <Link to="/sales" className="text-primary font-semibold text-sm hover:underline flex items-center gap-1">
               View All <i className="fas fa-arrow-right text-xs"></i>
@@ -614,21 +631,21 @@ export default function HomePage() {
           <div className="relative rounded-2xl overflow-hidden shadow-glass-xl" style={{ height: '300px' }}>
             {/* Background Image - Professional automotive */}
             <img 
-              src="https://images.pexels.com/photos/29112761/pexels-photo-29112761.jpeg?auto=compress&cs=tinysrgb&w=1200&h=400&fit=crop"
-              alt="Luxury car showroom - Harrison Tincher on Pexels"
+              src="/hero-car-original-withbackground.jpeg"
+              alt="Biltronix premium vehicle"
               className="absolute inset-0 w-full h-full object-cover"
             />
             {/* Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-primary-600/80"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-950/95 via-slate-900/86 to-blue-950/60"></div>
             
             {/* Content */}
             <div className="relative z-10 h-full flex items-center justify-center text-center px-4">
               <div className="max-w-2xl">
                 <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">
-                  Ready to Find Your Perfect Car?
+                  Ready for a Better Buying Decision?
                 </h2>
                 <p className="text-white/90 text-lg mb-6">
-                  Our team of automotive experts is ready to help you find the right vehicle.
+                  Speak with Biltronix for vehicle sourcing, parts guidance, or inspection support.
                 </p>
                 <div className="flex flex-wrap justify-center gap-4">
                   <a

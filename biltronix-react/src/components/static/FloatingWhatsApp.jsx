@@ -6,10 +6,12 @@ export default function FloatingWhatsApp() {
       href="https://wa.me/2347060882711"
       target="_blank"
       rel="noreferrer"
-      className="fixed bottom-5 right-5 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#25d366] text-2xl text-white shadow-[0_14px_34px_rgba(37,211,102,0.34)] transition hover:-translate-y-1 hover:shadow-[0_18px_44px_rgba(37,211,102,0.45)]"
+      className="fixed bottom-[calc(1.25rem+env(safe-area-inset-bottom))] right-5 z-[1000] flex h-14 w-14 items-center justify-center rounded-full bg-[#25d366] text-white shadow-[0_14px_34px_rgba(37,211,102,0.34)] transition hover:-translate-y-1 hover:shadow-[0_18px_44px_rgba(37,211,102,0.45)]"
       aria-label="Chat on WhatsApp"
     >
-      <i className="fab fa-whatsapp" aria-hidden="true"></i>
+      <svg aria-hidden="true" viewBox="0 0 32 32" className="h-7 w-7 fill-current">
+        <path d="M16.02 3.2c-7.05 0-12.78 5.67-12.78 12.65 0 2.23.6 4.4 1.72 6.31L3.2 28.8l6.84-1.78a12.9 12.9 0 0 0 5.98 1.48c7.05 0 12.78-5.67 12.78-12.65S23.07 3.2 16.02 3.2Zm0 22.92c-1.86 0-3.68-.5-5.27-1.43l-.38-.23-4.05 1.06 1.08-3.9-.26-.4a10.13 10.13 0 0 1-1.55-5.37c0-5.66 4.65-10.27 10.43-10.27s10.43 4.6 10.43 10.27-4.65 10.27-10.43 10.27Zm5.72-7.68c-.31-.15-1.84-.9-2.12-1-.28-.1-.49-.15-.7.15-.2.3-.8 1-.98 1.2-.18.2-.36.23-.67.08-.31-.15-1.31-.48-2.5-1.53a9.3 9.3 0 0 1-1.72-2.11c-.18-.3-.02-.47.13-.62.14-.13.31-.35.47-.52.16-.18.2-.3.31-.5.1-.2.05-.37-.03-.52-.08-.15-.7-1.67-.95-2.28-.25-.6-.5-.52-.7-.53h-.6c-.2 0-.52.08-.8.37-.28.3-1.05 1.02-1.05 2.48s1.08 2.88 1.23 3.08c.15.2 2.12 3.2 5.14 4.49.72.3 1.28.49 1.72.63.72.23 1.38.2 1.9.12.58-.08 1.84-.75 2.1-1.47.26-.72.26-1.34.18-1.47-.08-.13-.28-.2-.6-.35Z" />
+      </svg>
     </a>
   );
 }

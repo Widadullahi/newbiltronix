@@ -33,7 +33,7 @@ export default function SiteHeader() {
         <div className="container mx-auto flex flex-wrap items-center justify-between px-4 py-2">
           <span className="flex items-center gap-2">
             <i className="fas fa-clock text-primary-400"></i>
-            Mon - Sat · 09:00 AM - 07:00 PM
+            Mon - Sat - 09:00 AM - 07:00 PM
           </span>
           <span className="font-medium flex items-center gap-2">
             <i className="fab fa-whatsapp text-success"></i>
@@ -79,11 +79,13 @@ export default function SiteHeader() {
           <button
             type="button"
             onClick={() => setMobileMenuOpen((o) => !o)}
-            className="flex h-10 w-10 items-center justify-center rounded-[9px] border border-black/10 bg-white/10 text-text-primary lg:hidden"
+            className="flex h-10 w-10 flex-col items-center justify-center gap-1.5 rounded-[9px] border border-slate-200 bg-white text-text-primary shadow-sm lg:hidden"
             aria-label="Toggle menu"
             aria-expanded={mobileMenuOpen}
           >
-            <i className={`fas ${mobileMenuOpen ? 'fa-times' : 'fa-bars'}`}></i>
+            <span className={`block h-0.5 w-4 rounded-full bg-current transition ${mobileMenuOpen ? 'translate-y-2 rotate-45' : ''}`} />
+            <span className={`block h-0.5 w-4 rounded-full bg-current transition ${mobileMenuOpen ? 'opacity-0' : ''}`} />
+            <span className={`block h-0.5 w-4 rounded-full bg-current transition ${mobileMenuOpen ? '-translate-y-2 -rotate-45' : ''}`} />
           </button>
         </div>
 
@@ -113,3 +115,4 @@ export default function SiteHeader() {
     </header>
   );
 }
+
