@@ -195,6 +195,31 @@ function createReportPdf(report, account) {
   doc.save(`prepurchase-inspection-${fileId}.pdf`);
 }
 
+function PasswordVisibilityToggle({ visible, onToggle }) {
+  return (
+    <button
+      type='button'
+      onClick={onToggle}
+      className='absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-200'
+      aria-label={visible ? 'Hide password' : 'Show password'}
+    >
+      {visible ? (
+        <svg viewBox='0 0 24 24' className='h-5 w-5' fill='none' stroke='currentColor' strokeWidth='1.8'>
+          <path d='M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6S2.5 12 2.5 12Z' />
+          <circle cx='12' cy='12' r='3' />
+        </svg>
+      ) : (
+        <svg viewBox='0 0 24 24' className='h-5 w-5' fill='none' stroke='currentColor' strokeWidth='1.8'>
+          <path d='M3 3l18 18' />
+          <path d='M10.6 10.6A3 3 0 0 0 13.4 13.4' />
+          <path d='M9.2 5.2A11.7 11.7 0 0 1 12 4c6 0 9.5 6 9.5 8a11.8 11.8 0 0 1-2.6 3.7' />
+          <path d='M6.5 7.4A12.2 12.2 0 0 0 2.5 12s3.5 6 9.5 6c1.4 0 2.8-.2 4-.6' />
+        </svg>
+      )}
+    </button>
+  );
+}
+
 export default function InspectionPortalPage() {
   const inspectorAccountStorageKey = 'biltronix_inspector_account';
   const [account, setAccount] = useState(null);
@@ -222,6 +247,11 @@ export default function InspectionPortalPage() {
   const [resetOtp, setResetOtp] = useState('');
   const [resetPassword, setResetPassword] = useState('');
   const [resetConfirmPassword, setResetConfirmPassword] = useState('');
+  const [showRegistrationPassword, setShowRegistrationPassword] = useState(false);
+  const [showRegistrationConfirmPassword, setShowRegistrationConfirmPassword] = useState(false);
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
+  const [showResetPassword, setShowResetPassword] = useState(false);
+  const [showResetConfirmPassword, setShowResetConfirmPassword] = useState(false);
   const [resetBusy, setResetBusy] = useState(false);
   const [savingSettings, setSavingSettings] = useState(false);
   const [settings, setSettings] = useState({
@@ -564,361 +594,455 @@ export default function InspectionPortalPage() {
     setError('');
   };
 
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  const openAuth = (mode) => {
+    setAuthMode(mode);
+    setIsAuthModalOpen(true);
+    setError('');
+    setMessage('');
+  };
+
+  const closeAuthModal = () => {
+    setIsAuthModalOpen(false);
+    setError('');
+    setMessage('');
+  };
+
+  const renderAuthContent = () => (
+    <>
+      <div className='mb-5 flex rounded-2xl bg-white/10 p-1'>
+        <button
+          className={`flex-1 rounded-xl px-4 py-2.5 text-sm font-semibold transition ${authMode === 'register' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-300'}`}
+          onClick={() => setAuthMode('register')}
+          type='button'
+        >
+          Create Account
+        </button>
+        <button
+          className={`flex-1 rounded-xl px-4 py-2.5 text-sm font-semibold transition ${authMode === 'login' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-300'}`}
+          onClick={() => setAuthMode('login')}
+          type='button'
+        >
+          Sign In
+        </button>
+      </div>
+
+      <h3 className='mb-2 text-xl font-semibold'>Access your inspection workspace</h3>
+      <p className='mb-5 text-sm leading-7 text-slate-400'>Choose the option that fits you best and continue in seconds.</p>
+
+      {authMode === 'register' ? (
+        <form className='space-y-3' onSubmit={registerAccount}>
+          <input className='w-full rounded-2xl border border-white/10 bg-slate-900/80 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20' required placeholder='Full Name' value={registration.fullName} onChange={(e) => setRegistration((p) => ({ ...p, fullName: e.target.value }))} />
+          <input className='w-full rounded-2xl border border-white/10 bg-slate-900/80 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20' required type='email' placeholder='Email' value={registration.email} onChange={(e) => setRegistration((p) => ({ ...p, email: e.target.value }))} />
+          <div className='relative'>
+            <input className='w-full rounded-2xl border border-white/10 bg-slate-900/80 px-4 py-3 pr-12 text-sm text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20' required type={showRegistrationPassword ? 'text' : 'password'} placeholder='Password' value={registration.password} onChange={(e) => setRegistration((p) => ({ ...p, password: e.target.value }))} />
+            <PasswordVisibilityToggle visible={showRegistrationPassword} onToggle={() => setShowRegistrationPassword((prev) => !prev)} />
+          </div>
+          <div className='relative'>
+            <input className='w-full rounded-2xl border border-white/10 bg-slate-900/80 px-4 py-3 pr-12 text-sm text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20' required type={showRegistrationConfirmPassword ? 'text' : 'password'} placeholder='Confirm Password' value={registration.confirmPassword} onChange={(e) => setRegistration((p) => ({ ...p, confirmPassword: e.target.value }))} />
+            <PasswordVisibilityToggle visible={showRegistrationConfirmPassword} onToggle={() => setShowRegistrationConfirmPassword((prev) => !prev)} />
+          </div>
+          <input className='w-full rounded-2xl border border-white/10 bg-slate-900/80 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20' required placeholder='WhatsApp Number' value={registration.phone} onChange={(e) => setRegistration((p) => ({ ...p, phone: e.target.value }))} />
+          <input className='w-full rounded-2xl border border-white/10 bg-slate-900/80 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20' required placeholder='Company Name' value={registration.companyName} onChange={(e) => setRegistration((p) => ({ ...p, companyName: e.target.value }))} />
+          <textarea className='w-full rounded-2xl border border-white/10 bg-slate-900/80 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20' required placeholder='Company Address' value={registration.companyAddress} onChange={(e) => setRegistration((p) => ({ ...p, companyAddress: e.target.value }))} />
+          <label className='flex cursor-pointer flex-col gap-2 rounded-2xl border border-dashed border-white/10 bg-white/5 p-4 text-sm font-medium text-slate-300 transition hover:border-primary hover:bg-primary/10'>
+            Company Logo Upload
+            <input type='file' accept='image/*' onChange={(e) => uploadCompanyLogo(e.target.files?.[0])} className='hidden' />
+          </label>
+          {registration.companyLogoDataUrl && <img className='h-20 w-20 rounded-2xl border border-white/10 bg-slate-900 object-contain' src={registration.companyLogoDataUrl} alt='Company logo preview' />}
+          <label className='flex cursor-pointer flex-col gap-2 rounded-2xl border border-dashed border-white/10 bg-white/5 p-4 text-sm font-medium text-slate-300 transition hover:border-primary hover:bg-primary/10'>
+            Optional Signature Upload
+            <input type='file' accept='image/*' onChange={(e) => uploadSignature(e.target.files?.[0])} className='hidden' />
+          </label>
+          {registration.signatureDataUrl && <img className='h-20 w-20 rounded-2xl border border-white/10 bg-slate-900 object-contain' src={registration.signatureDataUrl} alt='Signature preview' />}
+          <button className='w-full rounded-2xl bg-primary px-5 py-3.5 text-sm font-semibold text-white shadow-[0_12px_32px_rgba(59,130,246,0.24)] transition hover:bg-primary-600' type='submit'>Create Account</button>
+        </form>
+      ) : (
+        <>
+          <form className='space-y-3' onSubmit={loginAccount}>
+            <input className='w-full rounded-2xl border border-white/10 bg-slate-900/80 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20' required type='email' placeholder='Email' value={loginData.email} onChange={(e) => setLoginData((p) => ({ ...p, email: e.target.value }))} />
+            <div className='relative'>
+              <input className='w-full rounded-2xl border border-white/10 bg-slate-900/80 px-4 py-3 pr-12 text-sm text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20' required type={showLoginPassword ? 'text' : 'password'} placeholder='Password' value={loginData.password} onChange={(e) => setLoginData((p) => ({ ...p, password: e.target.value }))} />
+              <PasswordVisibilityToggle visible={showLoginPassword} onToggle={() => setShowLoginPassword((prev) => !prev)} />
+            </div>
+            <button className='w-full rounded-2xl bg-primary px-5 py-3.5 text-sm font-semibold text-white shadow-[0_12px_32px_rgba(59,130,246,0.24)] transition hover:bg-primary-600' type='submit'>Login to Dashboard</button>
+          </form>
+          <div className='mt-4 space-y-3 rounded-2xl border border-white/10 bg-white/5 p-4'>
+            <h4 className='text-sm font-semibold text-white'>Forgot Password</h4>
+            <input className='w-full rounded-2xl border border-white/10 bg-slate-900/80 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20' type='email' placeholder='Your account email' value={resetEmail} onChange={(e) => setResetEmail(e.target.value)} disabled={resetBusy} />
+            <button className='w-full rounded-2xl bg-primary px-5 py-3.5 text-sm font-semibold text-white shadow-[0_12px_32px_rgba(59,130,246,0.24)] transition hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-60' type='button' onClick={requestPasswordReset} disabled={resetBusy}>{resetBusy ? 'Please wait...' : 'Request OTP'}</button>
+            <input className='w-full rounded-2xl border border-white/10 bg-slate-900/80 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20' type='text' placeholder='Enter OTP' value={resetOtp} onChange={(e) => setResetOtp(e.target.value)} disabled={resetBusy} />
+            <div className='relative'>
+              <input className='w-full rounded-2xl border border-white/10 bg-slate-900/80 px-4 py-3 pr-12 text-sm text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20' type={showResetPassword ? 'text' : 'password'} placeholder='New password' value={resetPassword} onChange={(e) => setResetPassword(e.target.value)} disabled={resetBusy} />
+              <PasswordVisibilityToggle visible={showResetPassword} onToggle={() => setShowResetPassword((prev) => !prev)} />
+            </div>
+            <div className='relative'>
+              <input className='w-full rounded-2xl border border-white/10 bg-slate-900/80 px-4 py-3 pr-12 text-sm text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20' type={showResetConfirmPassword ? 'text' : 'password'} placeholder='Confirm new password' value={resetConfirmPassword} onChange={(e) => setResetConfirmPassword(e.target.value)} disabled={resetBusy} />
+              <PasswordVisibilityToggle visible={showResetConfirmPassword} onToggle={() => setShowResetConfirmPassword((prev) => !prev)} />
+            </div>
+            <button className='w-full rounded-2xl bg-primary px-5 py-3.5 text-sm font-semibold text-white shadow-[0_12px_32px_rgba(59,130,246,0.24)] transition hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-60' type='button' onClick={confirmPasswordReset} disabled={resetBusy}>{resetBusy ? 'Please wait...' : 'Reset Password'}</button>
+          </div>
+        </>
+      )}
+
+      {message && <p className='mt-4 rounded-2xl bg-emerald-500/15 px-4 py-3 text-sm font-medium text-emerald-300'>{message}</p>}
+      {error && <p className='mt-4 rounded-2xl bg-rose-500/15 px-4 py-3 text-sm font-medium text-rose-300'>{error}</p>}
+    </>
+  );
+
   if (!account) {
     return (
-      <div className='min-h-screen bg-glass-bg'>
-        <header className='border-b border-glass-border bg-glass-surface px-6 py-4 backdrop-blur-2xl'>
-          <div className='mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 [&_h1]:m-0 [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:text-text-primary [&_p]:mt-1 [&_p]:text-sm [&_p]:text-text-secondary'>
-            <Link to='/'>Back to Home</Link>
-            <div>
-              <h1>Pre-Purchase Inspection App</h1>
-              <p>Generate branded, professional reports your clients can trust.</p>
+      <div className='min-h-screen bg-[linear-gradient(135deg,#f7f3ea_0%,#f4f7fb_55%,#f8fafc_100%)] text-slate-800'>
+        <header className='border-b border-slate-200/80 bg-white/85 backdrop-blur-xl'>
+          <div className='mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-6 py-5'>
+            <Link to='/' className='text-sm font-semibold text-slate-700 transition hover:text-primary'>
+              ← Back to Home
+            </Link>
+            <div className='flex gap-2'>
+              <button type='button' onClick={() => openAuth('login')} className='rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-primary hover:text-primary'>Sign In</button>
+              <button type='button' onClick={() => openAuth('register')} className='rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white shadow-[0_10px_30px_rgba(59,130,246,0.2)] transition hover:bg-primary-600'>Create Account</button>
             </div>
           </div>
-          <span className='inline-flex rounded-full bg-primary-50 px-4 py-1.5 text-xs font-semibold text-primary'>Inspector Workspace</span>
         </header>
 
-        <main className='mx-auto grid max-w-7xl grid-cols-2 items-start gap-8 px-6 py-8 max-[960px]:grid-cols-1'>
-          <section className='rounded-glass border border-glass-border bg-glass-surface p-8 shadow-glass backdrop-blur-glass max-[640px]:p-5 [&_h2]:mb-2 [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:text-text-primary [&_p]:leading-relaxed [&_p]:text-text-secondary [&_ul]:m-0 [&_ul]:mt-5 [&_ul]:list-disc [&_ul]:pl-5 [&_li]:py-2 [&_li]:text-text-secondary'>
-            <h2>Professional Pre-Purchase Inspection Reports</h2>
-            <p>
-              Generate clean, branded, client-ready vehicle inspection reports in minutes. Your company details,
-              watermark, and optional signature are included automatically.
-            </p>
-            <p className='rounded-xl border-l-[3px] border-primary bg-primary-50 p-4 font-medium text-primary'>
-              Create a secure account once, then log in any time with your email and password to continue from your
-              dashboard.
-            </p>
-            <ul>
-              <li>Structured checklist inspired by professional inspection workflow</li>
-              <li>Upload up to 10 evidence images and include all in PDF</li>
-              <li>Inspector dashboard with completed records and instant downloads</li>
-              <li>Company letterhead and signature area on every report</li>
-            </ul>
+        <main className='mx-auto flex max-w-7xl flex-col gap-6 px-6 py-8 lg:px-8 lg:py-10'>
+          <section className='relative overflow-hidden border border-slate-200 bg-slate-950 shadow-[0_8px_24px_rgba(15,23,42,0.03)] lg:p-0'>
+            <div className='absolute inset-0 bg-cover bg-center' style={{ backgroundImage: "url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1600&q=80')" }} />
+            <div className='absolute inset-0 bg-slate-950/70' />
+            <div className='relative grid gap-6 p-8 lg:grid-cols-[1.05fr_0.95fr] lg:p-10'>
+              <div className='max-w-2xl text-white'>
+                <p className='text-sm font-semibold uppercase tracking-[0.35em] text-slate-300'>Inspection workspace</p>
+                <h2 className='mt-4 text-3xl font-bold leading-tight sm:text-4xl'>A premium way to document vehicle condition.</h2>
+                <p className='mt-4 text-base leading-8 text-slate-300'>
+                  Built for teams that need a clear record from first inspection to final handoff, with the calm confidence of a professional workflow.
+                </p>
+
+                <div className='mt-8 border border-white/15 bg-white/10 p-5 backdrop-blur-sm'>
+                  <p className='text-xs font-semibold uppercase tracking-[0.3em] text-slate-300'>How it works</p>
+                  <ul className='mt-3 space-y-2 text-sm leading-7 text-slate-200'>
+                    <li>• Structured checks for each vehicle system.</li>
+                    <li>• Photos, notes, and verdicts kept together.</li>
+                    <li>• A polished PDF ready for client handoff.</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className='min-h-[220px]' />
+            </div>
           </section>
 
-          <section className='rounded-glass border border-glass-border bg-glass-surface p-8 shadow-glass backdrop-blur-glass max-[640px]:p-5 [&_h3]:mb-4 [&_h3]:text-xl [&_h3]:font-semibold [&_h3]:text-text-primary'>
-            <h3>Access Inspection Workspace</h3>
-            <p className='mb-5 text-[0.9375rem] text-text-secondary'>
-              New users can create an account. Returning users should log in with their existing email and password.
-            </p>
-            <div className='mb-6 flex rounded-xl bg-slate-100 p-1 [&_button]:flex-1 [&_button]:cursor-pointer [&_button]:rounded-lg [&_button]:border-0 [&_button]:bg-transparent [&_button]:px-4 [&_button]:py-2.5 [&_button]:text-[0.9375rem] [&_button]:font-medium [&_button]:text-text-secondary [&_button]:transition'>
-              <button className={authMode === 'register' ? 'bg-white text-text-primary shadow-sm' : ''} onClick={() => setAuthMode('register')} type='button'>Create Account</button>
-              <button className={authMode === 'login' ? 'bg-white text-text-primary shadow-sm' : ''} onClick={() => setAuthMode('login')} type='button'>Login</button>
+          <section className='grid gap-6 lg:grid-cols-[1.1fr_0.9fr]'>
+            <div className='  p-8 '>
+              <p className='text-sm font-semibold uppercase tracking-[0.3em] text-primary'>Built for daily use</p>
+              <h3 className='mt-3 text-2xl font-bold text-slate-900'>A process that stays consistent from inspection to handoff.</h3>
+              <p className='mt-3 text-base leading-8 text-slate-600'>The flow is simple enough for repeat work, but thorough enough to keep every report credible and easy to read.</p>
+              <div className='mt-6 space-y-3'>
+                <div className='border border-slate-200 bg-slate-50 p-4'>
+                  <p className='font-semibold text-slate-900'>Clear structure</p>
+                  <p className='mt-1 text-sm text-slate-600'>Every inspection follows a familiar layout, which makes follow-up easier for both teams and clients.</p>
+                </div>
+                <div className='border border-slate-200 bg-slate-50 p-4'>
+                  <p className='font-semibold text-slate-900'>Professional delivery</p>
+                  <p className='mt-1 text-sm text-slate-600'>The final PDF keeps your company identity, signature, and recommendations in one place.</p>
+                </div>
+              </div>
             </div>
 
-            {authMode === 'register' ? (
-              <form className='flex flex-col gap-4 [&_button]:cursor-pointer [&_button]:rounded-xl [&_button]:border-0 [&_button]:bg-primary [&_button]:px-6 [&_button]:py-3.5 [&_button]:font-semibold [&_button]:text-white [&_button]:shadow-float [&_input]:rounded-xl [&_input]:border [&_input]:border-glass-border [&_input]:bg-glass-surface [&_input]:px-4 [&_input]:py-3 [&_input]:outline-none [&_select]:rounded-xl [&_select]:border [&_select]:border-glass-border [&_select]:bg-glass-surface [&_select]:px-4 [&_select]:py-3 [&_select]:outline-none [&_textarea]:rounded-xl [&_textarea]:border [&_textarea]:border-glass-border [&_textarea]:bg-glass-surface [&_textarea]:px-4 [&_textarea]:py-3 [&_textarea]:outline-none' onSubmit={registerAccount}>
-                <input required placeholder='Full Name' value={registration.fullName} onChange={(e) => setRegistration((p) => ({ ...p, fullName: e.target.value }))} />
-                <input required type='email' placeholder='Email' value={registration.email} onChange={(e) => setRegistration((p) => ({ ...p, email: e.target.value }))} />
-                <input required type='password' placeholder='Password' value={registration.password} onChange={(e) => setRegistration((p) => ({ ...p, password: e.target.value }))} />
-                <input required type='password' placeholder='Confirm Password' value={registration.confirmPassword} onChange={(e) => setRegistration((p) => ({ ...p, confirmPassword: e.target.value }))} />
-                <input required placeholder='WhatsApp Number' value={registration.phone} onChange={(e) => setRegistration((p) => ({ ...p, phone: e.target.value }))} />
-                <input required placeholder='Company Name' value={registration.companyName} onChange={(e) => setRegistration((p) => ({ ...p, companyName: e.target.value }))} />
-                <textarea required placeholder='Company Address' value={registration.companyAddress} onChange={(e) => setRegistration((p) => ({ ...p, companyAddress: e.target.value }))} />
-                <label className='flex cursor-pointer flex-col gap-2 rounded-xl border-2 border-dashed border-slate-200 p-4 text-sm font-medium text-text-secondary transition hover:border-primary hover:bg-primary-50 [&_input]:hidden'>
-                  Company Logo Upload
-                  <input type='file' accept='image/*' onChange={(e) => uploadCompanyLogo(e.target.files?.[0])} />
-                </label>
-                {registration.companyLogoDataUrl && <img className='h-20 w-20 rounded-xl border border-slate-200 bg-slate-50 object-contain' src={registration.companyLogoDataUrl} alt='Company logo preview' />}
-                <label className='flex cursor-pointer flex-col gap-2 rounded-xl border-2 border-dashed border-slate-200 p-4 text-sm font-medium text-text-secondary transition hover:border-primary hover:bg-primary-50 [&_input]:hidden'>
-                  Optional Signature Upload
-                  <input type='file' accept='image/*' onChange={(e) => uploadSignature(e.target.files?.[0])} />
-                </label>
-                {registration.signatureDataUrl && <img className='h-20 w-20 rounded-xl border border-slate-200 bg-slate-50 object-contain' src={registration.signatureDataUrl} alt='Signature preview' />}
-                <button type='submit'>Create Account</button>
-              </form>
-            ) : (
-              <>
-                <form className='flex flex-col gap-4 [&_button]:cursor-pointer [&_button]:rounded-xl [&_button]:border-0 [&_button]:bg-primary [&_button]:px-6 [&_button]:py-3.5 [&_button]:font-semibold [&_button]:text-white [&_button]:shadow-float [&_input]:rounded-xl [&_input]:border [&_input]:border-glass-border [&_input]:bg-glass-surface [&_input]:px-4 [&_input]:py-3 [&_input]:outline-none [&_select]:rounded-xl [&_select]:border [&_select]:border-glass-border [&_select]:bg-glass-surface [&_select]:px-4 [&_select]:py-3 [&_select]:outline-none [&_textarea]:rounded-xl [&_textarea]:border [&_textarea]:border-glass-border [&_textarea]:bg-glass-surface [&_textarea]:px-4 [&_textarea]:py-3 [&_textarea]:outline-none' onSubmit={loginAccount}>
-                  <input required type='email' placeholder='Email' value={loginData.email} onChange={(e) => setLoginData((p) => ({ ...p, email: e.target.value }))} />
-                  <input required type='password' placeholder='Password' value={loginData.password} onChange={(e) => setLoginData((p) => ({ ...p, password: e.target.value }))} />
-                  <button type='submit'>Login to Dashboard</button>
-                </form>
-                <div className='flex flex-col gap-4 [&_button]:cursor-pointer [&_button]:rounded-xl [&_button]:border-0 [&_button]:bg-primary [&_button]:px-6 [&_button]:py-3.5 [&_button]:font-semibold [&_button]:text-white [&_button]:shadow-float [&_input]:rounded-xl [&_input]:border [&_input]:border-glass-border [&_input]:bg-glass-surface [&_input]:px-4 [&_input]:py-3 [&_input]:outline-none [&_select]:rounded-xl [&_select]:border [&_select]:border-glass-border [&_select]:bg-glass-surface [&_select]:px-4 [&_select]:py-3 [&_select]:outline-none [&_textarea]:rounded-xl [&_textarea]:border [&_textarea]:border-glass-border [&_textarea]:bg-glass-surface [&_textarea]:px-4 [&_textarea]:py-3 [&_textarea]:outline-none' style={{ marginTop: 12 }}>
-                  <h4 style={{ marginBottom: 8 }}>Forgot Password</h4>
-                  <input
-                    type='email'
-                    placeholder='Your account email'
-                    value={resetEmail}
-                    onChange={(e) => setResetEmail(e.target.value)}
-                    disabled={resetBusy}
-                  />
-                  <button type='button' onClick={requestPasswordReset} disabled={resetBusy}>
-                    {resetBusy ? 'Please wait...' : 'Request OTP'}
-                  </button>
-                  <input
-                    type='text'
-                    placeholder='Enter OTP'
-                    value={resetOtp}
-                    onChange={(e) => setResetOtp(e.target.value)}
-                    disabled={resetBusy}
-                  />
-                  <input
-                    type='password'
-                    placeholder='New password'
-                    value={resetPassword}
-                    onChange={(e) => setResetPassword(e.target.value)}
-                    disabled={resetBusy}
-                  />
-                  <input
-                    type='password'
-                    placeholder='Confirm new password'
-                    value={resetConfirmPassword}
-                    onChange={(e) => setResetConfirmPassword(e.target.value)}
-                    disabled={resetBusy}
-                  />
-                  <button type='button' onClick={confirmPasswordReset} disabled={resetBusy}>
-                    {resetBusy ? 'Please wait...' : 'Reset Password'}
-                  </button>
-                </div>
-              </>
-            )}
+            <div className='relative min-h-[320px] overflow-hidden border border-slate-200 shadow-sm'>
+              <div className='absolute inset-0 bg-cover bg-center' style={{ backgroundImage: "url('https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&fit=crop&w=1400&q=80')" }} />
+              <div className='absolute inset-0 bg-slate-950/55' />
+              <div className='relative flex h-full flex-col justify-end p-8 text-white'>
+                <p className='text-sm font-semibold uppercase tracking-[0.3em] text-slate-300'>What the experience feels like</p>
+                <h3 className='mt-3 text-2xl font-bold'>Focused, quiet, and ready to be shared.</h3>
+                <p className='mt-3 max-w-xl text-base leading-8 text-slate-200'>The layout is intentionally restrained so the report, not the interface, remains the focus.</p>
+              </div>
+            </div>
+          </section>
 
-            {message && <p className='mb-4 rounded-xl bg-success-light px-4 py-3 text-sm font-medium text-success'>{message}</p>}
-            {error && <p className='mb-4 rounded-xl bg-error-light px-4 py-3 text-sm font-medium text-error'>{error}</p>}
+          <section className='px-2 py-8 text-slate-700'>
+            <div className='flex flex-col gap-4 md:flex-row md:items-center md:justify-between'>
+              <div>
+                <p className='text-sm font-semibold uppercase tracking-[0.3em] text-primary'>Ready to begin</p>
+                <h3 className='mt-2 text-2xl font-bold text-slate-900'>Start with a straightforward workspace and build from there.</h3>
+              </div>
+              <div className='flex flex-wrap gap-3'>
+                <button type='button' onClick={() => openAuth('register')} className='rounded-md bg-primary px-5 py-3 text-sm font-semibold text-white transition hover:bg-primary-600'>Create Account</button>
+                <button type='button' onClick={() => openAuth('login')} className='rounded-md border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-primary hover:text-primary'>Sign In</button>
+              </div>
+            </div>
           </section>
         </main>
+
+        {isAuthModalOpen && (
+          <div className='fixed inset-0 z-50 flex items-center justify-center bg-slate-950/75 px-4 py-6 backdrop-blur-sm'>
+            <div className='relative w-full max-w-2xl rounded-[28px] border border-white/10 bg-slate-950/95 p-5 text-slate-100 shadow-2xl sm:p-8'>
+              <button type='button' onClick={closeAuthModal} className='absolute right-4 top-4 rounded-full border border-white/10 bg-white/10 p-2 text-slate-200 transition hover:bg-white/20'>
+                ✕
+              </button>
+              <div className='max-h-[80vh] overflow-y-auto pr-2'>
+                {renderAuthContent()}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
 
   return (
-    <div className='min-h-screen bg-glass-bg'>
-      <header className='border-b border-glass-border bg-glass-surface px-6 py-4 backdrop-blur-2xl'>
-        <div className='mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 [&_h1]:m-0 [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:text-text-primary [&_p]:mt-1 [&_p]:text-sm [&_p]:text-text-secondary'>
-          <Link to='/'>Back to Home</Link>
-          <div>
-            <h1>Inspection Dashboard</h1>
-            <p>Manage reports, review records, and export polished PDFs.</p>
+    <div className='min-h-screen bg-[linear-gradient(135deg,#f8fafc_0%,#eef6ff_55%,#f8fafc_100%)]'>
+      <header className='border-b border-slate-200/70 bg-white/80 backdrop-blur-2xl'>
+        <div className='mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-6 py-5'>
+          <Link to='/' className='inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-primary hover:text-primary'>
+            ← Back to Home
+          </Link>
+          <div className='text-right'>
+            <p className='text-xs font-semibold uppercase tracking-[0.3em] text-primary'>Inspection Dashboard</p>
+            <h1 className='mt-1 text-2xl font-bold text-slate-900'>Manage reports and inspections</h1>
           </div>
         </div>
-        <span className='inline-flex rounded-full bg-primary-50 px-4 py-1.5 text-xs font-semibold text-primary'>{account.companyName || 'Inspection Team'}</span>
       </header>
-      <div className='mx-auto flex max-w-7xl gap-8 px-6 py-8 max-[960px]:flex-col'>
-        <aside className='w-[260px] shrink-0 max-[960px]:w-full [&_h3]:m-0 [&_h3]:mb-1 [&_h3]:text-lg [&_h3]:font-bold [&_h3]:text-text-primary [&_p]:m-0 [&_p]:mb-5 [&_p]:text-sm [&_p]:text-text-secondary [&_button]:mb-1 [&_button]:block [&_button]:w-full [&_button]:cursor-pointer [&_button]:rounded-xl [&_button]:border-0 [&_button]:bg-transparent [&_button]:px-4 [&_button]:py-3 [&_button]:text-left [&_button]:text-[0.9375rem] [&_button]:font-medium [&_button]:text-text-secondary [&_button]:transition [&_button:hover]:bg-slate-100 [&_button:hover]:text-text-primary max-[960px]:[&_button]:mr-2 max-[960px]:[&_button]:inline-block max-[960px]:[&_button]:w-auto'>
-          <h3>{account.companyName}</h3>
-          <p>{account.fullName}</p>
-          <div className='mb-5 rounded-xl bg-primary-50 p-4 text-center [&_span]:text-xs [&_span]:uppercase [&_span]:tracking-wide [&_span]:text-text-muted [&_strong]:block [&_strong]:text-3xl [&_strong]:font-bold [&_strong]:text-primary'>
-            <strong>{inspectionCount}</strong>
-            <span>Inspections Completed</span>
-          </div>
-          <button className={activeTab === 'new' ? 'bg-primary-50 text-primary' : ''} onClick={() => setActiveTab('new')}>New Pre-Purchase Inspection</button>
-          <button className={activeTab === 'records' ? 'bg-primary-50 text-primary' : ''} onClick={() => setActiveTab('records')}>Records</button>
-          <button className={activeTab === 'settings' ? 'bg-primary-50 text-primary' : ''} onClick={() => setActiveTab('settings')}>Settings</button>
-          <button onClick={logout}>Logout</button>
-        </aside>
 
-        <main className='min-w-0 flex-1'>
-          {message && <p className='mb-4 rounded-xl bg-success-light px-4 py-3 text-sm font-medium text-success'>{message}</p>}
-          {error && <p className='mb-4 rounded-xl bg-error-light px-4 py-3 text-sm font-medium text-error'>{error}</p>}
-
-          {activeTab === 'new' && (
-            <section className='mb-6 rounded-glass border border-glass-border bg-glass-surface p-8 shadow-glass backdrop-blur-glass max-[640px]:p-5 [&_h2]:mb-2 [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:text-text-primary [&_h3]:mb-4 [&_h3]:text-xl [&_h3]:font-semibold [&_h3]:text-text-primary [&_h4]:mb-3 [&_h4]:text-base [&_h4]:font-semibold [&_h4]:text-text-primary'>
-              <h2>New Pre-Purchase Inspection</h2>
-              <p className='mb-6 text-[0.9375rem] text-text-secondary'>
-                Complete the vehicle details, run the full checklist, attach clear photos, and generate a polished PDF
-                report for your client.
+      <div className='mx-auto max-w-7xl px-6 py-8'>
+        <section className='mb-6 rounded-[30px] border border-slate-200/80 bg-white/90 p-6 shadow-[0_24px_80px_rgba(15,23,42,0.08)] backdrop-blur-xl'>
+          <div className='flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between'>
+            <div>
+              <p className='text-sm font-semibold uppercase tracking-[0.25em] text-primary'>Welcome back</p>
+              <h2 className='mt-2 text-3xl font-bold text-slate-900'>{account.companyName || 'Inspection Team'}</h2>
+              <p className='mt-3 max-w-2xl text-base leading-7 text-slate-600'>
+                Review completed inspections, create a new report, and export a polished PDF for your client in a few clicks.
               </p>
-              <div className='mb-8 grid grid-cols-3 gap-4 max-[640px]:grid-cols-1 [&_article]:rounded-xl [&_article]:border [&_article]:border-glass-border [&_article]:bg-glass-surface [&_article]:p-4 [&_article]:text-center [&_span]:mb-1 [&_span]:block [&_span]:text-xs [&_span]:text-text-muted [&_strong]:text-xl [&_strong]:font-bold [&_strong]:text-text-primary'>
-                <article>
-                  <span>Checklist Items</span>
-                  <strong>{inspection.checklist.length}</strong>
-                </article>
-                <article>
-                  <span>Image Slots</span>
-                  <strong>10 Max</strong>
-                </article>
-                <article>
-                  <span>Report Style</span>
-                  <strong>Letterhead PDF</strong>
-                </article>
+            </div>
+            <div className='grid gap-3 sm:grid-cols-3'>
+              <div className='rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-center'>
+                <p className='text-xs uppercase tracking-wide text-slate-500'>Completed</p>
+                <p className='mt-1 text-2xl font-bold text-slate-900'>{inspectionCount}</p>
               </div>
-              <form className='flex flex-col gap-4 [&_button]:cursor-pointer [&_button]:rounded-xl [&_button]:border-0 [&_button]:bg-primary [&_button]:px-6 [&_button]:py-3.5 [&_button]:font-semibold [&_button]:text-white [&_button]:shadow-float [&_input]:rounded-xl [&_input]:border [&_input]:border-glass-border [&_input]:bg-glass-surface [&_input]:px-4 [&_input]:py-3 [&_input]:outline-none [&_select]:rounded-xl [&_select]:border [&_select]:border-glass-border [&_select]:bg-glass-surface [&_select]:px-4 [&_select]:py-3 [&_select]:outline-none [&_textarea]:rounded-xl [&_textarea]:border [&_textarea]:border-glass-border [&_textarea]:bg-glass-surface [&_textarea]:px-4 [&_textarea]:py-3 [&_textarea]:outline-none' onSubmit={submitInspection}>
-                <h3>Vehicle Information</h3>
-                <div className='grid grid-cols-2 gap-4 max-[640px]:grid-cols-1'>
-                  <select
-                    required
-                    value={inspection.vehicleMake}
-                    onChange={(e) => {
-                      setInspection((p) => ({ ...p, vehicleMake: e.target.value, vehicleModel: '' }));
-                      setCustomInspectionMake('');
-                      setCustomInspectionModel('');
-                    }}
-                  >
-                    <option value='' disabled>Vehicle Make</option>
-                    {VEHICLE_MAKES.map((make) => (
-                      <option key={make} value={make}>
-                        {make}
-                      </option>
-                    ))}
-                    <option value={OTHER_OPTION}>Other</option>
-                  </select>
-                  {inspection.vehicleMake === OTHER_OPTION && (
-                    <input
-                      required
-                      placeholder='Enter Vehicle Make'
-                      value={customInspectionMake}
-                      onChange={(e) => setCustomInspectionMake(e.target.value)}
-                    />
-                  )}
-                  <select
-                    required
-                    value={inspection.vehicleModel}
-                    onChange={(e) => {
-                      setInspection((p) => ({ ...p, vehicleModel: e.target.value }));
-                      setCustomInspectionModel('');
-                    }}
-                    disabled={!inspection.vehicleMake || inspection.vehicleMake === OTHER_OPTION}
-                  >
-                    <option value='' disabled>{inspection.vehicleMake ? 'Vehicle Model' : 'Select Make First'}</option>
-                    {inspectionModelOptions.map((model) => (
-                      <option key={model} value={model}>
-                        {model}
-                      </option>
-                    ))}
-                    {inspection.vehicleMake && inspection.vehicleMake !== OTHER_OPTION && <option value={OTHER_OPTION}>Other</option>}
-                  </select>
-                  {(inspection.vehicleMake === OTHER_OPTION || inspection.vehicleModel === OTHER_OPTION) && (
-                    <input
-                      required
-                      placeholder='Enter Vehicle Model'
-                      value={customInspectionModel}
-                      onChange={(e) => setCustomInspectionModel(e.target.value)}
-                    />
-                  )}
-                  <input required type='number' placeholder='Year' value={inspection.year} onChange={(e) => setInspection((p) => ({ ...p, year: e.target.value }))} />
-                  <input placeholder='Color' value={inspection.color} onChange={(e) => setInspection((p) => ({ ...p, color: e.target.value }))} />
-                  <input
-                    placeholder='VIN (17 characters)'
-                    value={inspection.vin}
-                    maxLength={17}
-                    pattern='[A-HJ-NPR-Z0-9]{17}'
-                    title='VIN must be 17 characters. Letters I, O, and Q are not allowed.'
-                    onChange={(e) => setInspection((p) => ({ ...p, vin: e.target.value.toUpperCase() }))}
-                  />
-                  <input
-                    placeholder='Registration Number (ABC-123-DE)'
-                    value={inspection.regNo}
-                    maxLength={12}
-                    pattern='[A-Za-z]{3}-?[0-9]{3}-?[A-Za-z]{2}'
-                    title='Use format like ABC-123-DE.'
-                    onChange={(e) => setInspection((p) => ({ ...p, regNo: e.target.value.toUpperCase() }))}
-                  />
-                  <input placeholder='Mileage (km)' value={inspection.mileage} onChange={(e) => setInspection((p) => ({ ...p, mileage: e.target.value }))} />
-                  <select required value={inspection.transmission} onChange={(e) => setInspection((p) => ({ ...p, transmission: e.target.value }))}>
-                    <option value='' disabled>Transmission</option>
-                    <option value='Automatic'>Automatic</option>
-                    <option value='Manual'>Manual</option>
-                  </select>
-                  <select required value={inspection.fuelType} onChange={(e) => setInspection((p) => ({ ...p, fuelType: e.target.value }))}>
-                    <option value='' disabled>Fuel Type</option>
-                    <option value='Petrol'>Petrol</option>
-                    <option value='Diesel'>Diesel</option>
-                    <option value='Hybrid'>Hybrid</option>
-                    <option value='Electric'>Electric</option>
-                  </select>
-                  <select value={inspection.overallVerdict} onChange={(e) => setInspection((p) => ({ ...p, overallVerdict: e.target.value }))}>
-                    {VERDICT_OPTIONS.map((option) => (
-                      <option key={option}>{option}</option>
-                    ))}
-                  </select>
+              <div className='rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-center'>
+                <p className='text-xs uppercase tracking-wide text-slate-500'>Checklist</p>
+                <p className='mt-1 text-2xl font-bold text-slate-900'>{inspection.checklist.length}</p>
+              </div>
+              <div className='rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-center'>
+                <p className='text-xs uppercase tracking-wide text-slate-500'>Media</p>
+                <p className='mt-1 text-2xl font-bold text-slate-900'>10 max</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div className='flex flex-col gap-6 xl:flex-row'>
+          <aside className='xl:w-[280px]'>
+            <div className='rounded-[24px] border border-slate-200/80 bg-white/90 p-5 shadow-[0_20px_60px_rgba(15,23,42,0.07)]'>
+              <p className='text-sm font-semibold text-primary'>Inspector profile</p>
+              <h3 className='mt-2 text-xl font-bold text-slate-900'>{account.companyName}</h3>
+              <p className='mt-1 text-sm text-slate-600'>{account.fullName}</p>
+              <div className='mt-5 rounded-2xl bg-primary-50 p-4 text-center'>
+                <p className='text-xs uppercase tracking-[0.25em] text-slate-500'>Inspections completed</p>
+                <p className='mt-2 text-3xl font-bold text-primary'>{inspectionCount}</p>
+              </div>
+              <div className='mt-5 space-y-2'>
+                <button className={`w-full rounded-2xl px-4 py-3 text-left text-sm font-semibold transition ${activeTab === 'new' ? 'bg-primary-50 text-primary' : 'bg-slate-50 text-slate-700 hover:bg-slate-100'}`} onClick={() => setActiveTab('new')} type='button'>New Pre-Purchase Inspection</button>
+                <button className={`w-full rounded-2xl px-4 py-3 text-left text-sm font-semibold transition ${activeTab === 'records' ? 'bg-primary-50 text-primary' : 'bg-slate-50 text-slate-700 hover:bg-slate-100'}`} onClick={() => setActiveTab('records')} type='button'>Records</button>
+                <button className={`w-full rounded-2xl px-4 py-3 text-left text-sm font-semibold transition ${activeTab === 'settings' ? 'bg-primary-50 text-primary' : 'bg-slate-50 text-slate-700 hover:bg-slate-100'}`} onClick={() => setActiveTab('settings')} type='button'>Settings</button>
+                <button className='w-full rounded-2xl bg-slate-900 px-4 py-3 text-left text-sm font-semibold text-white transition hover:bg-slate-800' onClick={logout} type='button'>Logout</button>
+              </div>
+            </div>
+          </aside>
+
+          <main className='min-w-0 flex-1'>
+            {message && <p className='mb-4 rounded-2xl bg-emerald-500/15 px-4 py-3 text-sm font-medium text-emerald-700'>{message}</p>}
+            {error && <p className='mb-4 rounded-2xl bg-rose-500/15 px-4 py-3 text-sm font-medium text-rose-700'>{error}</p>}
+
+            {activeTab === 'new' && (
+              <section className='rounded-[28px] border border-slate-200/80 bg-white/90 p-8 shadow-[0_20px_60px_rgba(15,23,42,0.07)] backdrop-blur-xl'>
+                <div className='mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between'>
+                  <div>
+                    <p className='text-sm font-semibold uppercase tracking-[0.25em] text-primary'>Create report</p>
+                    <h2 className='mt-2 text-2xl font-bold text-slate-900'>New Pre-Purchase Inspection</h2>
+                    <p className='mt-2 max-w-2xl text-sm leading-7 text-slate-600'>
+                      Complete the vehicle details, run the checklist, attach clear photos, and generate a polished PDF report for your client.
+                    </p>
+                  </div>
+                  <div className='grid gap-3 sm:grid-cols-3'>
+                    <div className='rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3 text-center'>
+                      <p className='text-[11px] uppercase tracking-wide text-slate-500'>Checklist</p>
+                      <p className='mt-1 text-lg font-bold text-slate-900'>{inspection.checklist.length}</p>
+                    </div>
+                    <div className='rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3 text-center'>
+                      <p className='text-[11px] uppercase tracking-wide text-slate-500'>Image slots</p>
+                      <p className='mt-1 text-lg font-bold text-slate-900'>10 max</p>
+                    </div>
+                    <div className='rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3 text-center'>
+                      <p className='text-[11px] uppercase tracking-wide text-slate-500'>Format</p>
+                      <p className='mt-1 text-lg font-bold text-slate-900'>PDF</p>
+                    </div>
+                  </div>
                 </div>
 
-                <h3>Inspection Checklist</h3>
-                <p className='mb-6 text-[0.9375rem] text-text-secondary'>Rate each item and add comments where faults or concerns are observed.</p>
-                {groupedChecklist.map((group) => (
-                  <section key={group.title} className='mb-8 [&_h4]:mb-3 [&_h4]:rounded-xl [&_h4]:bg-primary-50 [&_h4]:px-4 [&_h4]:py-3 [&_h4]:text-primary'>
-                    <h4>{group.title}</h4>
-                    <div className='flex flex-col gap-2'>
-                      {group.rows.map((item, idx) => (
-                        <article key={`${group.title}-${item.label}`} className='grid grid-cols-[1fr_auto_auto] items-center gap-3 rounded-xl border border-glass-border bg-glass-surface px-4 py-3 transition hover:bg-white/85 max-[640px]:grid-cols-1 [&_input]:w-[180px] max-[640px]:[&_input]:w-full [&_strong]:text-[0.9375rem] [&_strong]:font-medium [&_strong]:text-text-primary'>
-                          <strong>{item.label}</strong>
-                          <select value={item.status} onChange={(e) => updateChecklist(group.title, idx, 'status', e.target.value)}>
-                            <option>Good</option>
-                            <option>Needs Attention</option>
-                            <option>Poor</option>
-                          </select>
-                          <input placeholder='Comments' value={item.note} onChange={(e) => updateChecklist(group.title, idx, 'note', e.target.value)} />
-                        </article>
+                <form className='space-y-6' onSubmit={submitInspection}>
+                  <div className='rounded-[24px] border border-slate-200 bg-slate-50/70 p-5'>
+                    <h3 className='mb-4 text-lg font-semibold text-slate-900'>Vehicle Information</h3>
+                    <div className='grid gap-4 md:grid-cols-2'>
+                      <select className='w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20' required value={inspection.vehicleMake} onChange={(e) => { setInspection((p) => ({ ...p, vehicleMake: e.target.value, vehicleModel: '' })); setCustomInspectionMake(''); setCustomInspectionModel(''); }}>
+                        <option value='' disabled>Vehicle Make</option>
+                        {VEHICLE_MAKES.map((make) => (
+                          <option key={make} value={make}>{make}</option>
+                        ))}
+                        <option value={OTHER_OPTION}>Other</option>
+                      </select>
+                      {inspection.vehicleMake === OTHER_OPTION && (
+                        <input className='w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20' required placeholder='Enter Vehicle Make' value={customInspectionMake} onChange={(e) => setCustomInspectionMake(e.target.value)} />
+                      )}
+                      <select className='w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20' required value={inspection.vehicleModel} onChange={(e) => { setInspection((p) => ({ ...p, vehicleModel: e.target.value })); setCustomInspectionModel(''); }} disabled={!inspection.vehicleMake || inspection.vehicleMake === OTHER_OPTION}>
+                        <option value='' disabled>{inspection.vehicleMake ? 'Vehicle Model' : 'Select Make First'}</option>
+                        {inspectionModelOptions.map((model) => (
+                          <option key={model} value={model}>{model}</option>
+                        ))}
+                        {inspection.vehicleMake && inspection.vehicleMake !== OTHER_OPTION && <option value={OTHER_OPTION}>Other</option>}
+                      </select>
+                      {(inspection.vehicleMake === OTHER_OPTION || inspection.vehicleModel === OTHER_OPTION) && (
+                        <input className='w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20' required placeholder='Enter Vehicle Model' value={customInspectionModel} onChange={(e) => setCustomInspectionModel(e.target.value)} />
+                      )}
+                      <input className='w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20' required type='number' placeholder='Year' value={inspection.year} onChange={(e) => setInspection((p) => ({ ...p, year: e.target.value }))} />
+                      <input className='w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20' placeholder='Color' value={inspection.color} onChange={(e) => setInspection((p) => ({ ...p, color: e.target.value }))} />
+                      <input className='w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20' placeholder='VIN (17 characters)' value={inspection.vin} maxLength={17} pattern='[A-HJ-NPR-Z0-9]{17}' title='VIN must be 17 characters. Letters I, O, and Q are not allowed.' onChange={(e) => setInspection((p) => ({ ...p, vin: e.target.value.toUpperCase() }))} />
+                      <input className='w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20' placeholder='Registration Number (ABC-123-DE)' value={inspection.regNo} maxLength={12} pattern='[A-Za-z]{3}-?[0-9]{3}-?[A-Za-z]{2}' title='Use format like ABC-123-DE.' onChange={(e) => setInspection((p) => ({ ...p, regNo: e.target.value.toUpperCase() }))} />
+                      <input className='w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20' placeholder='Mileage (km)' value={inspection.mileage} onChange={(e) => setInspection((p) => ({ ...p, mileage: e.target.value }))} />
+                      <select className='w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20' required value={inspection.transmission} onChange={(e) => setInspection((p) => ({ ...p, transmission: e.target.value }))}>
+                        <option value='' disabled>Transmission</option>
+                        <option value='Automatic'>Automatic</option>
+                        <option value='Manual'>Manual</option>
+                      </select>
+                      <select className='w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20' required value={inspection.fuelType} onChange={(e) => setInspection((p) => ({ ...p, fuelType: e.target.value }))}>
+                        <option value='' disabled>Fuel Type</option>
+                        <option value='Petrol'>Petrol</option>
+                        <option value='Diesel'>Diesel</option>
+                        <option value='Hybrid'>Hybrid</option>
+                        <option value='Electric'>Electric</option>
+                      </select>
+                      <select className='w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20' value={inspection.overallVerdict} onChange={(e) => setInspection((p) => ({ ...p, overallVerdict: e.target.value }))}>
+                        {VERDICT_OPTIONS.map((option) => (
+                          <option key={option}>{option}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className='rounded-[24px] border border-slate-200 bg-slate-50/70 p-5'>
+                    <div className='mb-4 flex items-center justify-between'>
+                      <h3 className='text-lg font-semibold text-slate-900'>Inspection Checklist</h3>
+                      <span className='rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary'>Rate each item</span>
+                    </div>
+                    <p className='mb-4 text-sm leading-7 text-slate-600'>Rate each item and add comments where faults or concerns are observed.</p>
+                    <div className='space-y-4'>
+                      {groupedChecklist.map((group) => (
+                        <section key={group.title} className='rounded-2xl border border-slate-200 bg-white p-4'>
+                          <h4 className='mb-3 text-sm font-semibold text-slate-900'>{group.title}</h4>
+                          <div className='space-y-2'>
+                            {group.rows.map((item, idx) => (
+                              <article key={`${group.title}-${item.label}`} className='grid gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-3 md:grid-cols-[1fr_auto_auto] md:items-center'>
+                                <strong className='text-sm font-medium text-slate-800'>{item.label}</strong>
+                                <select className='rounded-2xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none' value={item.status} onChange={(e) => updateChecklist(group.title, idx, 'status', e.target.value)}>
+                                  <option>Good</option>
+                                  <option>Needs Attention</option>
+                                  <option>Poor</option>
+                                </select>
+                                <input className='rounded-2xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none' placeholder='Comments' value={item.note} onChange={(e) => updateChecklist(group.title, idx, 'note', e.target.value)} />
+                              </article>
+                            ))}
+                          </div>
+                        </section>
                       ))}
                     </div>
-                  </section>
-                ))}
+                  </div>
 
-                <textarea placeholder='Final Recommendation' value={inspection.recommendation} onChange={(e) => setInspection((p) => ({ ...p, recommendation: e.target.value }))} />
+                  <div className='rounded-[24px] border border-slate-200 bg-slate-50/70 p-5'>
+                    <h3 className='mb-3 text-lg font-semibold text-slate-900'>Recommendation & Evidence</h3>
+                    <textarea className='w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20' placeholder='Final Recommendation' value={inspection.recommendation} onChange={(e) => setInspection((p) => ({ ...p, recommendation: e.target.value }))} />
+                    <label className='mt-4 flex cursor-pointer flex-col gap-2 rounded-2xl border border-dashed border-slate-300 bg-white p-4 text-sm font-medium text-slate-600 transition hover:border-primary hover:bg-primary/5'>
+                      Upload Inspection Images (max 10)
+                      <input type='file' accept='image/*' multiple onChange={(e) => uploadInspectionImages(e.target.files)} className='hidden' />
+                    </label>
+                    <p className='mt-3 text-sm leading-7 text-slate-600'>Tip: Use bright, sharp images of defects, VIN plate, engine bay, and tires.</p>
+                    {inspection.images.length > 0 && (
+                      <div className='mt-4 grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-3'>
+                        {inspection.images.map((img, idx) => (
+                          <img key={`preview-${idx}`} src={img} alt={`Inspection preview ${idx + 1}`} className='aspect-square w-full rounded-2xl border border-slate-200 object-cover' />
+                        ))}
+                      </div>
+                    )}
+                  </div>
 
-                <label className='flex cursor-pointer flex-col gap-2 rounded-xl border-2 border-dashed border-slate-200 p-4 text-sm font-medium text-text-secondary transition hover:border-primary hover:bg-primary-50 [&_input]:hidden'>
-                  Upload Inspection Images (max 10)
-                  <input type='file' accept='image/*' multiple onChange={(e) => uploadInspectionImages(e.target.files)} />
-                </label>
-                <p className='mb-6 text-[0.9375rem] text-text-secondary'>Tip: Use bright, sharp images of defects, VIN plate, engine bay, and tires.</p>
-                {inspection.images.length > 0 && (
-                  <div className='grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-3 [&_img]:aspect-square [&_img]:w-full [&_img]:rounded-xl [&_img]:border [&_img]:border-slate-200 [&_img]:object-cover'>
-                    {inspection.images.map((img, idx) => (
-                      <img key={`preview-${idx}`} src={img} alt={`Inspection preview ${idx + 1}`} />
+                  <button className='w-full rounded-2xl bg-primary px-6 py-3.5 text-sm font-semibold text-white shadow-[0_12px_32px_rgba(59,130,246,0.24)] transition hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-60' type='submit'>Save Inspection & Download PDF</button>
+                </form>
+              </section>
+            )}
+
+            {activeTab === 'records' && (
+              <section className='rounded-[28px] border border-slate-200/80 bg-white/90 p-8 shadow-[0_20px_60px_rgba(15,23,42,0.07)] backdrop-blur-xl'>
+                <div className='mb-5 flex items-center justify-between'>
+                  <div>
+                    <p className='text-sm font-semibold uppercase tracking-[0.25em] text-primary'>Library</p>
+                    <h2 className='mt-2 text-2xl font-bold text-slate-900'>Inspection Records</h2>
+                  </div>
+                </div>
+                {loadingReports ? (
+                  <p className='text-sm text-slate-600'>Loading records...</p>
+                ) : reports.length === 0 ? (
+                  <p className='text-sm text-slate-600'>No inspections yet.</p>
+                ) : (
+                  <div className='grid gap-4'>
+                    {reports.map((report) => (
+                      <article key={report._id} className='flex flex-col gap-4 rounded-[24px] border border-slate-200 bg-slate-50 p-5 md:flex-row md:items-center md:justify-between'>
+                        <div>
+                          <h4 className='text-base font-semibold text-slate-900'>{report.vehicleLabel}</h4>
+                          <p className='mt-1 text-sm text-slate-600'>{new Date(report.inspectedAt).toLocaleString()}</p>
+                        </div>
+                        <div className='flex items-center gap-3'>
+                          <span className='inline-flex rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary'>{report.overallVerdict}</span>
+                          <button className='rounded-2xl bg-primary px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-600' type='button' onClick={() => createReportPdf(report, account)}>Download PDF</button>
+                        </div>
+                      </article>
                     ))}
                   </div>
                 )}
+              </section>
+            )}
 
-                <button className='cursor-pointer rounded-xl border-0 bg-primary px-6 py-3.5 font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-60' type='submit'>Save Inspection & Download PDF</button>
-              </form>
-            </section>
-          )}
-
-          {activeTab === 'records' && (
-            <section className='mb-6 rounded-glass border border-glass-border bg-glass-surface p-8 shadow-glass backdrop-blur-glass max-[640px]:p-5 [&_h2]:mb-2 [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:text-text-primary [&_h3]:mb-4 [&_h3]:text-xl [&_h3]:font-semibold [&_h3]:text-text-primary [&_h4]:mb-3 [&_h4]:text-base [&_h4]:font-semibold [&_h4]:text-text-primary'>
-              <h2>Inspection Records</h2>
-              {loadingReports ? (
-                <p>Loading records...</p>
-              ) : reports.length === 0 ? (
-                <p>No inspections yet.</p>
-              ) : (
-                <div className='grid gap-4'>
-                  {reports.map((report) => (
-                    <article key={report._id} className='flex items-center justify-between gap-4 rounded-xl border border-glass-border bg-glass-surface p-5 max-[640px]:flex-col max-[640px]:items-start [&_p]:m-0 [&_p]:text-sm [&_p]:text-text-muted'>
-                      <div className='[&_h4]:m-0 [&_h4]:text-base [&_h4]:text-text-primary'>
-                        <h4>{report.vehicleLabel}</h4>
-                        <span className='inline-flex rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary'>{report.overallVerdict}</span>
-                      </div>
-                      <p>{new Date(report.inspectedAt).toLocaleString()}</p>
-                      <button className='cursor-pointer rounded-xl border-0 bg-primary px-6 py-3.5 font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-60' type='button' onClick={() => createReportPdf(report, account)}>Download PDF</button>
-                    </article>
-                  ))}
+            {activeTab === 'settings' && (
+              <section className='rounded-[28px] border border-slate-200/80 bg-white/90 p-8 shadow-[0_20px_60px_rgba(15,23,42,0.07)] backdrop-blur-xl'>
+                <div className='mb-5'>
+                  <p className='text-sm font-semibold uppercase tracking-[0.25em] text-primary'>Account</p>
+                  <h2 className='mt-2 text-2xl font-bold text-slate-900'>Account Settings</h2>
+                  <p className='mt-2 text-sm leading-7 text-slate-600'>
+                    Update your company details and signature. These details appear on your generated PDF reports.
+                  </p>
                 </div>
-              )}
-            </section>
-          )}
-
-          {activeTab === 'settings' && (
-            <section className='mb-6 rounded-glass border border-glass-border bg-glass-surface p-8 shadow-glass backdrop-blur-glass max-[640px]:p-5 [&_h2]:mb-2 [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:text-text-primary [&_h3]:mb-4 [&_h3]:text-xl [&_h3]:font-semibold [&_h3]:text-text-primary [&_h4]:mb-3 [&_h4]:text-base [&_h4]:font-semibold [&_h4]:text-text-primary'>
-              <h2>Account Settings</h2>
-              <p className='mb-6 text-[0.9375rem] text-text-secondary'>
-                Update your company details and signature. These details appear on your generated PDF reports.
-              </p>
-              <form className='grid grid-cols-2 gap-4 max-[640px]:grid-cols-1 [&_button]:cursor-pointer [&_button]:rounded-xl [&_button]:border-0 [&_button]:bg-primary [&_button]:px-6 [&_button]:py-3.5 [&_button]:font-semibold [&_button]:text-white [&_button]:shadow-float [&_input]:rounded-xl [&_input]:border [&_input]:border-glass-border [&_input]:bg-glass-surface [&_input]:px-4 [&_input]:py-3 [&_textarea]:col-span-2 [&_textarea]:rounded-xl [&_textarea]:border [&_textarea]:border-glass-border [&_textarea]:bg-glass-surface [&_textarea]:px-4 [&_textarea]:py-3 max-[640px]:[&_textarea]:col-span-1' onSubmit={saveSettings}>
-                <input required placeholder='Full Name' value={settings.fullName} onChange={(e) => setSettings((prev) => ({ ...prev, fullName: e.target.value }))} />
-                <input required type='email' placeholder='Email' value={settings.email} onChange={(e) => setSettings((prev) => ({ ...prev, email: e.target.value }))} />
-                <input required placeholder='WhatsApp Number' value={settings.phone} onChange={(e) => setSettings((prev) => ({ ...prev, phone: e.target.value }))} />
-                <input required placeholder='Company Name' value={settings.companyName} onChange={(e) => setSettings((prev) => ({ ...prev, companyName: e.target.value }))} />
-                <textarea required placeholder='Company Address' value={settings.companyAddress} onChange={(e) => setSettings((prev) => ({ ...prev, companyAddress: e.target.value }))} />
-                <label className='flex cursor-pointer flex-col gap-2 rounded-xl border-2 border-dashed border-slate-200 p-4 text-sm font-medium text-text-secondary transition hover:border-primary hover:bg-primary-50 [&_input]:hidden'>
-                  Update Company Logo
-                  <input type='file' accept='image/*' onChange={(e) => uploadSettingsCompanyLogo(e.target.files?.[0])} />
-                </label>
-                {settings.companyLogoDataUrl && <img className='h-20 w-20 rounded-xl border border-slate-200 bg-slate-50 object-contain' src={settings.companyLogoDataUrl} alt='Updated company logo preview' />}
-                <label className='flex cursor-pointer flex-col gap-2 rounded-xl border-2 border-dashed border-slate-200 p-4 text-sm font-medium text-text-secondary transition hover:border-primary hover:bg-primary-50 [&_input]:hidden'>
-                  Update Signature
-                  <input type='file' accept='image/*' onChange={(e) => uploadSettingsSignature(e.target.files?.[0])} />
-                </label>
-                {settings.signatureDataUrl && <img className='h-20 w-20 rounded-xl border border-slate-200 bg-slate-50 object-contain' src={settings.signatureDataUrl} alt='Updated signature preview' />}
-                <button className='cursor-pointer rounded-xl border-0 bg-primary px-6 py-3.5 font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-60' type='submit' disabled={savingSettings}>
-                  {savingSettings ? 'Saving...' : 'Save Settings'}
-                </button>
-              </form>
-            </section>
-          )}
-        </main>
+                <form className='grid gap-4 md:grid-cols-2' onSubmit={saveSettings}>
+                  <input className='w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20' required placeholder='Full Name' value={settings.fullName} onChange={(e) => setSettings((prev) => ({ ...prev, fullName: e.target.value }))} />
+                  <input className='w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20' required type='email' placeholder='Email' value={settings.email} onChange={(e) => setSettings((prev) => ({ ...prev, email: e.target.value }))} />
+                  <input className='w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20' required placeholder='WhatsApp Number' value={settings.phone} onChange={(e) => setSettings((prev) => ({ ...prev, phone: e.target.value }))} />
+                  <input className='w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20' required placeholder='Company Name' value={settings.companyName} onChange={(e) => setSettings((prev) => ({ ...prev, companyName: e.target.value }))} />
+                  <textarea className='w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 md:col-span-2' required placeholder='Company Address' value={settings.companyAddress} onChange={(e) => setSettings((prev) => ({ ...prev, companyAddress: e.target.value }))} />
+                  <label className='flex cursor-pointer flex-col gap-2 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 text-sm font-medium text-slate-600 transition hover:border-primary hover:bg-primary/5'>
+                    Update Company Logo
+                    <input type='file' accept='image/*' onChange={(e) => uploadSettingsCompanyLogo(e.target.files?.[0])} className='hidden' />
+                  </label>
+                  {settings.companyLogoDataUrl && <img className='h-20 w-20 rounded-2xl border border-slate-200 bg-white object-contain' src={settings.companyLogoDataUrl} alt='Updated company logo preview' />}
+                  <label className='flex cursor-pointer flex-col gap-2 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 text-sm font-medium text-slate-600 transition hover:border-primary hover:bg-primary/5'>
+                    Update Signature
+                    <input type='file' accept='image/*' onChange={(e) => uploadSettingsSignature(e.target.files?.[0])} className='hidden' />
+                  </label>
+                  {settings.signatureDataUrl && <img className='h-20 w-20 rounded-2xl border border-slate-200 bg-white object-contain' src={settings.signatureDataUrl} alt='Updated signature preview' />}
+                  <button className='rounded-2xl bg-primary px-6 py-3.5 text-sm font-semibold text-white shadow-[0_12px_32px_rgba(59,130,246,0.24)] transition hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-60 md:col-span-2' type='submit' disabled={savingSettings}>
+                    {savingSettings ? 'Saving...' : 'Save Settings'}
+                  </button>
+                </form>
+              </section>
+            )}
+          </main>
+        </div>
       </div>
     </div>
   );

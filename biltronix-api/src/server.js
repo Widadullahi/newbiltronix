@@ -18,7 +18,9 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const port = Number(process.env.PORT || 4000);
-const allowedOrigins = String(process.env.API_CORS_ORIGINS || '').split(',').map((x) => x.trim()).filter(Boolean);
+const configuredAllowedOrigins = String(process.env.API_CORS_ORIGINS || '').split(',').map((x) => x.trim()).filter(Boolean);
+const defaultAllowedOrigins = ['http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:3000', 'http://127.0.0.1:3000', 'http://localhost:4000', 'http://127.0.0.1:4000'];
+const allowedOrigins = [...new Set([...defaultAllowedOrigins, ...configuredAllowedOrigins])];
 const jwtSecret = String(process.env.JWT_SECRET || '');
 const accessTokenExpiresIn = String(process.env.ACCESS_TOKEN_EXPIRES_IN || '15m');
 const refreshTokenExpiresIn = String(process.env.REFRESH_TOKEN_EXPIRES_IN || '30d');
@@ -40,13 +42,20 @@ const mailer = smtpHost && smtpUser && smtpPass
   : null;
 
 app.use(helmet());
-app.use(cors({
+const corsOptions = {
   origin(origin, callback) {
-    if (!origin || allowedOrigins.length === 0 || allowedOrigins.includes('*') || allowedOrigins.includes(origin)) return callback(null, true);
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes('*') || allowedOrigins.includes(origin)) return callback(null, true);
+    if (/^https?:\/\/localhost(?::\d+)?$/.test(origin) || /^https?:\/\/127\.0\.0\.1(?::\d+)?$/.test(origin)) return callback(null, true);
+    if (/\.onrender\.com$/i.test(origin)) return callback(null, true);
     callback(new Error('CORS blocked'));
   },
-  credentials: false,
-}));
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+};
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 app.use(express.json({ limit: '25mb' }));
 
 const authLimiter = rateLimit({
