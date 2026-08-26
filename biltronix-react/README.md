@@ -14,11 +14,11 @@ This frontend uses the Biltronix API backend.
 ## Backend required
 Start the API in `../biltronix-api` first.
 
-## Vercel deployment
-This repo includes a root `vercel.json` configured to build this Vite app from `biltronix-react` and serve `biltronix-react/dist`.
+## AWS deployment
+Build this app and deploy `dist` to S3 + CloudFront or AWS Amplify Hosting.
 
-Set `VITE_API_BASE_URL` in Vercel to your Render API URL, for example:
-`https://your-render-service.onrender.com/api`
+Set `VITE_API_BASE_URL` to your AWS-hosted API URL, for example:
+`https://your-api-id.execute-api.us-east-1.amazonaws.com/api`
 
 ## Data integration
 - API client: `src/lib/sanityClient.js` (kept filename for compatibility)

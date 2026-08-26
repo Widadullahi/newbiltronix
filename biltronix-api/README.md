@@ -1,6 +1,6 @@
 # Biltronix API
 
-Express + SQLite backend for:
+Express + DynamoDB backend for:
 - Admin login
 - Vehicles / car parts / accessories
 - Car tips
@@ -11,8 +11,10 @@ Express + SQLite backend for:
 ## 1) Configure env
 Copy `.env.example` to `.env` and set:
 - `PORT`
-- `SQLITE_DB_PATH` (optional locally)
 - `API_CORS_ORIGINS` (comma-separated allowed frontend origins)
+- `AWS_REGION`
+- `DYNAMODB_TABLE_PREFIX`
+- `DYNAMODB_ENDPOINT` (optional, for DynamoDB Local)
 - `ADMIN_EMAIL`
 - `ADMIN_PASSWORD`
 - `JWT_SECRET`
@@ -24,10 +26,25 @@ Copy `.env.example` to `.env` and set:
 - `npm install`
 - `npm run dev`
 
-On startup, the SQLite schema is created automatically.
+On startup, default store highlights are seeded if the DynamoDB store highlights table is empty.
 
-## Render deployment
-This repo includes a root `render.yaml` configured to deploy only this API service from `biltronix-api`.
+## DynamoDB
+Create the tables with the root CloudFormation template:
+
+```sh
+aws cloudformation deploy \
+  --stack-name biltronix-dynamodb \
+  --template-file infra/dynamodb.yaml \
+  --parameter-overrides TablePrefix=biltronix
+```
+
+The API expects table names like `biltronix-bookings`, `biltronix-stock-items`, and `biltronix-inspection-reports` unless overridden with the `DYNAMODB_*_TABLE` variables.
+
+## AWS deployment
+The app is now structured for AWS deployment:
+- Frontend: deploy `biltronix-react` to S3 + CloudFront or AWS Amplify Hosting.
+- API: deploy `biltronix-api` to App Runner, Elastic Beanstalk, ECS, or Lambda behind API Gateway.
+- Database: DynamoDB tables from `infra/dynamodb.yaml`.
 
 ## Health check
 `GET http://localhost:4000/api/health`

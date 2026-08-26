@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import {
@@ -222,9 +222,11 @@ function PasswordVisibilityToggle({ visible, onToggle }) {
 
 export default function InspectionPortalPage() {
   const inspectorAccountStorageKey = 'biltronix_inspector_account';
+  const navigate = useNavigate();
+  const location = useLocation();
   const [account, setAccount] = useState(null);
   const [authMode, setAuthMode] = useState('register');
-  const [activeTab, setActiveTab] = useState('new');
+  const [activeTab, setActiveTab] = useState(location.pathname.includes('/dashboard') ? 'dashboard' : 'dashboard');
   const [reports, setReports] = useState([]);
   const [loadingReports, setLoadingReports] = useState(false);
   const [message, setMessage] = useState('');
@@ -374,7 +376,9 @@ export default function InspectionPortalPage() {
     try {
       const created = await createInspectorAccount(payload);
       setAccount(created);
-      setMessage('Account created. You can now create inspections.');
+      setActiveTab('dashboard');
+      navigate('/inspection-app/dashboard', { replace: true });
+      setMessage('Account created. Welcome to your dashboard.');
     } catch (createError) {
       setError(createError instanceof Error ? createError.message : 'Could not create account.');
     }
@@ -388,6 +392,8 @@ export default function InspectionPortalPage() {
     try {
       const loggedIn = await loginInspectorAccount(loginData.email.trim(), loginData.password);
       setAccount(loggedIn);
+      setActiveTab('dashboard');
+      navigate('/inspection-app/dashboard', { replace: true });
       setMessage('Logged in successfully.');
       return;
     } catch (loginError) {
@@ -590,11 +596,22 @@ export default function InspectionPortalPage() {
     clearInspectorSession();
     setAccount(null);
     setReports([]);
+    setActiveTab('dashboard');
+    navigate('/inspection-app', { replace: true });
     setMessage('');
     setError('');
   };
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    if (tab === 'dashboard') {
+      navigate('/inspection-app/dashboard', { replace: false });
+      return;
+    }
+    navigate('/inspection-app', { replace: false });
+  };
 
   const openAuth = (mode) => {
     setAuthMode(mode);
@@ -805,47 +822,72 @@ export default function InspectionPortalPage() {
       </header>
 
       <div className='mx-auto max-w-7xl px-6 py-8'>
-        <section className='mb-6 rounded-[30px] border border-slate-200/80 bg-white/90 p-6 shadow-[0_24px_80px_rgba(15,23,42,0.08)] backdrop-blur-xl'>
-          <div className='flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between'>
-            <div>
-              <p className='text-sm font-semibold uppercase tracking-[0.25em] text-primary'>Welcome back</p>
-              <h2 className='mt-2 text-3xl font-bold text-slate-900'>{account.companyName || 'Inspection Team'}</h2>
-              <p className='mt-3 max-w-2xl text-base leading-7 text-slate-600'>
-                Review completed inspections, create a new report, and export a polished PDF for your client in a few clicks.
+        <section className='mb-6 rounded-[30px] border border-slate-200/80 bg-[linear-gradient(135deg,#0f172a_0%,#172554_45%,#1d4ed8_100%)] p-6 text-white shadow-[0_24px_80px_rgba(15,23,42,0.14)]'>
+          <div className='flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between'>
+            <div className='max-w-2xl'>
+              <div className='inline-flex items-center rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.3em] text-slate-200'>
+                Operations overview
+              </div>
+              <h2 className='mt-3 text-3xl font-bold'>{account.companyName || 'Inspection Team'}</h2>
+              <p className='mt-3 text-base leading-8 text-slate-300'>
+                A premium control center for reports, evidence, and client-ready delivery.
               </p>
             </div>
             <div className='grid gap-3 sm:grid-cols-3'>
-              <div className='rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-center'>
-                <p className='text-xs uppercase tracking-wide text-slate-500'>Completed</p>
-                <p className='mt-1 text-2xl font-bold text-slate-900'>{inspectionCount}</p>
+              <div className='rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-center backdrop-blur-sm'>
+                <p className='text-[11px] uppercase tracking-wide text-slate-300'>Completed</p>
+                <p className='mt-1 text-2xl font-bold'>{inspectionCount}</p>
               </div>
-              <div className='rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-center'>
-                <p className='text-xs uppercase tracking-wide text-slate-500'>Checklist</p>
-                <p className='mt-1 text-2xl font-bold text-slate-900'>{inspection.checklist.length}</p>
+              <div className='rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-center backdrop-blur-sm'>
+                <p className='text-[11px] uppercase tracking-wide text-slate-300'>Checklist</p>
+                <p className='mt-1 text-2xl font-bold'>{inspection.checklist.length}</p>
               </div>
-              <div className='rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-center'>
-                <p className='text-xs uppercase tracking-wide text-slate-500'>Media</p>
-                <p className='mt-1 text-2xl font-bold text-slate-900'>10 max</p>
+              <div className='rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-center backdrop-blur-sm'>
+                <p className='text-[11px] uppercase tracking-wide text-slate-300'>Media</p>
+                <p className='mt-1 text-2xl font-bold'>10 max</p>
               </div>
             </div>
           </div>
         </section>
 
         <div className='flex flex-col gap-6 xl:flex-row'>
-          <aside className='xl:w-[280px]'>
-            <div className='rounded-[24px] border border-slate-200/80 bg-white/90 p-5 shadow-[0_20px_60px_rgba(15,23,42,0.07)]'>
-              <p className='text-sm font-semibold text-primary'>Inspector profile</p>
-              <h3 className='mt-2 text-xl font-bold text-slate-900'>{account.companyName}</h3>
-              <p className='mt-1 text-sm text-slate-600'>{account.fullName}</p>
-              <div className='mt-5 rounded-2xl bg-primary-50 p-4 text-center'>
-                <p className='text-xs uppercase tracking-[0.25em] text-slate-500'>Inspections completed</p>
-                <p className='mt-2 text-3xl font-bold text-primary'>{inspectionCount}</p>
+          <aside className='xl:w-[300px]'>
+            <div className='rounded-[28px] border border-slate-200/80 bg-[linear-gradient(180deg,#0f172a_0%,#111827_100%)] p-5 text-white shadow-[0_20px_60px_rgba(15,23,42,0.15)]'>
+              <div className='flex items-center gap-3 rounded-2xl border border-white/10 bg-white/10 p-3'>
+                <div className='flex h-11 w-11 items-center justify-center rounded-2xl bg-white/15 text-lg font-semibold'>
+                  {String(account.fullName || account.companyName || 'I').charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <p className='text-sm font-semibold'>{account.companyName || 'Inspector Workspace'}</p>
+                  <p className='text-sm text-slate-300'>{account.fullName || 'Professional profile'}</p>
+                </div>
+              </div>
+              <div className='mt-5 rounded-2xl border border-white/10 bg-white/10 p-4'>
+                <p className='text-[11px] uppercase tracking-[0.25em] text-slate-300'>Inspections completed</p>
+                <p className='mt-2 text-3xl font-bold text-white'>{inspectionCount}</p>
+                <p className='mt-2 text-sm text-slate-300'>Ready for the next client handoff.</p>
               </div>
               <div className='mt-5 space-y-2'>
-                <button className={`w-full rounded-2xl px-4 py-3 text-left text-sm font-semibold transition ${activeTab === 'new' ? 'bg-primary-50 text-primary' : 'bg-slate-50 text-slate-700 hover:bg-slate-100'}`} onClick={() => setActiveTab('new')} type='button'>New Pre-Purchase Inspection</button>
-                <button className={`w-full rounded-2xl px-4 py-3 text-left text-sm font-semibold transition ${activeTab === 'records' ? 'bg-primary-50 text-primary' : 'bg-slate-50 text-slate-700 hover:bg-slate-100'}`} onClick={() => setActiveTab('records')} type='button'>Records</button>
-                <button className={`w-full rounded-2xl px-4 py-3 text-left text-sm font-semibold transition ${activeTab === 'settings' ? 'bg-primary-50 text-primary' : 'bg-slate-50 text-slate-700 hover:bg-slate-100'}`} onClick={() => setActiveTab('settings')} type='button'>Settings</button>
-                <button className='w-full rounded-2xl bg-slate-900 px-4 py-3 text-left text-sm font-semibold text-white transition hover:bg-slate-800' onClick={logout} type='button'>Logout</button>
+                <button className={`flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm font-semibold transition ${activeTab === 'dashboard' ? 'bg-white text-slate-900 shadow-sm' : 'bg-white/10 text-slate-100 hover:bg-white/15'}`} onClick={() => handleTabChange('dashboard')} type='button'>
+                  <span className='flex h-8 w-8 items-center justify-center rounded-xl bg-slate-900/10 text-base'>◉</span>
+                  Dashboard
+                </button>
+                <button className={`flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm font-semibold transition ${activeTab === 'new' ? 'bg-white text-slate-900 shadow-sm' : 'bg-white/10 text-slate-100 hover:bg-white/15'}`} onClick={() => handleTabChange('new')} type='button'>
+                  <span className='flex h-8 w-8 items-center justify-center rounded-xl bg-slate-900/10 text-base'>＋</span>
+                  New Inspection
+                </button>
+                <button className={`flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm font-semibold transition ${activeTab === 'records' ? 'bg-white text-slate-900 shadow-sm' : 'bg-white/10 text-slate-100 hover:bg-white/15'}`} onClick={() => handleTabChange('records')} type='button'>
+                  <span className='flex h-8 w-8 items-center justify-center rounded-xl bg-slate-900/10 text-base'>▣</span>
+                  Records
+                </button>
+                <button className={`flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm font-semibold transition ${activeTab === 'settings' ? 'bg-white text-slate-900 shadow-sm' : 'bg-white/10 text-slate-100 hover:bg-white/15'}`} onClick={() => handleTabChange('settings')} type='button'>
+                  <span className='flex h-8 w-8 items-center justify-center rounded-xl bg-slate-900/10 text-base'>⚙</span>
+                  Settings
+                </button>
+                <button className='flex w-full items-center gap-3 rounded-2xl bg-rose-500/90 px-4 py-3 text-left text-sm font-semibold text-white transition hover:bg-rose-500' onClick={logout} type='button'>
+                  <span className='flex h-8 w-8 items-center justify-center rounded-xl bg-white/15 text-base'>⇢</span>
+                  Logout
+                </button>
               </div>
             </div>
           </aside>
@@ -853,6 +895,148 @@ export default function InspectionPortalPage() {
           <main className='min-w-0 flex-1'>
             {message && <p className='mb-4 rounded-2xl bg-emerald-500/15 px-4 py-3 text-sm font-medium text-emerald-700'>{message}</p>}
             {error && <p className='mb-4 rounded-2xl bg-rose-500/15 px-4 py-3 text-sm font-medium text-rose-700'>{error}</p>}
+
+            {activeTab === 'dashboard' && (
+              <section className='rounded-[32px] border border-slate-200/80 bg-[linear-gradient(135deg,#f8fafc_0%,#eef4ff_100%)] p-8 shadow-[0_20px_60px_rgba(15,23,42,0.07)] backdrop-blur-xl'>
+                <div className='mb-6 flex flex-col gap-4 border-b border-slate-200/80 pb-6 lg:flex-row lg:items-center lg:justify-between'>
+                  <div>
+                    <p className='text-sm font-semibold uppercase tracking-[0.3em] text-primary'>Operations overview</p>
+                    <h2 className='mt-2 text-2xl font-bold text-slate-900'>Executive dashboard</h2>
+                    <p className='mt-2 max-w-2xl text-sm leading-7 text-slate-600'>
+                      Keep your inspection workflow calm, structured, and ready for polished client handoff.
+                    </p>
+                  </div>
+                  <div className='flex flex-wrap gap-3'>
+                    <button className='rounded-2xl bg-primary px-5 py-3 text-sm font-semibold text-white transition hover:bg-primary-600' type='button' onClick={() => handleTabChange('new')}>
+                      Start New Inspection
+                    </button>
+                    <button className='rounded-2xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-primary hover:text-primary' type='button' onClick={() => handleTabChange('records')}>
+                      Review Records
+                    </button>
+                  </div>
+                </div>
+
+                <div className='grid gap-4 xl:grid-cols-[1.15fr_0.85fr]'>
+                  <div className='rounded-[28px] border border-slate-200 bg-slate-950 p-6 text-white shadow-[0_20px_45px_rgba(15,23,42,0.15)]'>
+                    <div className='flex items-center justify-between gap-3'>
+                      <div>
+                        <p className='text-sm font-semibold uppercase tracking-[0.3em] text-slate-300'>Command center</p>
+                        <h3 className='mt-2 text-2xl font-semibold'>Premium inspection workspace</h3>
+                      </div>
+                      <span className='rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-semibold text-slate-200'>Live</span>
+                    </div>
+                    <p className='mt-4 max-w-2xl text-sm leading-7 text-slate-300'>
+                      Review the health of your inspection operation, move quickly between reports, and keep every handoff polished.
+                    </p>
+                    <div className='mt-6 flex flex-wrap gap-3'>
+                      <div className='rounded-2xl border border-white/10 bg-white/10 px-4 py-3'>
+                        <p className='text-[11px] uppercase tracking-[0.25em] text-slate-300'>Current focus</p>
+                        <p className='mt-1 text-sm font-semibold'>Client-ready report delivery</p>
+                      </div>
+                      <div className='rounded-2xl border border-white/10 bg-white/10 px-4 py-3'>
+                        <p className='text-[11px] uppercase tracking-[0.25em] text-slate-300'>Workflow mode</p>
+                        <p className='mt-1 text-sm font-semibold'>Structured and efficient</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className='rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm'>
+                    <div className='flex items-center justify-between'>
+                      <div>
+                        <p className='text-sm font-semibold uppercase tracking-[0.25em] text-primary'>Today&apos;s activity</p>
+                        <h3 className='mt-2 text-lg font-semibold text-slate-900'>Momentum snapshot</h3>
+                      </div>
+                      <span className='rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700'>+18%</span>
+                    </div>
+                    <div className='mt-5 space-y-3'>
+                      {[
+                        { title: 'New inspection started', time: '09:20', tone: 'bg-primary' },
+                        { title: 'PDF exported', time: '11:45', tone: 'bg-emerald-500' },
+                        { title: 'Client follow-up noted', time: '14:10', tone: 'bg-amber-500' },
+                      ].map((item) => (
+                        <div key={item.title} className='flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3'>
+                          <div className='flex items-center gap-3'>
+                            <span className={`h-2.5 w-2.5 rounded-full ${item.tone}`} />
+                            <div>
+                              <p className='text-sm font-semibold text-slate-900'>{item.title}</p>
+                              <p className='text-sm text-slate-500'>Updated {item.time}</p>
+                            </div>
+                          </div>
+                          <span className='text-sm font-medium text-slate-500'>Today</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className='mt-6 grid gap-4 md:grid-cols-4'>
+                  <div className='rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm'>
+                    <p className='text-sm font-semibold text-slate-500'>Reports created</p>
+                    <p className='mt-3 text-3xl font-bold text-slate-900'>{inspectionCount}</p>
+                    <p className='mt-2 text-sm text-slate-600'>Ready for delivery.</p>
+                  </div>
+                  <div className='rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm'>
+                    <p className='text-sm font-semibold text-slate-500'>Checklist items</p>
+                    <p className='mt-3 text-3xl font-bold text-slate-900'>{inspection.checklist.length}</p>
+                    <p className='mt-2 text-sm text-slate-600'>Structured review coverage.</p>
+                  </div>
+                  <div className='rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm'>
+                    <p className='text-sm font-semibold text-slate-500'>Delivery pace</p>
+                    <p className='mt-3 text-3xl font-bold text-slate-900'>94%</p>
+                    <p className='mt-2 text-sm text-slate-600'>On-time report handoff.</p>
+                  </div>
+                  <div className='rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm'>
+                    <p className='text-sm font-semibold text-slate-500'>Account status</p>
+                    <p className='mt-3 text-3xl font-bold text-slate-900'>Active</p>
+                    <p className='mt-2 text-sm text-slate-600'>Professional profile ready.</p>
+                  </div>
+                </div>
+
+                <div className='mt-6 grid gap-4 lg:grid-cols-[1.05fr_0.95fr]'>
+                  <div className='rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm'>
+                    <div className='flex items-center justify-between'>
+                      <div>
+                        <h3 className='text-lg font-semibold text-slate-900'>Recent reports</h3>
+                        <p className='mt-1 text-sm text-slate-600'>A concise view of your latest work.</p>
+                      </div>
+                      <button className='text-sm font-semibold text-primary' type='button' onClick={() => handleTabChange('records')}>Open library</button>
+                    </div>
+                    <div className='mt-5 space-y-3'>
+                      {reports.length === 0 ? (
+                        <p className='text-sm text-slate-600'>No reports yet. Start a new inspection to build your portfolio.</p>
+                      ) : (
+                        reports.slice(0, 3).map((report) => (
+                          <div key={report._id} className='rounded-2xl border border-slate-200 bg-slate-50 p-4'>
+                            <div className='flex items-center justify-between gap-3'>
+                              <div>
+                                <p className='text-sm font-semibold text-slate-900'>{report.vehicleLabel}</p>
+                                <p className='mt-1 text-sm text-slate-600'>{new Date(report.inspectedAt).toLocaleString()}</p>
+                              </div>
+                              <span className='rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary'>{report.overallVerdict}</span>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+
+                  <div className='rounded-[24px] border border-slate-200 bg-slate-50 p-5'>
+                    <div className='flex items-center justify-between'>
+                      <h3 className='text-lg font-semibold text-slate-900'>Weekly momentum</h3>
+                      <span className='rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary'>+18% vs last week</span>
+                    </div>
+                    <div className='mt-6 flex h-40 items-end gap-3'>
+                      {[48, 72, 58, 88, 69, 92].map((height, index) => (
+                        <div key={index} className='flex flex-1 flex-col items-center gap-2'>
+                          <div className='w-full rounded-t-[16px] bg-[linear-gradient(180deg,#60a5fa_0%,#2563eb_100%)]' style={{ height: `${height}%` }} />
+                          <span className='text-xs font-medium text-slate-500'>{['M', 'T', 'W', 'T', 'F', 'S'][index]}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </section>
+            )}
 
             {activeTab === 'new' && (
               <section className='rounded-[28px] border border-slate-200/80 bg-white/90 p-8 shadow-[0_20px_60px_rgba(15,23,42,0.07)] backdrop-blur-xl'>

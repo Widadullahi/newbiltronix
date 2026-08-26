@@ -14,6 +14,7 @@ export default function App() {
       <Route path="/car-tips" element={<CarTipsPage />} />
       <Route path="/admin" element={<AdminDashboardPage />} />
       <Route path="/inspection-app" element={<InspectionPortalPage />} />
+      <Route path="/inspection-app/dashboard" element={<InspectionPortalPage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

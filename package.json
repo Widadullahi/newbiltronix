@@ -1,0 +1,16 @@
+{
+  "name": "biltronix-sales-monorepo",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "biltronix-api",
+    "biltronix-react"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace biltronix-api",
+    "dev:api": "npm run dev --workspace biltronix-api",
+    "dev:web": "npm run dev --workspace biltronix-react",
+    "build": "npm run build --workspace biltronix-react",
+    "start": "npm run start --workspace biltronix-api"
+  }
+}

@@ -1,6 +1,3 @@
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { createHash, randomBytes, randomInt } from 'node:crypto';
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -9,12 +6,21 @@ import helmet from 'helmet';
 import jwt from 'jsonwebtoken';
 import rateLimit from 'express-rate-limit';
 import nodemailer from 'nodemailer';
-import Database from 'better-sqlite3';
+import { createHash, randomBytes, randomInt } from 'node:crypto';
+import {
+  deleteItem,
+  getItem,
+  listItems,
+  nowIso,
+  patchItem,
+  putItem,
+  queryItems,
+  sortByCreatedDesc,
+  sortByOrderThenCreated,
+  tables,
+} from './dynamoStore.js';
 
 dotenv.config();
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const app = express();
 const port = Number(process.env.PORT || 4000);
@@ -41,19 +47,20 @@ const mailer = smtpHost && smtpUser && smtpPass
   ? nodemailer.createTransport({ host: smtpHost, port: smtpPort, secure: smtpSecure, auth: { user: smtpUser, pass: smtpPass } })
   : null;
 
-app.use(helmet());
 const corsOptions = {
   origin(origin, callback) {
     if (!origin) return callback(null, true);
     if (allowedOrigins.includes('*') || allowedOrigins.includes(origin)) return callback(null, true);
     if (/^https?:\/\/localhost(?::\d+)?$/.test(origin) || /^https?:\/\/127\.0\.0\.1(?::\d+)?$/.test(origin)) return callback(null, true);
-    if (/\.onrender\.com$/i.test(origin)) return callback(null, true);
+    if (/\.amazonaws\.com$/i.test(origin) || /\.amplifyapp\.com$/i.test(origin) || /\.cloudfront\.net$/i.test(origin)) return callback(null, true);
     callback(new Error('CORS blocked'));
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
 };
+
+app.use(helmet());
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
 app.use(express.json({ limit: '25mb' }));
@@ -66,87 +73,100 @@ const authLimiter = rateLimit({
   message: { error: 'Too many login attempts. Please try again later.' },
 });
 
-// SQLite database setup
-const dbPath = process.env.SQLITE_DB_PATH || path.join(__dirname, '../biltronix.db');
-const db = new Database(dbPath);
-db.pragma('journal_mode = WAL');
-
 const toInt = (v, f = 0) => (Number.isFinite(Number.parseInt(String(v), 10)) ? Number.parseInt(String(v), 10) : f);
 const safeString = (v) => String(v || '').trim();
 const hashValue = (v) => createHash('sha256').update(String(v)).digest('hex');
-
-function parseJsonArray(value) {
-  if (!value) return [];
-  if (Array.isArray(value)) return value;
-  try {
-    const parsed = JSON.parse(value);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-}
+const signAccessToken = (payload) => jwt.sign(payload, jwtSecret, { expiresIn: accessTokenExpiresIn });
+const sendError = (res, status, message) => res.status(status).json({ error: message });
+const makeBookingCode = () => `BK-${Math.floor(Math.random() * 9000) + 1000}`;
+const makeOrderCode = () => `OR-${Math.floor(Math.random() * 9000) + 1000}`;
+const makeOtpCode = () => String(randomInt(100000, 1000000));
 
 function expiresAtFromNow(duration, fallbackMs = 30 * 24 * 60 * 60 * 1000) {
   const m = /^\s*(\d+)\s*([smhd])\s*$/i.exec(String(duration || ''));
   if (!m) return new Date(Date.now() + fallbackMs);
   const n = Number(m[1]);
-  const unit = m[2].toLowerCase();
   const mult = { s: 1000, m: 60000, h: 3600000, d: 86400000 };
-  return new Date(Date.now() + n * (mult[unit] || 86400000));
+  return new Date(Date.now() + n * (mult[m[2].toLowerCase()] || 86400000));
 }
-
-const signAccessToken = (payload) => jwt.sign(payload, jwtSecret, { expiresIn: accessTokenExpiresIn });
-const sendError = (res, status, message) => res.status(status).json({ error: message });
 
 function normalizeBooking(row) {
-  return { _id: String(row.id), id: row.booking_code || String(row.id), customer: row.customer || 'Unknown Customer', service: row.service || 'General Service', date: row.date || '', status: row.status || 'Pending' };
-}
-function normalizeOrder(row) {
-  const amountValue = Number(row.amount || 0);
-  return { _id: String(row.id), id: row.order_code || String(row.id), item: row.item || 'Unknown Item', customer: row.customer || 'Unknown Customer', channel: row.channel || 'Website', amountValue, amountLabel: new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', maximumFractionDigits: 0 }).format(amountValue) };
-}
-function normalizeStockItem(row) {
-  return { _id: String(row.id), name: row.name || 'Untitled Item', description: row.description || '', primaryImageUrl: row.primary_image_url || '', featureImageUrl: row.feature_image_url || '', otherImageUrls: parseJsonArray(row.other_image_urls), soldOut: Boolean(row.sold_out), category: row.category || 'car-parts', stock: toInt(row.stock), sold: toInt(row.sold), unitPrice: toInt(row.unit_price), make: row.make || '', model: row.model || '', year: toInt(row.year), condition: row.condition || '', transmission: row.transmission || '', fuelType: row.fuel_type || '' };
-}
-function normalizeCarTip(row) {
-  return { _id: String(row.id), title: row.title || 'Untitled Tip', body: row.body || '', category: row.category || 'General', imageUrl: row.image_url || '', order: toInt(row.display_order, 999) };
-}
-function normalizeStoreHighlight(row) {
-  return { _id: String(row.id), title: row.title || 'Untitled Category', summary: row.summary || '', category: row.category || 'General', ctaLabel: row.cta_label || 'Browse Store', ctaHref: row.cta_href || '/sales', order: toInt(row.display_order, 999) };
-}
-function normalizeInspectorAccount(row) {
-  return { _id: String(row.id), fullName: row.full_name || '', email: row.email || '', phone: row.phone || '', companyName: row.company_name || '', companyAddress: row.company_address || '', signatureDataUrl: row.signature_data_url || '', companyLogoDataUrl: row.company_logo_data_url || '' };
-}
-function normalizeInspectionReport(row) {
-  return { _id: String(row.id), accountId: String(row.account_id || ''), companyName: row.company_name || '', inspectorName: row.inspector_name || '', vehicleLabel: row.vehicle_label || '', vehicleRegNo: row.vehicle_reg_no || '', vin: row.vin || '', mileage: row.mileage || '', transmission: row.transmission || '', fuelType: row.fuel_type || '', inspectedAt: row.inspected_at || '', checklist: parseJsonArray(row.checklist), images: parseJsonArray(row.images), overallVerdict: row.overall_verdict || 'Pending', recommendation: row.recommendation || '' };
+  return { _id: row.id, id: row.bookingCode || row.id, customer: row.customer || 'Unknown Customer', service: row.service || 'General Service', date: row.date || '', status: row.status || 'Pending' };
 }
 
-const makeBookingCode = () => `BK-${Math.floor(Math.random() * 9000) + 1000}`;
-const makeOrderCode = () => `OR-${Math.floor(Math.random() * 9000) + 1000}`;
-const makeOtpCode = () => String(randomInt(100000, 1000000));
+function normalizeOrder(row) {
+  const amountValue = Number(row.amount || 0);
+  return { _id: row.id, id: row.orderCode || row.id, item: row.item || 'Unknown Item', customer: row.customer || 'Unknown Customer', channel: row.channel || 'Website', amountValue, amountLabel: new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', maximumFractionDigits: 0 }).format(amountValue) };
+}
+
+function normalizeStockItem(row) {
+  return { _id: row.id, name: row.name || 'Untitled Item', description: row.description || '', primaryImageUrl: row.primaryImageUrl || '', featureImageUrl: row.featureImageUrl || '', otherImageUrls: Array.isArray(row.otherImageUrls) ? row.otherImageUrls : [], soldOut: Boolean(row.soldOut), category: row.category || 'car-parts', stock: toInt(row.stock), sold: toInt(row.sold), unitPrice: toInt(row.unitPrice), make: row.make || '', model: row.model || '', year: toInt(row.year), condition: row.condition || '', transmission: row.transmission || '', fuelType: row.fuelType || '' };
+}
+
+function normalizeCarTip(row) {
+  return { _id: row.id, title: row.title || 'Untitled Tip', body: row.body || '', category: row.category || 'General', imageUrl: row.imageUrl || '', order: toInt(row.order, 999) };
+}
+
+function normalizeStoreHighlight(row) {
+  return { _id: row.id, title: row.title || 'Untitled Category', summary: row.summary || '', category: row.category || 'General', ctaLabel: row.ctaLabel || 'Browse Store', ctaHref: row.ctaHref || '/sales', order: toInt(row.order, 999) };
+}
+
+function normalizeInspectorAccount(row) {
+  return { _id: row.id, fullName: row.fullName || '', email: row.email || '', phone: row.phone || '', companyName: row.companyName || '', companyAddress: row.companyAddress || '', signatureDataUrl: row.signatureDataUrl || '', companyLogoDataUrl: row.companyLogoDataUrl || '' };
+}
+
+function normalizeInspectionReport(row) {
+  return { _id: row.id, accountId: String(row.accountId || ''), companyName: row.companyName || '', inspectorName: row.inspectorName || '', vehicleLabel: row.vehicleLabel || '', vehicleRegNo: row.vehicleRegNo || '', vin: row.vin || '', mileage: row.mileage || '', transmission: row.transmission || '', fuelType: row.fuelType || '', inspectedAt: row.inspectedAt || '', checklist: Array.isArray(row.checklist) ? row.checklist : [], images: Array.isArray(row.images) ? row.images : [], overallVerdict: row.overallVerdict || 'Pending', recommendation: row.recommendation || '' };
+}
+
+async function findOne(tableName, predicate, limit = 1000) {
+  const rows = await listItems(tableName, { limit });
+  return rows.find(predicate) || null;
+}
+
+async function findInspectorByEmail(email) {
+  const rows = await queryItems(tables.inspectorAccounts, 'email-index', '#email = :email', { ':email': email }, { '#email': 'email' }, 1);
+  return rows[0] || null;
+}
+
+async function findRefreshToken(role, tokenHash) {
+  const rows = await queryItems(tables.refreshTokens, 'tokenHash-index', 'tokenHash = :tokenHash', { ':tokenHash': tokenHash }, undefined, 5);
+  return rows.find((row) => row.role === role) || null;
+}
 
 async function createRefreshToken(role, subjectId) {
   const token = randomBytes(48).toString('hex');
-  const tokenHash = hashValue(token);
-  const expiresAt = expiresAtFromNow(refreshTokenExpiresIn);
-  const result = db.prepare('INSERT INTO refresh_tokens (role, subject_id, token_hash, expires_at) VALUES (?, ?, ?, ?)').run(role, String(subjectId), tokenHash, expiresAt.toISOString());
-  return { id: result.lastInsertRowid, token };
+  const record = await putItem(tables.refreshTokens, {
+    role,
+    subjectId: String(subjectId),
+    tokenHash: hashValue(token),
+    expiresAt: expiresAtFromNow(refreshTokenExpiresIn).toISOString(),
+    revokedAt: '',
+    replacedById: '',
+  });
+  return { id: record.id, token };
 }
 
 async function rotateRefreshToken(role, token) {
-  const existing = db.prepare('SELECT * FROM refresh_tokens WHERE role = ? AND token_hash = ? AND revoked_at IS NULL AND expires_at > ? LIMIT 1').get(role, hashValue(token), new Date().toISOString());
-  if (!existing) return null;
-  const next = await createRefreshToken(role, existing.subject_id);
-  db.prepare('UPDATE refresh_tokens SET revoked_at = ?, replaced_by_id = ? WHERE id = ?').run(new Date().toISOString(), next.id, existing.id);
-  return { subjectId: String(existing.subject_id), refreshToken: next.token };
+  const tokenHash = hashValue(token);
+  const existing = await findRefreshToken(role, tokenHash);
+  if (!existing || existing.revokedAt || String(existing.expiresAt || '') <= nowIso()) return null;
+  const next = await createRefreshToken(role, existing.subjectId);
+  await patchItem(tables.refreshTokens, existing.id, { revokedAt: nowIso(), replacedById: next.id });
+  return { subjectId: String(existing.subjectId), refreshToken: next.token };
 }
 
 async function revokeRefreshToken(role, token) {
-  db.prepare('UPDATE refresh_tokens SET revoked_at = ? WHERE role = ? AND token_hash = ? AND revoked_at IS NULL').run(new Date().toISOString(), role, hashValue(token));
+  const tokenHash = hashValue(token);
+  const existing = await findRefreshToken(role, tokenHash);
+  if (existing) await patchItem(tables.refreshTokens, existing.id, { revokedAt: nowIso() });
 }
 
 async function revokeAllSubjectTokens(role, subjectId) {
-  db.prepare('UPDATE refresh_tokens SET revoked_at = ? WHERE role = ? AND subject_id = ? AND revoked_at IS NULL').run(new Date().toISOString(), role, String(subjectId));
+  const rows = await queryItems(tables.refreshTokens, 'subjectId-index', 'subjectId = :subjectId', { ':subjectId': String(subjectId) }, undefined, 2000);
+  await Promise.all(rows
+    .filter((row) => row.role === role && String(row.subjectId) === String(subjectId) && !row.revokedAt)
+    .map((row) => patchItem(tables.refreshTokens, row.id, { revokedAt: nowIso() })));
 }
 
 function requireAuth(req, res, next) {
@@ -167,8 +187,8 @@ const requireRole = (role) => (req, res, next) => {
 };
 
 function requireInspectorSelf(req, res, next) {
-  const targetId = toInt(req.params.id);
-  if (!req.auth || req.auth.role !== 'inspector' || targetId !== toInt(req.auth.inspectorId)) {
+  const targetId = String(req.params.id || '');
+  if (!req.auth || req.auth.role !== 'inspector' || targetId !== String(req.auth.inspectorId || '')) {
     return sendError(res, 403, 'You can only update your own account.');
   }
   next();
@@ -189,186 +209,43 @@ async function sendOtpEmail(email, otp) {
   return true;
 }
 
-async function initSchema() {
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS bookings (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      booking_code VARCHAR(40) NOT NULL UNIQUE,
-      customer VARCHAR(150) NOT NULL,
-      service VARCHAR(150) NOT NULL,
-      date VARCHAR(40) NOT NULL,
-      status VARCHAR(50) NOT NULL DEFAULT 'Pending',
-      whatsapp_number VARCHAR(50) NOT NULL DEFAULT '',
-      vehicle VARCHAR(200) NOT NULL DEFAULT '',
-      email VARCHAR(180) NOT NULL DEFAULT '',
-      note TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
-
-    CREATE TABLE IF NOT EXISTS orders (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      order_code VARCHAR(40) NOT NULL UNIQUE,
-      item VARCHAR(200) NOT NULL,
-      customer VARCHAR(150) NOT NULL,
-      amount DECIMAL(12,2) NOT NULL DEFAULT 0,
-      channel VARCHAR(80) NOT NULL DEFAULT 'Website',
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
-
-    CREATE TABLE IF NOT EXISTS stock_items (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name VARCHAR(220) NOT NULL,
-      description TEXT,
-      primary_image_url TEXT,
-      feature_image_url TEXT,
-      other_image_urls TEXT,
-      sold_out TINYINT(1) NOT NULL DEFAULT 0,
-      category VARCHAR(60) NOT NULL DEFAULT 'car-parts',
-      stock INT NOT NULL DEFAULT 0,
-      sold INT NOT NULL DEFAULT 0,
-      unit_price INT NOT NULL DEFAULT 0,
-      make VARCHAR(100) NOT NULL DEFAULT '',
-      model VARCHAR(100) NOT NULL DEFAULT '',
-      year INT NOT NULL DEFAULT 0,
-      condition VARCHAR(80) NOT NULL DEFAULT '',
-      transmission VARCHAR(80) NOT NULL DEFAULT '',
-      fuel_type VARCHAR(80) NOT NULL DEFAULT '',
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
-
-    CREATE TABLE IF NOT EXISTS car_tips (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      title VARCHAR(220) NOT NULL,
-      body TEXT,
-      category VARCHAR(100) NOT NULL DEFAULT 'General',
-      image_url TEXT,
-      display_order INT NOT NULL DEFAULT 999,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
-
-    CREATE TABLE IF NOT EXISTS store_highlights (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      title VARCHAR(180) NOT NULL,
-      summary TEXT,
-      category VARCHAR(100) NOT NULL DEFAULT 'General',
-      cta_label VARCHAR(100) NOT NULL DEFAULT 'Browse Store',
-      cta_href VARCHAR(200) NOT NULL DEFAULT '/sales',
-      display_order INT NOT NULL DEFAULT 999,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
-
-    CREATE TABLE IF NOT EXISTS inspector_accounts (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      full_name VARCHAR(160) NOT NULL,
-      email VARCHAR(180) NOT NULL UNIQUE,
-      password_hash VARCHAR(255) NOT NULL,
-      phone VARCHAR(80) NOT NULL DEFAULT '',
-      company_name VARCHAR(200) NOT NULL DEFAULT '',
-      company_address TEXT,
-      signature_data_url TEXT,
-      company_logo_data_url TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
-
-    CREATE TABLE IF NOT EXISTS inspection_reports (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      account_id INT NOT NULL,
-      company_name VARCHAR(200) NOT NULL DEFAULT '',
-      inspector_name VARCHAR(160) NOT NULL DEFAULT '',
-      vehicle_label VARCHAR(220) NOT NULL DEFAULT '',
-      vehicle_reg_no VARCHAR(80) NOT NULL DEFAULT '',
-      vin VARCHAR(40) NOT NULL DEFAULT '',
-      mileage VARCHAR(80) NOT NULL DEFAULT '',
-      transmission VARCHAR(80) NOT NULL DEFAULT '',
-      fuel_type VARCHAR(80) NOT NULL DEFAULT '',
-      inspected_at VARCHAR(80) NOT NULL,
-      checklist TEXT,
-      images TEXT,
-      overall_verdict VARCHAR(80) NOT NULL DEFAULT 'Pending',
-      recommendation TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
-
-    CREATE TABLE IF NOT EXISTS refresh_tokens (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      role VARCHAR(40) NOT NULL,
-      subject_id VARCHAR(120) NOT NULL,
-      token_hash VARCHAR(255) NOT NULL UNIQUE,
-      expires_at DATETIME NOT NULL,
-      revoked_at DATETIME NULL,
-      replaced_by_id INT NULL,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
-
-    CREATE TABLE IF NOT EXISTS password_reset_otps (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      email VARCHAR(180) NOT NULL,
-      otp_hash VARCHAR(255) NOT NULL,
-      expires_at DATETIME NOT NULL,
-      used_at DATETIME NULL,
-      attempts INT NOT NULL DEFAULT 0,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
-
-    CREATE INDEX IF NOT EXISTS idx_refresh_tokens_subject ON refresh_tokens(role, subject_id);
-    CREATE INDEX IF NOT EXISTS idx_refresh_tokens_expires ON refresh_tokens(expires_at);
-    CREATE INDEX IF NOT EXISTS idx_password_reset_email ON password_reset_otps(email);
-    CREATE INDEX IF NOT EXISTS idx_password_reset_expires ON password_reset_otps(expires_at);
-  `);
-
-  // Insert default store highlights if they don't exist
-  const count = db.prepare('SELECT COUNT(*) as count FROM store_highlights').get();
-  if (count.count < 1) {
-    db.exec(`
-      INSERT INTO store_highlights (title, summary, category, cta_label, cta_href, display_order)
-      VALUES ('Vehicles', 'Inspected sedans, SUVs, and premium options ready for immediate delivery.', 'Vehicles', 'Browse Vehicles', '/sales#products', 1);
-      INSERT INTO store_highlights (title, summary, category, cta_label, cta_href, display_order)
-      VALUES ('Car Parts', 'OEM-grade parts including brake kits, filters, batteries, and service components.', 'Car Parts', 'Browse Parts', '/sales#products', 2);
-      INSERT INTO store_highlights (title, summary, category, cta_label, cta_href, display_order)
-      VALUES ('Accessories', 'Dash cams, seat covers, phone mounts, and practical interior upgrades.', 'Accessories', 'Browse Accessories', '/sales#products', 3);
-    `);
-  }
-
-  console.log('SQLite database initialized successfully');
+async function seedStoreHighlights() {
+  const existing = await listItems(tables.storeHighlights, { limit: 1 });
+  if (existing.length > 0) return;
+  await Promise.all([
+    putItem(tables.storeHighlights, { title: 'Vehicles', summary: 'Inspected sedans, SUVs, and premium options ready for immediate delivery.', category: 'Vehicles', ctaLabel: 'Browse Vehicles', ctaHref: '/sales#products', order: 1 }),
+    putItem(tables.storeHighlights, { title: 'Car Parts', summary: 'OEM-grade parts including brake kits, filters, batteries, and service components.', category: 'Car Parts', ctaLabel: 'Browse Parts', ctaHref: '/sales#products', order: 2 }),
+    putItem(tables.storeHighlights, { title: 'Accessories', summary: 'Dash cams, seat covers, phone mounts, and practical interior upgrades.', category: 'Accessories', ctaLabel: 'Browse Accessories', ctaHref: '/sales#products', order: 3 }),
+  ]);
 }
 
-app.get('/api/health', (_req, res) => res.json({ ok: true }));
+app.get('/api/health', (_req, res) => res.json({ ok: true, storage: 'dynamodb' }));
 
 app.post('/api/admin/login', authLimiter, async (req, res) => {
   const email = safeString(req.body?.email).toLowerCase();
   const password = String(req.body?.password || '');
   const adminEmail = safeString(process.env.ADMIN_EMAIL).toLowerCase();
   const adminPassword = String(process.env.ADMIN_PASSWORD || '');
-
   if (!adminEmail || !adminPassword) return sendError(res, 500, 'Admin credentials are not configured on the server.');
   if (email !== adminEmail || password !== adminPassword) return sendError(res, 401, 'Invalid admin email or password.');
-
-  const accessToken = signAccessToken({ role: 'admin', email: adminEmail });
   const refresh = await createRefreshToken('admin', adminEmail);
-  res.json({ success: true, accessToken, refreshToken: refresh.token });
+  res.json({ success: true, accessToken: signAccessToken({ role: 'admin', email: adminEmail }), refreshToken: refresh.token });
 });
 
 app.post('/api/auth/refresh', async (req, res) => {
   const role = safeString(req.body?.role);
   const refreshToken = String(req.body?.refreshToken || '');
   if (!['admin', 'inspector'].includes(role) || !refreshToken) return sendError(res, 400, 'Role and refresh token are required.');
-
   const rotated = await rotateRefreshToken(role, refreshToken);
   if (!rotated) return sendError(res, 401, 'Invalid or expired refresh token.');
-
   if (role === 'admin') {
     const adminEmail = safeString(process.env.ADMIN_EMAIL).toLowerCase();
     if (!adminEmail || rotated.subjectId !== adminEmail) return sendError(res, 401, 'Invalid refresh subject.');
     return res.json({ accessToken: signAccessToken({ role: 'admin', email: adminEmail }), refreshToken: rotated.refreshToken });
   }
-
-  const inspectorId = toInt(rotated.subjectId);
-  const account = db.prepare('SELECT * FROM inspector_accounts WHERE id = ?').get(inspectorId);
+  const account = await getItem(tables.inspectorAccounts, rotated.subjectId);
   if (!account) return sendError(res, 401, 'Inspector account not found.');
-  res.json({ accessToken: signAccessToken({ role: 'inspector', inspectorId, email: account.email }), refreshToken: rotated.refreshToken });
+  res.json({ accessToken: signAccessToken({ role: 'inspector', inspectorId: account.id, email: account.email }), refreshToken: rotated.refreshToken });
 });
 
 app.post('/api/auth/logout', async (req, res) => {
@@ -381,9 +258,11 @@ app.post('/api/auth/logout', async (req, res) => {
 
 app.get('/api/dashboard', requireAuth, requireRole('admin'), async (_req, res) => {
   try {
-    const bookings = db.prepare('SELECT * FROM bookings ORDER BY created_at DESC LIMIT 150').all();
-    const orders = db.prepare('SELECT * FROM orders ORDER BY created_at DESC LIMIT 150').all();
-    res.json({ bookings: bookings.map(normalizeBooking), orders: orders.map(normalizeOrder), inventory: [] });
+    const [bookings, orders] = await Promise.all([
+      listItems(tables.bookings, { limit: 150 }),
+      listItems(tables.orders, { limit: 150 }),
+    ]);
+    res.json({ bookings: bookings.sort(sortByCreatedDesc).map(normalizeBooking), orders: orders.sort(sortByCreatedDesc).map(normalizeOrder), inventory: [] });
   } catch {
     sendError(res, 500, 'Failed to load dashboard data.');
   }
@@ -392,8 +271,8 @@ app.get('/api/dashboard', requireAuth, requireRole('admin'), async (_req, res) =
 app.get('/api/car-tips', async (req, res) => {
   const limit = Math.max(1, Math.min(500, toInt(req.query.limit, 6)));
   try {
-    const rows = db.prepare(`SELECT * FROM car_tips ORDER BY display_order ASC, created_at DESC LIMIT ?`).all(limit);
-    res.json(rows.map(normalizeCarTip));
+    const rows = await listItems(tables.carTips, { limit: 500 });
+    res.json(rows.sort(sortByOrderThenCreated).slice(0, limit).map(normalizeCarTip));
   } catch {
     sendError(res, 500, 'Failed to load car tips.');
   }
@@ -403,43 +282,37 @@ app.post('/api/car-tips', requireAuth, requireRole('admin'), async (req, res) =>
   const title = safeString(req.body?.title);
   const body = safeString(req.body?.body);
   if (!title || !body) return sendError(res, 400, 'Tip title and content are required.');
-  const category = safeString(req.body?.category) || 'General';
-  const imageUrl = String(req.body?.imageUrl || '');
-  const order = toInt(req.body?.order, 999);
   try {
-    const result = db.prepare('INSERT INTO car_tips (title, body, category, image_url, display_order) VALUES (?, ?, ?, ?, ?)').run(title, body, category, imageUrl, order);
-    const rows = db.prepare('SELECT * FROM car_tips WHERE id = ?').get(result.lastInsertRowid);
-    res.status(201).json(normalizeCarTip(rows));
+    const row = await putItem(tables.carTips, { title, body, category: safeString(req.body?.category) || 'General', imageUrl: String(req.body?.imageUrl || ''), order: toInt(req.body?.order, 999) });
+    res.status(201).json(normalizeCarTip(row));
   } catch {
     sendError(res, 500, 'Could not add car tip.');
   }
 });
 
 app.patch('/api/car-tips/:id', requireAuth, requireRole('admin'), async (req, res) => {
-  const id = toInt(req.params.id);
-  if (!id) return sendError(res, 400, 'Invalid tip ID.');
+  const id = String(req.params.id || '');
   try {
-    const e = db.prepare('SELECT * FROM car_tips WHERE id = ?').get(id);
-    if (!e) return sendError(res, 404, 'Tip not found.');
-    const title = safeString(req.body?.title) || e.title;
-    const body = safeString(req.body?.body) || e.body;
-    const category = safeString(req.body?.category) || e.category;
-    const imageUrl = String(req.body?.imageUrl || e.image_url || '');
-    const order = Number.isFinite(Number(req.body?.order)) ? toInt(req.body?.order) : toInt(e.display_order, 999);
-    db.prepare('UPDATE car_tips SET title = ?, body = ?, category = ?, image_url = ?, display_order = ? WHERE id = ?').run(title, body, category, imageUrl, order, id);
-    const rows = db.prepare('SELECT * FROM car_tips WHERE id = ?').get(id);
-    res.json(normalizeCarTip(rows));
+    const existing = await getItem(tables.carTips, id);
+    if (!existing) return sendError(res, 404, 'Tip not found.');
+    const updated = await patchItem(tables.carTips, id, {
+      title: safeString(req.body?.title) || existing.title,
+      body: safeString(req.body?.body) || existing.body,
+      category: safeString(req.body?.category) || existing.category,
+      imageUrl: req.body?.imageUrl === undefined ? (existing.imageUrl || '') : String(req.body?.imageUrl || ''),
+      order: Number.isFinite(Number(req.body?.order)) ? toInt(req.body?.order) : toInt(existing.order, 999),
+    });
+    res.json(normalizeCarTip(updated));
   } catch {
     sendError(res, 500, 'Could not update car tip.');
   }
 });
 
 app.delete('/api/car-tips/:id', requireAuth, requireRole('admin'), async (req, res) => {
-  const id = toInt(req.params.id);
-  if (!id) return sendError(res, 400, 'Invalid tip ID.');
+  const id = String(req.params.id || '');
   try {
-    db.prepare('DELETE FROM car_tips WHERE id = ?').run(id);
-    res.json({ deletedId: String(id) });
+    await deleteItem(tables.carTips, id);
+    res.json({ deletedId: id });
   } catch {
     sendError(res, 500, 'Could not delete car tip.');
   }
@@ -448,8 +321,8 @@ app.delete('/api/car-tips/:id', requireAuth, requireRole('admin'), async (req, r
 app.get('/api/store-highlights', async (req, res) => {
   const limit = Math.max(1, Math.min(100, toInt(req.query.limit, 6)));
   try {
-    const rows = db.prepare(`SELECT * FROM store_highlights ORDER BY display_order ASC, created_at DESC LIMIT ?`).all(limit);
-    res.json(rows.map(normalizeStoreHighlight));
+    const rows = await listItems(tables.storeHighlights, { limit: 100 });
+    res.json(rows.sort(sortByOrderThenCreated).slice(0, limit).map(normalizeStoreHighlight));
   } catch {
     sendError(res, 500, 'Failed to load store highlights.');
   }
@@ -458,8 +331,8 @@ app.get('/api/store-highlights', async (req, res) => {
 app.get('/api/stock-items', async (req, res) => {
   const limit = Math.max(1, Math.min(2000, toInt(req.query.limit, 300)));
   try {
-    const rows = db.prepare(`SELECT * FROM stock_items ORDER BY category ASC, name ASC LIMIT ?`).all(limit);
-    res.json(rows.map(normalizeStockItem));
+    const rows = await listItems(tables.stockItems, { limit });
+    res.json(rows.sort((a, b) => `${a.category || ''}${a.name || ''}`.localeCompare(`${b.category || ''}${b.name || ''}`)).map(normalizeStockItem));
   } catch {
     sendError(res, 500, 'Failed to load stock items.');
   }
@@ -471,12 +344,8 @@ app.post('/api/bookings', async (req, res) => {
   const date = safeString(req.body?.date);
   if (!customer || !service || !date) return sendError(res, 400, 'Customer name, service, and appointment date are required.');
   try {
-    const result = db.prepare(
-      `INSERT INTO bookings (booking_code, customer, service, date, status, whatsapp_number, vehicle, email, note)
-       VALUES (?, ?, ?, ?, 'Pending', ?, ?, ?, ?)`
-    ).run(makeBookingCode(), customer, service, date, safeString(req.body?.whatsappNumber), safeString(req.body?.vehicle), safeString(req.body?.email), safeString(req.body?.note));
-    const rows = db.prepare('SELECT * FROM bookings WHERE id = ?').get(result.lastInsertRowid);
-    res.status(201).json(normalizeBooking(rows));
+    const row = await putItem(tables.bookings, { bookingCode: makeBookingCode(), customer, service, date, status: 'Pending', whatsappNumber: safeString(req.body?.whatsappNumber), vehicle: safeString(req.body?.vehicle), email: safeString(req.body?.email), note: safeString(req.body?.note) });
+    res.status(201).json(normalizeBooking(row));
   } catch {
     sendError(res, 500, 'Could not save booking request.');
   }
@@ -488,9 +357,8 @@ app.post('/api/orders', requireAuth, requireRole('admin'), async (req, res) => {
   if (!item || !customer) return sendError(res, 400, 'Item and customer are required.');
   const amount = Number(req.body?.amount || 0);
   try {
-    const result = db.prepare('INSERT INTO orders (order_code, item, customer, amount, channel) VALUES (?, ?, ?, ?, ?)').run(makeOrderCode(), item, customer, Number.isFinite(amount) ? amount : 0, safeString(req.body?.channel) || 'Website');
-    const rows = db.prepare('SELECT * FROM orders WHERE id = ?').get(result.lastInsertRowid);
-    res.status(201).json(normalizeOrder(rows));
+    const row = await putItem(tables.orders, { orderCode: makeOrderCode(), item, customer, amount: Number.isFinite(amount) ? amount : 0, channel: safeString(req.body?.channel) || 'Website' });
+    res.status(201).json(normalizeOrder(row));
   } catch {
     sendError(res, 500, 'Could not create order.');
   }
@@ -499,96 +367,76 @@ app.post('/api/orders', requireAuth, requireRole('admin'), async (req, res) => {
 app.post('/api/stock-items', requireAuth, requireRole('admin'), async (req, res) => {
   const name = safeString(req.body?.name);
   if (!name) return sendError(res, 400, 'Item name is required.');
-  const category = safeString(req.body?.category) || 'car-parts';
   try {
-    const result = db.prepare(
-      `INSERT INTO stock_items (
-        name, description, primary_image_url, feature_image_url, other_image_urls,
-        sold_out, category, stock, sold, unit_price, make, model, year, condition, transmission, fuel_type
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-    ).run(
+    const row = await putItem(tables.stockItems, {
       name,
-      safeString(req.body?.description),
-      String(req.body?.primaryImageUrl || ''),
-      String(req.body?.featureImageUrl || ''),
-      JSON.stringify(Array.isArray(req.body?.otherImageUrls) ? req.body.otherImageUrls : []),
-      req.body?.soldOut ? 1 : 0,
-      category,
-      toInt(req.body?.stock),
-      toInt(req.body?.sold),
-      toInt(req.body?.unitPrice),
-      safeString(req.body?.make),
-      safeString(req.body?.model),
-      toInt(req.body?.year),
-      safeString(req.body?.condition),
-      safeString(req.body?.transmission),
-      safeString(req.body?.fuelType),
-    );
-    const rows = db.prepare('SELECT * FROM stock_items WHERE id = ?').get(result.lastInsertRowid);
-    res.status(201).json(normalizeStockItem(rows));
+      description: safeString(req.body?.description),
+      primaryImageUrl: String(req.body?.primaryImageUrl || ''),
+      featureImageUrl: String(req.body?.featureImageUrl || ''),
+      otherImageUrls: Array.isArray(req.body?.otherImageUrls) ? req.body.otherImageUrls : [],
+      soldOut: Boolean(req.body?.soldOut),
+      category: safeString(req.body?.category) || 'car-parts',
+      stock: toInt(req.body?.stock),
+      sold: toInt(req.body?.sold),
+      unitPrice: toInt(req.body?.unitPrice),
+      make: safeString(req.body?.make),
+      model: safeString(req.body?.model),
+      year: toInt(req.body?.year),
+      condition: safeString(req.body?.condition),
+      transmission: safeString(req.body?.transmission),
+      fuelType: safeString(req.body?.fuelType),
+    });
+    res.status(201).json(normalizeStockItem(row));
   } catch {
     sendError(res, 500, 'Could not add stock item.');
   }
 });
 
 app.patch('/api/stock-items/:id', requireAuth, requireRole('admin'), async (req, res) => {
-  const id = toInt(req.params.id);
-  if (!id) return sendError(res, 400, 'Invalid item ID.');
+  const id = String(req.params.id || '');
   try {
-    const e = db.prepare('SELECT * FROM stock_items WHERE id = ?').get(id);
-    if (!e) return sendError(res, 404, 'Item not found.');
-
-    db.prepare(
-      `UPDATE stock_items SET
-        name = ?, description = ?, primary_image_url = ?, feature_image_url = ?, other_image_urls = ?,
-        sold_out = ?, stock = ?, sold = ?, unit_price = ?, make = ?, model = ?, year = ?, condition = ?,
-        transmission = ?, fuel_type = ?
-      WHERE id = ?`
-    ).run(
-      safeString(req.body?.name) || e.name,
-      req.body?.description === undefined ? (e.description || '') : safeString(req.body?.description),
-      req.body?.primaryImageUrl === undefined ? (e.primary_image_url || '') : String(req.body?.primaryImageUrl || ''),
-      req.body?.featureImageUrl === undefined ? (e.feature_image_url || '') : String(req.body?.featureImageUrl || ''),
-      JSON.stringify(Array.isArray(req.body?.otherImageUrls) ? req.body.otherImageUrls : parseJsonArray(e.other_image_urls)),
-      req.body?.soldOut === undefined ? Number(e.sold_out) : req.body?.soldOut ? 1 : 0,
-      req.body?.stock === undefined ? toInt(e.stock) : toInt(req.body?.stock),
-      req.body?.sold === undefined ? toInt(e.sold) : toInt(req.body?.sold),
-      req.body?.unitPrice === undefined ? toInt(e.unit_price) : toInt(req.body?.unitPrice),
-      req.body?.make === undefined ? (e.make || '') : safeString(req.body?.make),
-      req.body?.model === undefined ? (e.model || '') : safeString(req.body?.model),
-      req.body?.year === undefined ? toInt(e.year) : toInt(req.body?.year),
-      req.body?.condition === undefined ? (e.condition || '') : safeString(req.body?.condition),
-      req.body?.transmission === undefined ? (e.transmission || '') : safeString(req.body?.transmission),
-      req.body?.fuelType === undefined ? (e.fuel_type || '') : safeString(req.body?.fuelType),
-      id,
-    );
-
-    const rows = db.prepare('SELECT * FROM stock_items WHERE id = ?').get(id);
-    res.json(normalizeStockItem(rows));
+    const existing = await getItem(tables.stockItems, id);
+    if (!existing) return sendError(res, 404, 'Item not found.');
+    const updated = await patchItem(tables.stockItems, id, {
+      name: safeString(req.body?.name) || existing.name,
+      description: req.body?.description === undefined ? (existing.description || '') : safeString(req.body?.description),
+      primaryImageUrl: req.body?.primaryImageUrl === undefined ? (existing.primaryImageUrl || '') : String(req.body?.primaryImageUrl || ''),
+      featureImageUrl: req.body?.featureImageUrl === undefined ? (existing.featureImageUrl || '') : String(req.body?.featureImageUrl || ''),
+      otherImageUrls: Array.isArray(req.body?.otherImageUrls) ? req.body.otherImageUrls : (Array.isArray(existing.otherImageUrls) ? existing.otherImageUrls : []),
+      soldOut: req.body?.soldOut === undefined ? Boolean(existing.soldOut) : Boolean(req.body?.soldOut),
+      stock: req.body?.stock === undefined ? toInt(existing.stock) : toInt(req.body?.stock),
+      sold: req.body?.sold === undefined ? toInt(existing.sold) : toInt(req.body?.sold),
+      unitPrice: req.body?.unitPrice === undefined ? toInt(existing.unitPrice) : toInt(req.body?.unitPrice),
+      make: req.body?.make === undefined ? (existing.make || '') : safeString(req.body?.make),
+      model: req.body?.model === undefined ? (existing.model || '') : safeString(req.body?.model),
+      year: req.body?.year === undefined ? toInt(existing.year) : toInt(req.body?.year),
+      condition: req.body?.condition === undefined ? (existing.condition || '') : safeString(req.body?.condition),
+      transmission: req.body?.transmission === undefined ? (existing.transmission || '') : safeString(req.body?.transmission),
+      fuelType: req.body?.fuelType === undefined ? (existing.fuelType || '') : safeString(req.body?.fuelType),
+    });
+    res.json(normalizeStockItem(updated));
   } catch {
     sendError(res, 500, 'Could not update stock item.');
   }
 });
 
 app.patch('/api/stock-items/:id/sold-status', requireAuth, requireRole('admin'), async (req, res) => {
-  const id = toInt(req.params.id);
-  if (!id) return sendError(res, 400, 'Invalid item ID.');
+  const id = String(req.params.id || '');
   try {
-    db.prepare('UPDATE stock_items SET sold_out = ? WHERE id = ?').run(req.body?.soldOut ? 1 : 0, id);
-    const rows = db.prepare('SELECT * FROM stock_items WHERE id = ?').get(id);
-    if (!rows) return sendError(res, 404, 'Item not found.');
-    res.json(normalizeStockItem(rows));
+    const existing = await getItem(tables.stockItems, id);
+    if (!existing) return sendError(res, 404, 'Item not found.');
+    const updated = await patchItem(tables.stockItems, id, { soldOut: Boolean(req.body?.soldOut) });
+    res.json(normalizeStockItem(updated));
   } catch {
     sendError(res, 500, 'Could not update sold status.');
   }
 });
 
 app.delete('/api/stock-items/:id', requireAuth, requireRole('admin'), async (req, res) => {
-  const id = toInt(req.params.id);
-  if (!id) return sendError(res, 400, 'Invalid item ID.');
+  const id = String(req.params.id || '');
   try {
-    db.prepare('DELETE FROM stock_items WHERE id = ?').run(id);
-    res.json({ deletedId: String(id) });
+    await deleteItem(tables.stockItems, id);
+    res.json({ deletedId: id });
   } catch {
     sendError(res, 500, 'Could not delete stock item.');
   }
@@ -599,21 +447,13 @@ app.post('/api/inspectors/register', authLimiter, async (req, res) => {
   const email = safeString(req.body?.email).toLowerCase();
   const password = String(req.body?.password || '');
   if (!fullName || !email || password.length < 6) return sendError(res, 400, 'Full name, valid email, and password (min 6 chars) are required.');
-
   try {
-    const exists = db.prepare('SELECT id FROM inspector_accounts WHERE email = ?').get(email);
+    const exists = await findInspectorByEmail(email);
     if (exists) return sendError(res, 409, 'An account with this email already exists. Please log in instead.');
-
-    const result = db.prepare(
-      `INSERT INTO inspector_accounts (full_name, email, password_hash, phone, company_name, company_address, signature_data_url, company_logo_data_url)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
-    ).run(fullName, email, await bcrypt.hash(password, 10), safeString(req.body?.phone), safeString(req.body?.companyName), safeString(req.body?.companyAddress), String(req.body?.signatureDataUrl || ''), String(req.body?.companyLogoDataUrl || ''));
-
-    const rows = db.prepare('SELECT * FROM inspector_accounts WHERE id = ?').get(result.lastInsertRowid);
-    const account = normalizeInspectorAccount(rows);
-    const accessToken = signAccessToken({ role: 'inspector', inspectorId: toInt(account._id), email: account.email });
+    const row = await putItem(tables.inspectorAccounts, { fullName, email, passwordHash: await bcrypt.hash(password, 10), phone: safeString(req.body?.phone), companyName: safeString(req.body?.companyName), companyAddress: safeString(req.body?.companyAddress), signatureDataUrl: String(req.body?.signatureDataUrl || ''), companyLogoDataUrl: String(req.body?.companyLogoDataUrl || '') });
+    const account = normalizeInspectorAccount(row);
     const refresh = await createRefreshToken('inspector', account._id);
-    res.status(201).json({ account, accessToken, refreshToken: refresh.token });
+    res.status(201).json({ account, accessToken: signAccessToken({ role: 'inspector', inspectorId: account._id, email: account.email }), refreshToken: refresh.token });
   } catch {
     sendError(res, 500, 'Could not create inspector account.');
   }
@@ -623,17 +463,12 @@ app.post('/api/inspectors/login', authLimiter, async (req, res) => {
   const email = safeString(req.body?.email).toLowerCase();
   const password = String(req.body?.password || '');
   if (!email || !password) return sendError(res, 400, 'Email and password are required.');
-
   try {
-    const accountRow = db.prepare('SELECT * FROM inspector_accounts WHERE email = ? ORDER BY created_at DESC LIMIT 1').get(email);
-    if (!accountRow) return sendError(res, 401, 'Invalid email or password.');
-    const matches = await bcrypt.compare(password, accountRow.password_hash);
-    if (!matches) return sendError(res, 401, 'Invalid email or password.');
-
-    const account = normalizeInspectorAccount(accountRow);
-    const accessToken = signAccessToken({ role: 'inspector', inspectorId: toInt(account._id), email: account.email });
+    const row = await findInspectorByEmail(email);
+    if (!row || !(await bcrypt.compare(password, row.passwordHash || ''))) return sendError(res, 401, 'Invalid email or password.');
+    const account = normalizeInspectorAccount(row);
     const refresh = await createRefreshToken('inspector', account._id);
-    res.json({ account, accessToken, refreshToken: refresh.token });
+    res.json({ account, accessToken: signAccessToken({ role: 'inspector', inspectorId: account._id, email: account.email }), refreshToken: refresh.token });
   } catch {
     sendError(res, 500, 'Could not login.');
   }
@@ -642,20 +477,15 @@ app.post('/api/inspectors/login', authLimiter, async (req, res) => {
 app.post('/api/inspectors/password-reset/request', authLimiter, async (req, res) => {
   const email = safeString(req.body?.email).toLowerCase();
   if (!email) return sendError(res, 400, 'Email is required.');
-
   try {
-    const account = db.prepare('SELECT id FROM inspector_accounts WHERE email = ? LIMIT 1').get(email);
+    const account = await findInspectorByEmail(email);
     let debugOtp = '';
-
     if (account) {
       const otp = makeOtpCode();
-      const otpHash = hashValue(`${otp}:${jwtSecret}`);
-      const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
-      db.prepare('INSERT INTO password_reset_otps (email, otp_hash, expires_at) VALUES (?, ?, ?)').run(email, otpHash, expiresAt.toISOString());
+      await putItem(tables.passwordResetOtps, { email, otpHash: hashValue(`${otp}:${jwtSecret}`), expiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString(), usedAt: '', attempts: 0 });
       await sendOtpEmail(email, otp);
       if (nodeEnv !== 'production' && (!mailer || !smtpFrom)) debugOtp = otp;
     }
-
     res.json({ success: true, message: 'If the email exists, an OTP has been sent.', ...(debugOtp ? { devOtp: debugOtp } : {}) });
   } catch {
     sendError(res, 500, 'Could not process password reset request.');
@@ -667,29 +497,20 @@ app.post('/api/inspectors/password-reset/confirm', authLimiter, async (req, res)
   const otp = safeString(req.body?.otp);
   const newPassword = String(req.body?.newPassword || '');
   if (!email || !otp || newPassword.length < 6) return sendError(res, 400, 'Email, OTP, and new password (min 6 chars) are required.');
-
   try {
-    const row = db.prepare(
-      `SELECT * FROM password_reset_otps
-       WHERE email = ? AND used_at IS NULL AND expires_at > ?
-       ORDER BY id DESC LIMIT 1`
-    ).get(email, new Date().toISOString());
+    const rows = await listItems(tables.passwordResetOtps, { limit: 1000 });
+    const row = rows.filter((item) => item.email === email && !item.usedAt && String(item.expiresAt || '') > nowIso()).sort(sortByCreatedDesc)[0];
     if (!row) return sendError(res, 400, 'Invalid or expired OTP.');
     if (toInt(row.attempts) >= 5) return sendError(res, 429, 'Too many OTP attempts. Request a new OTP.');
-
-    const inputHash = hashValue(`${otp}:${jwtSecret}`);
-    if (inputHash !== row.otp_hash) {
-      db.prepare('UPDATE password_reset_otps SET attempts = attempts + 1 WHERE id = ?').run(row.id);
+    if (hashValue(`${otp}:${jwtSecret}`) !== row.otpHash) {
+      await patchItem(tables.passwordResetOtps, row.id, { attempts: toInt(row.attempts) + 1 });
       return sendError(res, 400, 'Invalid or expired OTP.');
     }
-
-    const account = db.prepare('SELECT * FROM inspector_accounts WHERE email = ? LIMIT 1').get(email);
+    const account = await findInspectorByEmail(email);
     if (!account) return sendError(res, 400, 'Invalid password reset request.');
-
-    db.prepare('UPDATE inspector_accounts SET password_hash = ? WHERE id = ?').run(await bcrypt.hash(newPassword, 10), account.id);
-    db.prepare('UPDATE password_reset_otps SET used_at = ? WHERE id = ?').run(new Date().toISOString(), row.id);
+    await patchItem(tables.inspectorAccounts, account.id, { passwordHash: await bcrypt.hash(newPassword, 10) });
+    await patchItem(tables.passwordResetOtps, row.id, { usedAt: nowIso() });
     await revokeAllSubjectTokens('inspector', account.id);
-
     res.json({ success: true, message: 'Password reset successful. Please log in again.' });
   } catch {
     sendError(res, 500, 'Could not reset password.');
@@ -697,86 +518,65 @@ app.post('/api/inspectors/password-reset/confirm', authLimiter, async (req, res)
 });
 
 app.patch('/api/inspectors/:id', requireAuth, requireInspectorSelf, async (req, res) => {
-  const id = toInt(req.params.id);
-  if (!id) return sendError(res, 400, 'Invalid account ID.');
-
+  const id = String(req.params.id || '');
   try {
-    const e = db.prepare('SELECT * FROM inspector_accounts WHERE id = ?').get(id);
-    if (!e) return sendError(res, 404, 'Account not found.');
-
-    const email = safeString(req.body?.email || e.email).toLowerCase();
-    const owner = db.prepare('SELECT id FROM inspector_accounts WHERE email = ? LIMIT 1').get(email);
-    if (owner && Number(owner.id) !== id) return sendError(res, 409, 'Email is already in use by another inspector account.');
-
-    db.prepare(
-      `UPDATE inspector_accounts SET
-        full_name = ?, email = ?, phone = ?, company_name = ?, company_address = ?, signature_data_url = ?, company_logo_data_url = ?
-      WHERE id = ?`
-    ).run(
-      safeString(req.body?.fullName || e.full_name),
+    const existing = await getItem(tables.inspectorAccounts, id);
+    if (!existing) return sendError(res, 404, 'Account not found.');
+    const email = safeString(req.body?.email || existing.email).toLowerCase();
+    const owner = await findInspectorByEmail(email);
+    if (owner && owner.id !== id) return sendError(res, 409, 'Email is already in use by another inspector account.');
+    const updated = await patchItem(tables.inspectorAccounts, id, {
+      fullName: safeString(req.body?.fullName || existing.fullName),
       email,
-      safeString(req.body?.phone || e.phone),
-      safeString(req.body?.companyName || e.company_name),
-      safeString(req.body?.companyAddress || e.company_address),
-      String(req.body?.signatureDataUrl ?? e.signature_data_url ?? ''),
-      String(req.body?.companyLogoDataUrl ?? e.company_logo_data_url ?? ''),
-      id,
-    );
-
-    const updatedRows = db.prepare('SELECT * FROM inspector_accounts WHERE id = ?').get(id);
-    res.json(normalizeInspectorAccount(updatedRows));
+      phone: safeString(req.body?.phone || existing.phone),
+      companyName: safeString(req.body?.companyName || existing.companyName),
+      companyAddress: safeString(req.body?.companyAddress || existing.companyAddress),
+      signatureDataUrl: String(req.body?.signatureDataUrl ?? existing.signatureDataUrl ?? ''),
+      companyLogoDataUrl: String(req.body?.companyLogoDataUrl ?? existing.companyLogoDataUrl ?? ''),
+    });
+    res.json(normalizeInspectorAccount(updated));
   } catch {
     sendError(res, 500, 'Could not update account.');
   }
 });
 
 app.post('/api/inspection-reports', requireAuth, requireRole('inspector'), async (req, res) => {
-  const accountId = toInt(req.body?.accountId);
+  const accountId = String(req.body?.accountId || '');
   const inspectedAt = safeString(req.body?.inspectedAt);
   if (!accountId || !inspectedAt) return sendError(res, 400, 'Account ID and inspection date are required.');
-  if (accountId !== toInt(req.auth.inspectorId)) return sendError(res, 403, 'You can only create reports for your account.');
-
+  if (accountId !== String(req.auth.inspectorId || '')) return sendError(res, 403, 'You can only create reports for your account.');
   try {
-    const accountRows = db.prepare('SELECT id FROM inspector_accounts WHERE id = ?').get(accountId);
-    if (!accountRows) return sendError(res, 404, 'Inspector account not found.');
-
-    const result = db.prepare(
-      `INSERT INTO inspection_reports (
-        account_id, company_name, inspector_name, vehicle_label, vehicle_reg_no,
-        vin, mileage, transmission, fuel_type, inspected_at,
-        checklist, images, overall_verdict, recommendation
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-    ).run(
+    const account = await getItem(tables.inspectorAccounts, accountId);
+    if (!account) return sendError(res, 404, 'Inspector account not found.');
+    const row = await putItem(tables.inspectionReports, {
       accountId,
-      safeString(req.body?.companyName),
-      safeString(req.body?.inspectorName),
-      safeString(req.body?.vehicleLabel),
-      safeString(req.body?.vehicleRegNo),
-      safeString(req.body?.vin),
-      safeString(req.body?.mileage),
-      safeString(req.body?.transmission),
-      safeString(req.body?.fuelType),
+      companyName: safeString(req.body?.companyName),
+      inspectorName: safeString(req.body?.inspectorName),
+      vehicleLabel: safeString(req.body?.vehicleLabel),
+      vehicleRegNo: safeString(req.body?.vehicleRegNo),
+      vin: safeString(req.body?.vin),
+      mileage: safeString(req.body?.mileage),
+      transmission: safeString(req.body?.transmission),
+      fuelType: safeString(req.body?.fuelType),
       inspectedAt,
-      JSON.stringify(Array.isArray(req.body?.checklist) ? req.body.checklist : []),
-      JSON.stringify(Array.isArray(req.body?.images) ? req.body.images : []),
-      safeString(req.body?.overallVerdict) || 'Pending',
-      safeString(req.body?.recommendation),
-    );
-
-    const rows = db.prepare('SELECT * FROM inspection_reports WHERE id = ?').get(result.lastInsertRowid);
-    res.status(201).json(normalizeInspectionReport(rows));
+      checklist: Array.isArray(req.body?.checklist) ? req.body.checklist : [],
+      images: Array.isArray(req.body?.images) ? req.body.images : [],
+      overallVerdict: safeString(req.body?.overallVerdict) || 'Pending',
+      recommendation: safeString(req.body?.recommendation),
+    });
+    res.status(201).json(normalizeInspectionReport(row));
   } catch {
     sendError(res, 500, 'Could not save inspection report.');
   }
 });
 
 app.get('/api/inspection-reports', requireAuth, requireRole('inspector'), async (req, res) => {
-  const accountId = toInt(req.query.accountId);
+  const accountId = String(req.query.accountId || '');
   if (!accountId) return sendError(res, 400, 'accountId is required.');
-  if (accountId !== toInt(req.auth.inspectorId)) return sendError(res, 403, 'You can only view your own reports.');
+  if (accountId !== String(req.auth.inspectorId || '')) return sendError(res, 403, 'You can only view your own reports.');
   try {
-    const rows = db.prepare('SELECT * FROM inspection_reports WHERE account_id = ? ORDER BY inspected_at DESC').all(accountId);
-    res.json(rows.map(normalizeInspectionReport));
+    const rows = await queryItems(tables.inspectionReports, 'accountId-index', 'accountId = :accountId', { ':accountId': accountId }, undefined, 1000);
+    res.json(rows.sort((a, b) => String(b.inspectedAt || '').localeCompare(String(a.inspectedAt || ''))).map(normalizeInspectionReport));
   } catch {
     sendError(res, 500, 'Could not load inspection reports.');
   }
@@ -788,7 +588,7 @@ app.use((err, _req, res, _next) => {
 });
 
 async function bootstrap() {
-  initSchema();
+  await seedStoreHighlights();
   app.listen(port, () => {
     console.log(`Biltronix API running at http://localhost:${port}`);
   });

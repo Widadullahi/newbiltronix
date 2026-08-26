@@ -9,6 +9,27 @@ const productFilters = [
   { label: 'Accessories', value: 'accessory' },
 ];
 
+const productMeta = {
+  vehicle: {
+    kicker: 'Verified unit',
+    accent: 'from-blue-500/90 to-cyan-300/80',
+    badgeClass: 'border-blue-200/40 bg-blue-500/90 text-white',
+    chips: ['Inspected', 'Clean title', 'Delivery ready'],
+  },
+  part: {
+    kicker: 'OEM-grade',
+    accent: 'from-emerald-500/90 to-lime-300/80',
+    badgeClass: 'border-emerald-200/40 bg-emerald-500/90 text-white',
+    chips: ['Warranty', 'Fit checked', 'Fast pickup'],
+  },
+  accessory: {
+    kicker: 'Premium add-on',
+    accent: 'from-violet-500/90 to-fuchsia-300/80',
+    badgeClass: 'border-violet-200/40 bg-violet-500/90 text-white',
+    chips: ['Curated', 'Install support', 'In stock'],
+  },
+};
+
 const storeProducts = [
   // Vehicles
   {
@@ -176,44 +197,77 @@ export default function SalesPage() {
                 <p>Try adjusting your search or filter criteria</p>
               </div>
             ) : (
-              filteredProducts.map((product) => (
-                <article key={product.title} className="group relative flex flex-col overflow-hidden rounded-lg border border-slate-400/20 bg-gradient-to-b from-slate-900 to-[#030a18] shadow-[0_22px_58px_rgba(2,6,23,0.36)] transition duration-300 hover:-translate-y-2 hover:border-blue-400/30 hover:shadow-[0_34px_80px_rgba(2,6,23,0.5)]">
-                  {/* Image */}
-                  <div className="relative h-56 shrink-0 overflow-hidden bg-slate-950 after:pointer-events-none after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[120px] after:bg-[linear-gradient(to_bottom,transparent_0%,rgba(2,6,23,0.2)_45%,#071225_100%)]">
-                    <img
-                      src={product.image}
-                      alt={product.title}
-                      className="block h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.06]"
-                    />
-                    <span className={`absolute right-3.5 top-3.5 z-[2] rounded border px-3 py-1 text-[0.65rem] font-bold uppercase tracking-[0.08em] backdrop-blur ${product.category === 'vehicle' ? 'border-blue-300/40 bg-blue-600/80 text-white' : product.category === 'part' ? 'border-green-300/40 bg-green-600/80 text-white' : 'border-violet-300/40 bg-violet-600/80 text-white'}`}>
-                      {product.badge}
-                    </span>
-                  </div>
+              filteredProducts.map((product) => {
+                const meta = productMeta[product.category] || productMeta.vehicle;
 
-                  {/* Body */}
-                  <div className="flex flex-1 flex-col px-[22px] pb-[22px]">
-                    <h2 className="m-0 mb-1.5 text-[1.08rem] font-bold tracking-[-0.01em] text-slate-50">{product.title}</h2>
-                    <p className="m-0 mb-4 text-[1.45rem] font-extrabold tracking-[-0.02em] text-blue-200">{product.price}</p>
-                    <div className="mb-3.5 h-px bg-gradient-to-r from-blue-400/30 to-white/5" />
-                    <p className="mb-5 text-sm leading-relaxed text-slate-300/70">{product.description}</p>
+                return (
+                  <article key={product.title} className="group relative flex min-h-[520px] flex-col overflow-hidden rounded-xl border border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.96),rgba(2,6,23,0.98))] shadow-[0_24px_70px_rgba(0,0,0,0.36)] transition duration-300 before:pointer-events-none before:absolute before:inset-0 before:z-[1] before:bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.12),transparent_34%)] hover:-translate-y-1.5 hover:border-white/20 hover:shadow-[0_34px_90px_rgba(15,23,42,0.68)]">
+                    <div className={`absolute left-0 top-0 z-[2] h-1 w-full bg-gradient-to-r ${meta.accent}`} aria-hidden="true" />
 
-                    <div className="mt-auto flex gap-2.5">
-                      <a
-                        href="https://wa.me/2347060882711"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex flex-1 items-center justify-center gap-[7px] rounded-md bg-gradient-to-br from-blue-700 to-blue-500 px-4 py-[11px] text-[0.82rem] font-bold tracking-[0.03em] text-white no-underline shadow-[0_12px_30px_rgba(37,99,235,0.3)] transition hover:-translate-y-px hover:text-white hover:brightness-110"
-                      >
-                        <i className="fab fa-whatsapp" aria-hidden="true"></i>
-                        Inquire Now
-                      </a>
-                      <button className="inline-flex items-center justify-center gap-1.5 rounded-md border border-white/10 bg-transparent px-4 py-[11px] text-[0.82rem] font-semibold text-white/55 transition hover:border-blue-400/40 hover:text-blue-200">
-                        Details
-                      </button>
+                    <div className="relative z-[2] m-3 mb-0 h-60 shrink-0 overflow-hidden rounded-lg border border-white/10 bg-slate-950 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.04)]">
+                      <img
+                        src={product.image}
+                        alt={product.title}
+                        className="block h-full w-full object-cover transition duration-700 group-hover:scale-[1.05] group-hover:saturate-[1.08]"
+                      />
+                      <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(2,6,23,0.78),rgba(2,6,23,0.12)_52%,rgba(255,255,255,0.04))]" />
+                      <div className="absolute left-4 right-4 top-4 flex items-start justify-between gap-3">
+                        <span className="rounded-full border border-white/15 bg-slate-950/60 px-3 py-1 text-[0.62rem] font-bold uppercase tracking-[0.16em] text-slate-100 backdrop-blur">
+                          {meta.kicker}
+                        </span>
+                        <span className={`rounded-full border px-3 py-1 text-[0.62rem] font-bold uppercase tracking-[0.12em] shadow-[0_10px_25px_rgba(0,0,0,0.25)] backdrop-blur ${meta.badgeClass}`}>
+                          {product.badge}
+                        </span>
+                      </div>
+                      <div className="absolute bottom-4 left-4 right-4">
+                        <p className="m-0 text-[0.65rem] font-bold uppercase tracking-[0.18em] text-slate-300">Starting from</p>
+                        <p className="m-0 mt-1 text-[1.65rem] font-extrabold leading-none tracking-normal text-white drop-shadow">{product.price}</p>
+                      </div>
                     </div>
-                  </div>
-                </article>
-              ))
+
+                    <div className="relative z-[2] flex flex-1 flex-col p-5">
+                      <div className="mb-4">
+                        <h2 className="m-0 text-[1.1rem] font-extrabold leading-snug tracking-normal text-slate-50">{product.title}</h2>
+                        <p className="mt-2 min-h-[70px] text-sm leading-6 text-slate-300/78">{product.description}</p>
+                      </div>
+
+                      <div className="mb-5 flex flex-wrap gap-2">
+                        {meta.chips.map((chip) => (
+                          <span key={chip} className="inline-flex items-center gap-1.5 rounded-md border border-white/10 bg-white/[0.06] px-2.5 py-1.5 text-[0.72rem] font-semibold text-slate-200">
+                            <i className="fas fa-check text-[0.62rem] text-blue-300" aria-hidden="true"></i>
+                            {chip}
+                          </span>
+                        ))}
+                      </div>
+
+                      <div className="mt-auto border-t border-white/10 pt-4">
+                        <div className="flex items-center justify-between gap-3 pb-4 text-xs text-slate-400">
+                          <span className="inline-flex items-center gap-2">
+                            <i className="fas fa-shield-alt text-blue-300" aria-hidden="true"></i>
+                            Biltronix checked
+                          </span>
+                          <span className="font-semibold text-slate-200">Available</span>
+                        </div>
+
+                        <div className="grid grid-cols-[1fr_auto] gap-2.5">
+                          <a
+                            href="https://wa.me/2347060882711"
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-white px-4 py-3 text-[0.82rem] font-extrabold tracking-[0.03em] text-slate-950 no-underline shadow-[0_16px_34px_rgba(255,255,255,0.14)] transition hover:-translate-y-px hover:text-slate-950 hover:bg-blue-100"
+                          >
+                            <i className="fab fa-whatsapp text-emerald-500" aria-hidden="true"></i>
+                            Inquire Now
+                          </a>
+                          <button className="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-white/10 bg-white/[0.06] text-slate-200 transition hover:border-blue-300/40 hover:bg-blue-400/10 hover:text-blue-100" type="button" aria-label={`View details for ${product.title}`}>
+                            <i className="fas fa-arrow-right" aria-hidden="true"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </article>
+                );
+              })
             )}
           </div>
         </div>
