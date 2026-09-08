@@ -280,7 +280,7 @@ export default function SalesPage() {
         <div className="container mx-auto px-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <span>Biltronix Store · Premium Vehicles &amp; Parts</span>
-            <span>© {new Date().getFullYear()} Biltronix Automotive. All rights reserved.</span>
+            <span>© {new Date().getFullYear()} Biltronix Automobile. All rights reserved.</span>
           </div>
         </div>
       </footer>

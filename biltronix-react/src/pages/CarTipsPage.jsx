@@ -257,7 +257,7 @@ export default function CarTipsPage() {
       <footer className="border-t border-white/10 bg-slate-950 py-6 text-sm text-slate-400">
         <div className="container mx-auto px-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <span>© {new Date().getFullYear()} Biltronix Automotive. All rights reserved.</span>
+            <span>© {new Date().getFullYear()} Biltronix Automobile. All rights reserved.</span>
             <span>Expert automotive advice, updated daily.</span>
           </div>
         </div>

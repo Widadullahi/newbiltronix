@@ -50,7 +50,7 @@ export default function SiteHeader() {
             <img src="/logo.jpg" alt="Biltronix" className="h-10 w-10 rounded-lg border border-slate-200 object-cover" />
             <div>
               <span className="text-lg font-bold text-text-primary">Biltronix</span>
-              <span className="text-primary ml-1 font-semibold">Automotive</span>
+              <span className="text-primary ml-1 font-semibold">Automobile</span>
             </div>
           </Link>
 

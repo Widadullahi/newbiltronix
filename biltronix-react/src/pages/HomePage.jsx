@@ -213,99 +213,212 @@ export default function HomePage() {
     <div className="min-h-screen bg-glass-bg">
       <SiteHeader />
 
-      {/* ── Dark Luxury Hero ── */}
+      {/* ── Showroom Hero ── */}
       <section
-        className={`relative flex min-h-[calc(100vh-96px)] w-full items-center overflow-hidden bg-slate-900 xl:min-h-[90vh] max-[900px]:min-h-0 max-[900px]:flex-col max-[900px]:justify-start max-[900px]:pt-9${heroAnimated ? ' lux-on' : ''}`}
+        className={`relative flex min-h-[calc(100vh-96px)] w-full items-center overflow-hidden xl:min-h-[90vh] max-[900px]:min-h-0 max-[900px]:flex-col max-[900px]:justify-start max-[900px]:pt-9${heroAnimated ? ' lux-on' : ''}`}
         aria-label="Biltronix hero"
       >
-        <div className="absolute inset-0 z-0 bg-slate-900" aria-hidden="true" />
-
-        {/* Speed lines */}
-        <div className="pointer-events-none absolute inset-0 z-[1] overflow-hidden max-[900px]:hidden" aria-hidden="true">
-          {HERO_LINES.map((l, i) => (
-            <div
-              key={i}
-              className="absolute right-0 h-px w-[var(--lw,200px)] opacity-0 [background:linear-gradient(to_left,transparent_0%,rgba(96,165,250,var(--lo,0.7))_38%,rgba(219,234,254,var(--lo,0.7))_66%,transparent_100%)] [.lux-on_&]:animate-[luxLine_var(--ldur,1s)_ease-out_var(--ld,0s)_infinite] motion-reduce:animate-none"
-              style={{ top: l.top, '--lw': l.width, '--ld': l.delay, '--ldur': l.dur, '--lo': l.opacity }}
-            />
-          ))}
+        {/* Background showroom image */}
+        <div className="absolute inset-0 z-0">
+          <img
+            src="/new_design/background.png"
+            alt=""
+            className="h-full w-full object-cover object-center"
+            aria-hidden="true"
+          />
         </div>
 
         {/* Left hero content */}
         <div className="relative z-20 w-full flex-[0_0_48%] pl-[7%] pr-4 max-[1100px]:flex-[0_0_52%] max-[900px]:mx-auto max-[900px]:max-w-3xl max-[900px]:flex-none max-[900px]:px-6 max-[900px]:text-center max-[640px]:px-[18px]">
-          <p className="mb-4 hidden text-[0.68rem] font-bold uppercase tracking-[0.22em] text-blue-200/70 max-[900px]:block">Automotive Sales & Services</p>
-          <h1 className="m-0 mb-5 max-w-[680px] font-heading text-[clamp(2.5rem,5vw,4.2rem)] font-extrabold leading-[1.08] text-white max-[900px]:mx-auto max-[640px]:text-[clamp(2rem,10vw,2.75rem)]">
+          {/* Badge */}
+          <div className="mb-5 inline-flex items-center gap-2 rounded-full bg-[#0f1b2d] px-4 py-2 max-[900px]:mx-auto">
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#c9952c] text-[0.6rem] text-white">
+              <i className="fas fa-star" aria-hidden="true"></i>
+            </span>
+            <span className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-white">Premium Automobile Solutions</span>
+          </div>
+
+          <h1 className="m-0 mb-5 max-w-[680px] font-heading text-[clamp(2.5rem,5vw,4.2rem)] font-extrabold leading-[1.08] text-[#0f1b2d] max-[900px]:mx-auto max-[640px]:text-[clamp(2rem,10vw,2.75rem)]">
             Find Your Dream Car at{' '}
-            <span className="animate-[luxGoldShimmer_4s_linear_infinite] bg-[linear-gradient(90deg,#60a5fa,#93c5fd,#ffffff,#bfdbfe,#60a5fa)] bg-[length:300%_auto] bg-clip-text text-transparent motion-reduce:animate-none motion-reduce:bg-none motion-reduce:text-blue-300">Biltronix</span>
+            <span className="text-[#c9952c]">Biltronix</span>
           </h1>
 
-          <p className="mb-5 max-w-[470px] text-base leading-[1.78] text-slate-300/85 max-[900px]:mx-auto max-[900px]:max-w-[620px] max-[640px]:mb-[18px] max-[640px]:text-[0.95rem] max-[640px]:leading-7">
+          <p className="mb-5 max-w-[470px] text-base leading-[1.78] text-slate-600 max-[900px]:mx-auto max-[900px]:max-w-[620px] max-[640px]:mb-[18px] max-[640px]:text-[0.95rem] max-[640px]:leading-7">
             Browse our curated selection of premium vehicles, genuine parts, and
             expert guidance. Every vehicle is thoroughly inspected and backed by
             our quality guarantee.
           </p>
 
-          <div className="mb-7 grid max-w-[560px] grid-cols-2 gap-2.5 max-[900px]:mx-auto max-[640px]:mb-5">
+          {/* Service pills */}
+          <div className="mb-7 flex flex-wrap gap-2.5 max-w-[580px] max-[900px]:mx-auto max-[640px]:mb-5 max-[640px]:justify-center">
             {heroServices.map((service) => (
-              <span key={service.label} className="inline-flex min-h-10 items-center gap-2 rounded-md border border-blue-200/15 bg-white/[0.055] px-3 py-2 text-[0.75rem] font-semibold text-slate-100/85 backdrop-blur max-[420px]:text-[0.68rem]">
-                <i className={`${service.icon} w-4 text-center text-blue-300`} aria-hidden="true"></i>
+              <span key={service.label} className="inline-flex min-h-10 items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-4 py-2 text-[0.75rem] font-semibold text-[#0f1b2d] shadow-sm backdrop-blur-sm max-[420px]:text-[0.68rem]">
+                <i className={`${service.icon} w-4 text-center text-[#0f1b2d]`} aria-hidden="true"></i>
                 {service.label}
               </span>
             ))}
           </div>
 
+          {/* CTA buttons */}
           <div className="mb-8 flex flex-wrap items-center gap-3.5 max-[900px]:mb-6 max-[900px]:justify-center max-[640px]:mb-[18px] max-[640px]:grid max-[640px]:grid-cols-1 max-[640px]:gap-2.5">
-            <Link to="/sales" className="inline-flex items-center justify-center gap-2.5 rounded px-[26px] py-[13px] text-[0.82rem] font-bold uppercase tracking-[0.08em] text-white no-underline shadow-[0_12px_34px_rgba(37,99,235,0.42)] transition hover:-translate-y-0.5 hover:text-white hover:shadow-[0_16px_48px_rgba(37,99,235,0.58)] [background:linear-gradient(135deg,#1d4ed8_0%,#3b82f6_52%,#60a5fa_100%)] [background-size:200%_auto] hover:[background-position:right_center] max-[640px]:w-full">
-              <i className="fas fa-car" aria-hidden="true"></i>
+            <Link to="/sales" className="inline-flex items-center justify-center gap-2.5 rounded-lg bg-[#0f1b2d] px-7 py-3.5 text-[0.82rem] font-bold text-white no-underline shadow-lg transition hover:-translate-y-0.5 hover:bg-[#162640] hover:text-white max-[640px]:w-full">
               Browse Inventory
+              <i className="fas fa-arrow-right" aria-hidden="true"></i>
             </Link>
-            <Link to="/car-tips" className="inline-flex items-center justify-center gap-2 rounded border border-white/20 px-6 py-[13px] text-[0.82rem] font-semibold tracking-[0.05em] text-white/80 no-underline transition hover:border-white/50 hover:bg-white/10 hover:text-white max-[640px]:w-full">
+            <Link to="/car-tips" className="inline-flex items-center justify-center gap-2 rounded-lg border-2 border-[#0f1b2d] px-7 py-3.5 text-[0.82rem] font-bold text-[#0f1b2d] no-underline transition hover:bg-[#0f1b2d] hover:text-white max-[640px]:w-full">
               Expert Tips
+              <i className="fas fa-arrow-right" aria-hidden="true"></i>
             </Link>
           </div>
 
+          {/* Trust badges */}
           <div className="flex flex-wrap gap-5 max-[900px]:mb-0 max-[900px]:grid max-[900px]:grid-cols-3 max-[900px]:gap-2.5">
-            <span className="flex items-center gap-[7px] text-[0.8rem] text-slate-200/70 max-[900px]:justify-center max-[900px]:rounded-md max-[900px]:border max-[900px]:border-white/10 max-[900px]:bg-white/[0.04] max-[900px]:px-2 max-[900px]:py-2 max-[900px]:text-[0.72rem] max-[900px]:text-white/90 [&_i]:text-[0.85rem] [&_i]:text-blue-400 max-[900px]:[&_i]:text-blue-300">
-              <i className="fas fa-shield-alt" aria-hidden="true"></i>
-              Certified
-            </span>
-            <span className="flex items-center gap-[7px] text-[0.8rem] text-slate-200/70 max-[900px]:justify-center max-[900px]:rounded-md max-[900px]:border max-[900px]:border-white/10 max-[900px]:bg-white/[0.04] max-[900px]:px-2 max-[900px]:py-2 max-[900px]:text-[0.72rem] max-[900px]:text-white/90 [&_i]:text-[0.85rem] [&_i]:text-blue-400 max-[900px]:[&_i]:text-blue-300">
-              <i className="fas fa-truck" aria-hidden="true"></i>
-              Delivery
-            </span>
-            <span className="flex items-center gap-[7px] text-[0.8rem] text-slate-200/70 max-[900px]:justify-center max-[900px]:rounded-md max-[900px]:border max-[900px]:border-white/10 max-[900px]:bg-white/[0.04] max-[900px]:px-2 max-[900px]:py-2 max-[900px]:text-[0.72rem] max-[900px]:text-white/90 [&_i]:text-[0.85rem] [&_i]:text-blue-400 max-[900px]:[&_i]:text-blue-300">
-              <i className="fas fa-headset" aria-hidden="true"></i>
-              Support
-            </span>
+            <span className="flex items-center gap-2 text-[0.8rem] text-[#0f1b2d]/80 max-[900px]:justify-center max-[900px]:rounded-lg max-[900px]:border max-[900px]:border-slate-200 max-[900px]:bg-white/60 max-[900px]:px-3 max-[900px]:py-2.5 max-[900px]:text-[0.72rem] max-[900px]:text-[#0f1b2d] [&_i]:text-[0.9rem] [&_i]:text-[#c9952c]">
+                <i className="fas fa-shield-alt" aria-hidden="true"></i>
+                <span><strong>Certified</strong> <span className="text-[0.7rem] text-slate-500">Quality Assured</span></span>
+              </span>
+            <span className="flex items-center gap-2 text-[0.8rem] text-[#0f1b2d]/80 max-[900px]:justify-center max-[900px]:rounded-lg max-[900px]:border max-[900px]:border-slate-200 max-[900px]:bg-white/60 max-[900px]:px-3 max-[900px]:py-2.5 max-[900px]:text-[0.72rem] max-[900px]:text-[#0f1b2d] [&_i]:text-[0.9rem] [&_i]:text-[#c9952c]">
+                <i className="fas fa-truck" aria-hidden="true"></i>
+                <span><strong>Fast Delivery</strong> <span className="text-[0.7rem] text-slate-500">Across Nigeria</span></span>
+              </span>
+            <span className="flex items-center gap-2 text-[0.8rem] text-[#0f1b2d]/80 max-[900px]:justify-center max-[900px]:rounded-lg max-[900px]:border max-[900px]:border-slate-200 max-[900px]:bg-white/60 max-[900px]:px-3 max-[900px]:py-2.5 max-[900px]:text-[0.72rem] max-[900px]:text-[#0f1b2d] [&_i]:text-[0.9rem] [&_i]:text-[#c9952c]">
+                <i className="fas fa-headset" aria-hidden="true"></i>
+                <span><strong>24/7 Support</strong> <span className="text-[0.7rem] text-slate-500">We're here to help</span></span>
+              </span>
           </div>
         </div>
 
-        {/* Car stage */}
-        <div className="absolute right-0 top-0 z-[5] h-full w-[62%] max-[1100px]:w-[58%] max-[900px]:relative max-[900px]:right-auto max-[900px]:top-auto max-[900px]:mt-1 max-[900px]:h-[260px] max-[900px]:w-full max-[640px]:mt-0 max-[640px]:h-[180px] max-[420px]:h-[160px]" aria-hidden="true">
-          <div className="pointer-events-none absolute left-[20%] top-[-30%] z-[1] h-[80%] w-[60%] bg-[radial-gradient(ellipse,rgba(147,197,253,0.16)_0%,transparent_60%)]" />
-          <div className="pointer-events-none absolute bottom-[44%] left-0 z-[2] h-[60px] w-[38%] opacity-0 transition-opacity delay-[1900ms] duration-700 [background:linear-gradient(to_left,rgba(191,219,254,0.18),transparent)] [clip-path:polygon(100%_45%,0%_0%,0%_25%)] [.lux-on_&]:animate-[luxBeamPulse_5s_ease-in-out_infinite] [.lux-on_&]:opacity-100 max-[900px]:hidden motion-reduce:animate-none" />
-          <div className="pointer-events-none absolute bottom-[33%] left-0 z-[2] h-[60px] w-[38%] opacity-0 transition-opacity delay-[1900ms] duration-700 [background:linear-gradient(to_left,rgba(147,197,253,0.12),transparent)] [clip-path:polygon(100%_55%,0%_75%,0%_100%)] [.lux-on_&]:animate-[luxBeamPulse_5s_ease-in-out_0.5s_infinite] [.lux-on_&]:opacity-100 max-[900px]:hidden motion-reduce:animate-none" />
-          <div className="pointer-events-none absolute bottom-0 left-[5%] right-0 z-[2] h-[90px] bg-[radial-gradient(ellipse_at_center_bottom,rgba(37,99,235,0.55)_0%,transparent_68%)] opacity-0 blur-[22px] transition-opacity delay-[1700ms] duration-1000 [.lux-on_&]:animate-[luxGroundPulse_4.5s_ease-in-out_infinite] [.lux-on_&]:opacity-100 motion-reduce:animate-none" />
-          <div className="absolute inset-0 translate-x-[115%] opacity-0 [.lux-on_&]:animate-[luxSlideIn_1.4s_cubic-bezier(0.22,1,0.36,1)_0.25s_forwards] motion-reduce:translate-x-0 motion-reduce:animate-none motion-reduce:opacity-100">
-            <div className="absolute inset-0 [.lux-on_&]:animate-[luxFloat_5.5s_ease-in-out_1.7s_infinite] motion-reduce:animate-none">
-              <img
-                src="/hero-car-original.png"
-                alt="Luxury sports car — Biltronix premium collection"
-                className="absolute inset-0 h-full w-full object-contain object-[center_bottom] max-[900px]:px-6 max-[900px]:object-[center_bottom] max-[640px]:px-2 [filter:brightness(1.12)_contrast(1.14)_saturate(1.08)_drop-shadow(0_28px_70px_rgba(2,6,23,0.34))_drop-shadow(0_0_54px_rgba(147,197,253,0.36))]"
-                loading="eager"
-              />
+        {/* Car + floating cards */}
+        <div className="absolute right-0 top-0 z-[5] flex h-full w-[55%] items-center justify-center max-[1100px]:w-[50%] max-[900px]:relative max-[900px]:right-auto max-[900px]:top-auto max-[900px]:mt-1 max-[900px]:h-[260px] max-[900px]:w-full max-[640px]:mt-0 max-[640px]:h-[180px] max-[420px]:h-[160px]" aria-hidden="true">
+          {/* Car image */}
+          <div className="absolute inset-0 flex items-end justify-center max-[900px]:items-center">
+            <img
+              src="/new_design/car.png"
+              alt="Premium vehicle — Biltronix collection"
+              className="h-[85%] w-auto object-contain max-[900px]:h-[90%] max-[900px]:px-4 max-[640px]:px-2"
+              loading="eager"
+            />
+          </div>
+
+          {/* Floating card: Rating */}
+          <div className="absolute right-[8%] top-[18%] z-[10] rounded-xl border border-slate-200/80 bg-white px-5 py-3.5 shadow-[0_8px_30px_rgba(0,0,0,0.12)] max-[1100px]:right-[4%] max-[900px]:hidden">
+            <div className="mb-1 flex gap-0.5">
+              {[...Array(5)].map((_, i) => (
+                <i key={i} className="fas fa-star text-[0.7rem] text-[#c9952c]"></i>
+              ))}
+            </div>
+            <p className="m-0 text-[0.95rem] font-bold text-[#0f1b2d]">4.9/5</p>
+            <p className="m-0 text-[0.68rem] text-slate-500">Customer Rating</p>
+            <p className="m-0 text-[0.62rem] text-slate-400">Based on 1.2k+ reviews</p>
+          </div>
+
+          {/* Floating card: Verified Stock */}
+          <div className="absolute right-[2%] top-[38%] z-[10] flex items-center gap-3 rounded-xl border border-slate-200/80 bg-white px-4 py-3 shadow-[0_8px_30px_rgba(0,0,0,0.12)] max-[1100px]:right-0 max-[900px]:hidden">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-100">
+              <i className="fas fa-check text-[0.8rem] text-emerald-600"></i>
+            </div>
+            <div>
+              <p className="m-0 text-[0.78rem] font-bold text-[#0f1b2d]">Verified Stock</p>
+              <p className="m-0 text-[0.62rem] text-slate-500">Authentic & Inspected</p>
+            </div>
+          </div>
+
+          {/* Floating card: Inspection Passed */}
+          <div className="absolute right-[6%] bottom-[20%] z-[10] flex items-center gap-3 rounded-xl border border-slate-200/80 bg-white px-4 py-3 shadow-[0_8px_30px_rgba(0,0,0,0.12)] max-[1100px]:right-[2%] max-[900px]:hidden">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-100">
+              <i className="fas fa-check-double text-[0.8rem] text-emerald-600"></i>
+            </div>
+            <div>
+              <p className="m-0 text-[0.78rem] font-bold text-[#0f1b2d]">Inspection Passed</p>
+              <p className="m-0 text-[0.62rem] text-slate-500">150+ Point Checklist</p>
             </div>
           </div>
         </div>
 
         {/* Scroll indicator */}
         <div className="absolute bottom-9 left-1/2 z-[16] flex -translate-x-1/2 flex-col items-center gap-2 opacity-0 transition-opacity delay-[2600ms] duration-700 [.lux-on_&]:opacity-100 max-[900px]:hidden" aria-hidden="true">
-          <span className="text-[0.6rem] uppercase tracking-[0.25em] text-black/45">Scroll</span>
-          <div className="h-[5px] w-[5px] animate-[luxScrollBounce_1.6s_ease-in-out_infinite] rounded-full bg-black/35" />
+          <div className="flex h-8 w-5 items-start justify-center rounded-full border-2 border-slate-400/50 pt-1.5">
+            <div className="h-1.5 w-1.5 animate-[luxScrollBounce_1.6s_ease-in-out_infinite] rounded-full bg-slate-400/60" />
+          </div>
+          <span className="text-[0.6rem] uppercase tracking-[0.25em] text-slate-500">Scroll</span>
         </div>
 
         {/* Fade into page background */}
         <div className="pointer-events-none absolute bottom-0 left-0 right-0 z-[15] h-[140px] bg-gradient-to-b from-transparent to-[#f8fafc]" aria-hidden="true" />
+      </section>
+
+      {/* ── Trusted Brands Carousel ── */}
+      <section className="relative z-10 border-b border-slate-200/60 bg-white/70 py-7 backdrop-blur-sm" aria-label="Trusted brands">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <p className="mb-5 text-center text-[0.68rem] font-bold uppercase tracking-[0.22em] text-slate-400">Trusted by Leading Brands</p>
+        </div>
+        <div className="group relative overflow-hidden">
+          <div className="pointer-events-none absolute left-0 top-0 z-[2] h-full w-20 bg-gradient-to-r from-white to-transparent" aria-hidden="true" />
+          <div className="pointer-events-none absolute right-0 top-0 z-[2] h-full w-20 bg-gradient-to-l from-white to-transparent" aria-hidden="true" />
+          <div className="brand-track flex w-max gap-10 items-center px-5 group-hover:[animation-play-state:paused]">
+            {[
+              '/brands/toyota.png',
+              '/brands/bmw.png',
+              '/brands/mercedes-benz.png',
+              '/brands/lexus.png',
+              '/brands/honda.png',
+              '/brands/ford.png',
+              '/brands/audi-logo-2016.png',
+              '/brands/porsche-logo-2014.png',
+              '/brands/nissan-logo-2020.png',
+              '/brands/hyundai-logo-2011.png',
+              '/brands/kia-logo-2021.png',
+              '/brands/volkswagen-logo.png',
+              '/brands/land-rover-logo-2021.png',
+              '/brands/subaru.png',
+              '/brands/mazda-logo-2018.v.png',
+              '/brands/chevrolet-logo-2013.png',
+              '/brands/ferrari-logo.png',
+              '/brands/lamborghini.png',
+              '/brands/maserati-logo-2020.png',
+              '/brands/bentley-logo-2025.png',
+            ].map((src) => (
+              <img
+                key={src}
+                src={src}
+                alt="Brand logo"
+                className="h-9 w-auto shrink-0 object-contain opacity-50 grayscale transition duration-300 hover:opacity-100 hover:grayscale-0 sm:h-10"
+                loading="lazy"
+              />
+            ))}
+            {/* Duplicate set for seamless loop */}
+            {[
+              '/brands/toyota.png',
+              '/brands/bmw.png',
+              '/brands/mercedes-benz.png',
+              '/brands/lexus.png',
+              '/brands/honda.png',
+              '/brands/ford.png',
+              '/brands/audi-logo-2016.png',
+              '/brands/porsche-logo-2014.png',
+              '/brands/nissan-logo-2020.png',
+              '/brands/hyundai-logo-2011.png',
+              '/brands/kia-logo-2021.png',
+              '/brands/volkswagen-logo.png',
+              '/brands/land-rover-logo-2021.png',
+              '/brands/subaru.png',
+              '/brands/mazda-logo-2018.v.png',
+              '/brands/chevrolet-logo-2013.png',
+              '/brands/ferrari-logo.png',
+              '/brands/lamborghini.png',
+              '/brands/maserati-logo-2020.png',
+              '/brands/bentley-logo-2025.png',
+            ].map((src, i) => (
+              <img
+                key={`dup-${src}`}
+                src={src}
+                alt="Brand logo"
+                className="h-9 w-auto shrink-0 object-contain opacity-50 grayscale transition duration-300 hover:opacity-100 hover:grayscale-0 sm:h-10"
+                loading="lazy"
+              />
+            ))}
+          </div>
+        </div>
       </section>
 
       <main className="relative z-10 space-y-16 pt-16 pb-20">
@@ -679,7 +792,7 @@ export default function HomePage() {
                 <img src="/logo.jpg" alt="Biltronix" className="h-10 w-10 rounded-lg" />
                 <div>
                   <span className="text-lg font-bold">Biltronix</span>
-                  <span className="text-primary ml-1">Automotive</span>
+                  <span className="text-primary ml-1">Automobile</span>
                 </div>
               </div>
               <p className="text-slate-400 text-sm leading-relaxed">
@@ -732,7 +845,7 @@ export default function HomePage() {
           {/* Bottom Bar */}
           <div className="border-t border-slate-800 mt-8 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-slate-500 text-sm">
-              © {new Date().getFullYear()} Biltronix Automotive. All rights reserved.
+              © {new Date().getFullYear()} Biltronix Automobile. All rights reserved.
             </p>
             <div className="flex items-center gap-4">
               <a href="https://wa.me/2347060882711" target="_blank" rel="noreferrer" className="text-slate-400 hover:text-white transition-colors">

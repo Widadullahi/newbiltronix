@@ -31,3 +31,18 @@
     @apply outline outline-2 outline-offset-2 outline-primary;
   }
 }
+
+@layer utilities {
+  .brand-track {
+    animation: brandScroll 20s linear infinite;
+  }
+
+  @keyframes brandScroll {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+}
