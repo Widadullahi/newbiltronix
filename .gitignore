@@ -4,5 +4,6 @@ dist/
 */dist/
 npm-debug.log*
 *.log
+**/.git_disabled/
 docker/dynamodb/*.db
 docker/dynamodb/*.db.*
