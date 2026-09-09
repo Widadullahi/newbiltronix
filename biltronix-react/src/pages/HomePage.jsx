@@ -4,10 +4,10 @@ import FloatingWhatsApp from '../components/static/FloatingWhatsApp.jsx';
 import { Link } from 'react-router-dom';
 
 const quickStats = [
-  { value: '120+', label: 'Ready Vehicles', detail: 'Checked before listing' },
-  { value: '360+', label: 'Advisory Guides', detail: 'Practical ownership notes' },
-  { value: '15', label: 'Trusted Brands', detail: 'Selected for reliability' },
-  { value: '24/7', label: 'Buyer Support', detail: 'Guidance when you need it' },
+  { icon: 'fas fa-car-side', value: '120+', label: 'Ready Vehicles', detail: 'Every listing inspected' },
+  { icon: 'fas fa-book-open', value: '360+', label: 'Advisory Guides', detail: 'Practical ownership notes' },
+  { icon: 'fas fa-medal', value: '15', label: 'Trusted Brands', detail: 'Selected for reliability' },
+  { icon: 'fas fa-headset', value: '24/7', label: 'Buyer Support', detail: 'Guidance when you need it' },
 ];
 
 const featureBoxes = [
@@ -114,18 +114,6 @@ const HERO_LINES = [
   { top: '80%', width: '180px', delay: '0.10s', dur: '1.00s', opacity: 0.7 },
 ];
 
-const typeBadgeClasses = {
-  vehicle: 'bg-gradient-to-br from-blue-700/95 to-blue-400/80 text-white',
-  part: 'bg-green-600/85 text-white',
-  accessory: 'bg-violet-600/85 text-white',
-};
-
-const itemTagClasses = {
-  vehicle: 'bg-blue-600/20 text-blue-200',
-  part: 'bg-green-600/20 text-green-300',
-  accessory: 'bg-violet-600/20 text-violet-200',
-};
-
 const heroServices = [
   { icon: 'fas fa-car', label: 'Vehicle Sales' },
   { icon: 'fas fa-cogs', label: 'Genuine Parts' },
@@ -133,28 +121,40 @@ const heroServices = [
   { icon: 'fas fa-wrench', label: 'Service & Maintenance' },
 ];
 
-// Featured items for hero carousel - includes vehicles, parts, and accessories
+// Featured items - featured stock
 const featuredItems = [
+  {
+    type: 'vehicle',
+    name: 'Mercedes-Benz GLE 350',
+    price: 'NGN 45,000,000',
+    image: '/hero-car-original-withbackground.jpeg',
+    badge: 'Vehicle',
+    color: 'White',
+    tags: ['Petrol', 'Automatic', 'Used'],
+    status: 'Verified Stock',
+    perks: ['Certified', 'Premium Grade', 'Concierge Support'],
+  },
   {
     type: 'vehicle',
     name: 'Lexus RX 350',
     price: 'NGN 28,500,000',
     image: '/hero-car-original-withbackground.jpeg',
     badge: 'Vehicle',
-  },
-  {
-    type: 'vehicle',
-    name: 'Mercedes-Benz GLE',
-    price: 'NGN 45,000,000',
-    image: '/hero-car-original-withbackground.jpeg',
-    badge: 'Vehicle',
+    color: 'Black',
+    tags: ['Petrol', 'Automatic', 'Used'],
+    status: 'Verified Stock',
+    perks: ['Certified', 'Premium Grade'],
   },
   {
     type: 'vehicle',
     name: 'Toyota Land Cruiser',
-    price: 'NGN 52,000,000',
+    price: 'NGN 85,000,000',
     image: '/hero-car-original-withbackground.jpeg',
     badge: 'Vehicle',
+    color: 'Black',
+    tags: ['Diesel', 'Automatic', 'Used'],
+    status: 'Verified Stock',
+    perks: ['Certified', 'Premium Grade', 'Concierge Support'],
   },
   {
     type: 'part',
@@ -162,26 +162,36 @@ const featuredItems = [
     price: 'NGN 62,000',
     image: '/repair-troubleshooting.jpeg',
     badge: 'Parts',
+    tags: ['OEM Grade', 'Front & Rear'],
+    status: 'In Stock',
+    perks: [],
   },
   {
     type: 'part',
     name: 'Synthetic Motor Oil',
-    price: 'NGN 28,500',
+    price: 'NGN 22,500',
     image: '/computerized Diagnostics.jpg',
     badge: 'Parts',
+    tags: ['5W-30', '4L'],
+    status: 'In Stock',
+    perks: [],
   },
   {
     type: 'accessory',
     name: '4K Dash Camera',
-    price: 'NGN 85,000',
+    price: 'NGN 2,000,000',
     image: '/ecu-trouble-shooting-repair.jpeg',
     badge: 'Accessories',
+    tags: ['4K', 'Wi-Fi', 'GPS'],
+    status: 'In Stock',
+    perks: [],
   },
 ];
 
 export default function HomePage() {
-  const [currentSlide, setCurrentSlide] = useState(0);
   const [heroAnimated, setHeroAnimated] = useState(false);
+  const [activeTab, setActiveTab] = useState('All Items');
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Trigger hero animation shortly after mount
   useEffect(() => {
@@ -189,25 +199,21 @@ export default function HomePage() {
     return () => clearTimeout(t);
   }, []);
 
-  // Auto-advance carousel every 4 seconds
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % featuredItems.length);
-    }, 4000);
-    return () => clearInterval(timer);
-  }, []);
+  const stockTabs = ['All Items', 'Vehicles', 'Parts', 'Accessories'];
 
-  const goToSlide = (index) => {
-    setCurrentSlide(index);
-  };
-
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + featuredItems.length) % featuredItems.length);
-  };
-
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % featuredItems.length);
-  };
+  const filteredItems = featuredItems.filter((item) => {
+    const matchesTab =
+      activeTab === 'All Items' ||
+      (activeTab === 'Vehicles' && item.type === 'vehicle') ||
+      (activeTab === 'Parts' && item.type === 'part') ||
+      (activeTab === 'Accessories' && item.type === 'accessory');
+    const query = searchQuery.trim().toLowerCase();
+    const matchesSearch =
+      query === '' ||
+      item.name.toLowerCase().includes(query) ||
+      item.price.toLowerCase().includes(query);
+    return matchesTab && matchesSearch;
+  });
 
   return (
     <div className="min-h-screen bg-glass-bg">
@@ -231,57 +237,57 @@ export default function HomePage() {
         {/* Left hero content */}
         <div className="relative z-20 w-full flex-[0_0_48%] pl-[7%] pr-4 max-[1100px]:flex-[0_0_52%] max-[900px]:mx-auto max-[900px]:max-w-3xl max-[900px]:flex-none max-[900px]:px-6 max-[900px]:text-center max-[640px]:px-[18px]">
           {/* Badge */}
-          <div className="mb-5 inline-flex items-center gap-2 rounded-full bg-[#0f1b2d] px-4 py-2 max-[900px]:mx-auto">
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#c9952c] text-[0.6rem] text-white">
+          <div className="mb-5 inline-flex translate-x-[-42px] items-center gap-2 rounded-full bg-primary px-4 py-2 opacity-0 shadow-[0_6px_20px_rgba(13,110,253,0.25)] [.lux-on_&]:animate-[heroTextIn_0.7s_cubic-bezier(0.22,1,0.36,1)_forwards] max-[900px]:mx-auto">
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white text-[0.6rem] text-primary">
               <i className="fas fa-star" aria-hidden="true"></i>
             </span>
             <span className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-white">Premium Automobile Solutions</span>
           </div>
 
-          <h1 className="m-0 mb-5 max-w-[680px] font-heading text-[clamp(2.5rem,5vw,4.2rem)] font-extrabold leading-[1.08] text-[#0f1b2d] max-[900px]:mx-auto max-[640px]:text-[clamp(2rem,10vw,2.75rem)]">
+          <h1 className="m-0 mb-5 max-w-[680px] translate-x-[-42px] font-heading text-[clamp(2.5rem,5vw,4.2rem)] font-extrabold leading-[1.08] opacity-0 text-text-primary [.lux-on_&]:animate-[heroTextIn_0.75s_cubic-bezier(0.22,1,0.36,1)_0.12s_forwards] max-[900px]:mx-auto max-[640px]:text-[clamp(2rem,10vw,2.75rem)]">
             Find Your Dream Car at{' '}
-            <span className="text-[#c9952c]">Biltronix</span>
+            <span className="text-primary">Biltronix</span>
           </h1>
 
-          <p className="mb-5 max-w-[470px] text-base leading-[1.78] text-slate-600 max-[900px]:mx-auto max-[900px]:max-w-[620px] max-[640px]:mb-[18px] max-[640px]:text-[0.95rem] max-[640px]:leading-7">
+          <p className="mb-5 max-w-[470px] translate-x-[-42px] text-base opacity-0 leading-[1.78] text-slate-600 [.lux-on_&]:animate-[heroTextIn_0.75s_cubic-bezier(0.22,1,0.36,1)_0.24s_forwards] max-[900px]:mx-auto max-[900px]:max-w-[620px] max-[640px]:mb-[18px] max-[640px]:text-[0.95rem] max-[640px]:leading-7">
             Browse our curated selection of premium vehicles, genuine parts, and
             expert guidance. Every vehicle is thoroughly inspected and backed by
             our quality guarantee.
           </p>
 
           {/* Service pills */}
-          <div className="mb-7 flex flex-wrap gap-2.5 max-w-[580px] max-[900px]:mx-auto max-[640px]:mb-5 max-[640px]:justify-center">
+          <div className="mb-7 flex max-w-[580px] translate-x-[-42px] flex-wrap gap-2.5 opacity-0 [.lux-on_&]:animate-[heroTextIn_0.75s_cubic-bezier(0.22,1,0.36,1)_0.36s_forwards] max-[900px]:mx-auto max-[640px]:mb-5 max-[640px]:justify-center">
             {heroServices.map((service) => (
-              <span key={service.label} className="inline-flex min-h-10 items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-4 py-2 text-[0.75rem] font-semibold text-[#0f1b2d] shadow-sm backdrop-blur-sm max-[420px]:text-[0.68rem]">
-                <i className={`${service.icon} w-4 text-center text-[#0f1b2d]`} aria-hidden="true"></i>
+              <span key={service.label} className="inline-flex min-h-10 items-center gap-2 rounded-full border border-primary-200 bg-white/80 px-4 py-2 text-[0.75rem] font-semibold text-primary shadow-sm backdrop-blur-sm max-[420px]:text-[0.68rem]">
+                <i className={`${service.icon} w-4 text-center text-primary`} aria-hidden="true"></i>
                 {service.label}
               </span>
             ))}
           </div>
 
           {/* CTA buttons */}
-          <div className="mb-8 flex flex-wrap items-center gap-3.5 max-[900px]:mb-6 max-[900px]:justify-center max-[640px]:mb-[18px] max-[640px]:grid max-[640px]:grid-cols-1 max-[640px]:gap-2.5">
-            <Link to="/sales" className="inline-flex items-center justify-center gap-2.5 rounded-lg bg-[#0f1b2d] px-7 py-3.5 text-[0.82rem] font-bold text-white no-underline shadow-lg transition hover:-translate-y-0.5 hover:bg-[#162640] hover:text-white max-[640px]:w-full">
+          <div className="mb-8 flex translate-x-[-42px] flex-wrap items-center gap-3.5 opacity-0 [.lux-on_&]:animate-[heroTextIn_0.75s_cubic-bezier(0.22,1,0.36,1)_0.48s_forwards] max-[900px]:mb-6 max-[900px]:justify-center max-[640px]:mb-[18px] max-[640px]:grid max-[640px]:grid-cols-1 max-[640px]:gap-2.5">
+            <Link to="/sales" className="inline-flex items-center justify-center gap-2.5 rounded-lg bg-primary px-7 py-3.5 text-[0.82rem] font-bold text-white no-underline shadow-[0_10px_28px_rgba(13,110,253,0.3)] transition hover:-translate-y-0.5 hover:bg-primary-500 hover:text-white max-[640px]:w-full">
               Browse Inventory
               <i className="fas fa-arrow-right" aria-hidden="true"></i>
             </Link>
-            <Link to="/car-tips" className="inline-flex items-center justify-center gap-2 rounded-lg border-2 border-[#0f1b2d] px-7 py-3.5 text-[0.82rem] font-bold text-[#0f1b2d] no-underline transition hover:bg-[#0f1b2d] hover:text-white max-[640px]:w-full">
+            <Link to="/car-tips" className="inline-flex items-center justify-center gap-2 rounded-lg border-2 border-primary px-7 py-3.5 text-[0.82rem] font-bold text-primary no-underline transition hover:bg-primary hover:text-white max-[640px]:w-full">
               Expert Tips
               <i className="fas fa-arrow-right" aria-hidden="true"></i>
             </Link>
           </div>
 
           {/* Trust badges */}
-          <div className="flex flex-wrap gap-5 max-[900px]:mb-0 max-[900px]:grid max-[900px]:grid-cols-3 max-[900px]:gap-2.5">
-            <span className="flex items-center gap-2 text-[0.8rem] text-[#0f1b2d]/80 max-[900px]:justify-center max-[900px]:rounded-lg max-[900px]:border max-[900px]:border-slate-200 max-[900px]:bg-white/60 max-[900px]:px-3 max-[900px]:py-2.5 max-[900px]:text-[0.72rem] max-[900px]:text-[#0f1b2d] [&_i]:text-[0.9rem] [&_i]:text-[#c9952c]">
+          <div className="flex translate-x-[-42px] flex-wrap gap-5 opacity-0 [.lux-on_&]:animate-[heroTextIn_0.75s_cubic-bezier(0.22,1,0.36,1)_0.6s_forwards] max-[900px]:mb-0 max-[900px]:grid max-[900px]:grid-cols-3 max-[900px]:gap-2.5">
+            <span className="flex items-center gap-2 text-[0.8rem] text-text-primary/80 max-[900px]:justify-center max-[900px]:rounded-lg max-[900px]:border max-[900px]:border-primary-200 max-[900px]:bg-white/60 max-[900px]:px-3 max-[900px]:py-2.5 max-[900px]:text-[0.72rem] max-[900px]:text-text-primary [&_i]:text-[0.9rem] [&_i]:text-primary">
                 <i className="fas fa-shield-alt" aria-hidden="true"></i>
                 <span><strong>Certified</strong> <span className="text-[0.7rem] text-slate-500">Quality Assured</span></span>
               </span>
-            <span className="flex items-center gap-2 text-[0.8rem] text-[#0f1b2d]/80 max-[900px]:justify-center max-[900px]:rounded-lg max-[900px]:border max-[900px]:border-slate-200 max-[900px]:bg-white/60 max-[900px]:px-3 max-[900px]:py-2.5 max-[900px]:text-[0.72rem] max-[900px]:text-[#0f1b2d] [&_i]:text-[0.9rem] [&_i]:text-[#c9952c]">
+            <span className="flex items-center gap-2 text-[0.8rem] text-text-primary/80 max-[900px]:justify-center max-[900px]:rounded-lg max-[900px]:border max-[900px]:border-primary-200 max-[900px]:bg-white/60 max-[900px]:px-3 max-[900px]:py-2.5 max-[900px]:text-[0.72rem] max-[900px]:text-text-primary [&_i]:text-[0.9rem] [&_i]:text-primary">
                 <i className="fas fa-truck" aria-hidden="true"></i>
                 <span><strong>Fast Delivery</strong> <span className="text-[0.7rem] text-slate-500">Across Nigeria</span></span>
               </span>
-            <span className="flex items-center gap-2 text-[0.8rem] text-[#0f1b2d]/80 max-[900px]:justify-center max-[900px]:rounded-lg max-[900px]:border max-[900px]:border-slate-200 max-[900px]:bg-white/60 max-[900px]:px-3 max-[900px]:py-2.5 max-[900px]:text-[0.72rem] max-[900px]:text-[#0f1b2d] [&_i]:text-[0.9rem] [&_i]:text-[#c9952c]">
+            <span className="flex items-center gap-2 text-[0.8rem] text-text-primary/80 max-[900px]:justify-center max-[900px]:rounded-lg max-[900px]:border max-[900px]:border-primary-200 max-[900px]:bg-white/60 max-[900px]:px-3 max-[900px]:py-2.5 max-[900px]:text-[0.72rem] max-[900px]:text-text-primary [&_i]:text-[0.9rem] [&_i]:text-primary">
                 <i className="fas fa-headset" aria-hidden="true"></i>
                 <span><strong>24/7 Support</strong> <span className="text-[0.7rem] text-slate-500">We're here to help</span></span>
               </span>
@@ -291,7 +297,7 @@ export default function HomePage() {
         {/* Car + floating cards */}
         <div className="absolute right-0 top-0 z-[5] flex h-full w-[55%] items-center justify-center max-[1100px]:w-[50%] max-[900px]:relative max-[900px]:right-auto max-[900px]:top-auto max-[900px]:mt-1 max-[900px]:h-[260px] max-[900px]:w-full max-[640px]:mt-0 max-[640px]:h-[180px] max-[420px]:h-[160px]" aria-hidden="true">
           {/* Car image */}
-          <div className="absolute inset-0 flex items-end justify-center max-[900px]:items-center">
+          <div className="absolute inset-0 flex items-end justify-center translate-x-[120%] opacity-0 [.lux-on_&]:animate-[heroCarIn_1.1s_cubic-bezier(0.22,1,0.36,1)_0.15s_forwards] max-[900px]:items-center">
             <img
               src="/new_design/car.png"
               alt="Premium vehicle — Biltronix collection"
@@ -301,35 +307,35 @@ export default function HomePage() {
           </div>
 
           {/* Floating card: Rating */}
-          <div className="absolute right-[8%] top-[18%] z-[10] rounded-xl border border-slate-200/80 bg-white px-5 py-3.5 shadow-[0_8px_30px_rgba(0,0,0,0.12)] max-[1100px]:right-[4%] max-[900px]:hidden">
+          <div className="absolute right-[8%] top-[18%] z-[10] rounded-xl border border-slate-200/80 bg-white px-5 py-3.5 opacity-0 shadow-[0_8px_30px_rgba(0,0,0,0.12)] [.lux-on_&]:animate-[heroTextIn_0.7s_cubic-bezier(0.22,1,0.36,1)_0.85s_forwards] max-[1100px]:right-[4%] max-[900px]:hidden">
             <div className="mb-1 flex gap-0.5">
               {[...Array(5)].map((_, i) => (
-                <i key={i} className="fas fa-star text-[0.7rem] text-[#c9952c]"></i>
+                <i key={i} className="fas fa-star text-[0.7rem] text-primary"></i>
               ))}
             </div>
-            <p className="m-0 text-[0.95rem] font-bold text-[#0f1b2d]">4.9/5</p>
+            <p className="m-0 text-[0.95rem] font-bold text-text-primary">4.9/5</p>
             <p className="m-0 text-[0.68rem] text-slate-500">Customer Rating</p>
             <p className="m-0 text-[0.62rem] text-slate-400">Based on 1.2k+ reviews</p>
           </div>
 
           {/* Floating card: Verified Stock */}
-          <div className="absolute right-[2%] top-[38%] z-[10] flex items-center gap-3 rounded-xl border border-slate-200/80 bg-white px-4 py-3 shadow-[0_8px_30px_rgba(0,0,0,0.12)] max-[1100px]:right-0 max-[900px]:hidden">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-100">
-              <i className="fas fa-check text-[0.8rem] text-emerald-600"></i>
+          <div className="absolute right-[2%] top-[38%] z-[10] flex items-center gap-3 rounded-xl border border-slate-200/80 bg-white px-4 py-3 opacity-0 shadow-[0_8px_30px_rgba(0,0,0,0.12)] [.lux-on_&]:animate-[heroTextIn_0.7s_cubic-bezier(0.22,1,0.36,1)_1s_forwards] max-[1100px]:right-0 max-[900px]:hidden">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-100">
+              <i className="fas fa-check text-[0.8rem] text-primary"></i>
             </div>
             <div>
-              <p className="m-0 text-[0.78rem] font-bold text-[#0f1b2d]">Verified Stock</p>
+              <p className="m-0 text-[0.78rem] font-bold text-text-primary">Verified Stock</p>
               <p className="m-0 text-[0.62rem] text-slate-500">Authentic & Inspected</p>
             </div>
           </div>
 
           {/* Floating card: Inspection Passed */}
-          <div className="absolute right-[6%] bottom-[20%] z-[10] flex items-center gap-3 rounded-xl border border-slate-200/80 bg-white px-4 py-3 shadow-[0_8px_30px_rgba(0,0,0,0.12)] max-[1100px]:right-[2%] max-[900px]:hidden">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-100">
-              <i className="fas fa-check-double text-[0.8rem] text-emerald-600"></i>
+          <div className="absolute right-[6%] bottom-[20%] z-[10] flex items-center gap-3 rounded-xl border border-slate-200/80 bg-white px-4 py-3 opacity-0 shadow-[0_8px_30px_rgba(0,0,0,0.12)] [.lux-on_&]:animate-[heroTextIn_0.7s_cubic-bezier(0.22,1,0.36,1)_1.15s_forwards] max-[1100px]:right-[2%] max-[900px]:hidden">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-100">
+              <i className="fas fa-check-double text-[0.8rem] text-primary"></i>
             </div>
             <div>
-              <p className="m-0 text-[0.78rem] font-bold text-[#0f1b2d]">Inspection Passed</p>
+              <p className="m-0 text-[0.78rem] font-bold text-text-primary">Inspection Passed</p>
               <p className="m-0 text-[0.62rem] text-slate-500">150+ Point Checklist</p>
             </div>
           </div>
@@ -422,71 +428,133 @@ export default function HomePage() {
       </section>
 
       <main className="relative z-10 space-y-16 pt-16 pb-20">
-        {/* Featured Items — Premium Split Panel */}
+        {/* Featured Stock Section */}
         <section className="container mx-auto px-4 md:px-6">
-          <div className="flex items-center justify-between mb-6">
+          {/* Header */}
+          <div className="mb-8 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <span className="badge-primary text-xs mb-2 inline-block">Our Collection</span>
+              <span className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-primary mb-2 inline-block">Our Collection</span>
               <h2 className="text-2xl md:text-3xl font-bold text-text-primary">Featured Stock</h2>
               <p className="text-text-secondary text-sm mt-1">Vehicles, parts, and accessories in one place</p>
             </div>
-            <Link to="/sales" className="text-primary font-semibold text-sm hover:underline flex items-center gap-1">
-              View All <i className="fas fa-arrow-right text-xs"></i>
-            </Link>
+            <div className="relative w-full lg:w-[340px]">
+              <i className="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-400" aria-hidden="true"></i>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search for vehicles, parts or accessories..."
+                className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-11 pr-4 text-sm text-text-primary shadow-sm outline-none transition placeholder:text-slate-400 focus:border-primary"
+              />
+            </div>
           </div>
 
-          <div className="relative grid min-h-[500px] grid-cols-[1fr_320px] overflow-hidden rounded-lg border border-blue-300/20 bg-slate-950 shadow-[0_36px_110px_rgba(2,6,23,0.45),0_0_0_1px_rgba(255,255,255,0.04),inset_0_1px_0_rgba(255,255,255,0.12)] before:pointer-events-none before:absolute before:inset-0 before:z-[3] before:bg-[linear-gradient(110deg,transparent_0%,rgba(96,165,250,0.08)_42%,transparent_72%)] after:pointer-events-none after:absolute after:inset-3.5 after:z-[4] after:border after:border-blue-100/10 max-md:grid-cols-1 max-md:after:inset-2.5">
-            {/* Main image */}
-            <div className="group relative overflow-hidden">
-              <img
-                src={featuredItems[currentSlide].image}
-                alt={featuredItems[currentSlide].name}
-                className="block h-full min-h-[420px] w-full object-cover transition-transform duration-500 group-hover:scale-[1.03] max-md:min-h-[340px] [filter:saturate(0.92)_contrast(1.08)]"
-                loading="eager"
-              />
-              <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-[#01050e]/95 via-[#081631]/70 via-[44%] to-transparent p-[34px] max-md:p-7">
-                <div className="absolute left-[34px] right-[34px] top-7 flex justify-between gap-3 text-[0.62rem] font-extrabold uppercase tracking-[0.16em] text-blue-100/70 max-md:left-7 max-md:right-7 max-md:top-[22px] max-md:text-[0.55rem] max-md:tracking-[0.12em]">
-                  <span>Signature Selection</span>
-                  <span>Verified Stock</span>
-                </div>
-                <span className={`mb-3 inline-block w-fit rounded border border-white/20 px-3.5 py-1.5 text-[0.68rem] font-bold uppercase tracking-[0.06em] backdrop-blur ${typeBadgeClasses[featuredItems[currentSlide].type]}`}>
-                  {featuredItems[currentSlide].badge}
-                </span>
-                <h3 className="m-0 mb-1.5 text-[clamp(2rem,4vw,3.35rem)] font-extrabold leading-[1.15] tracking-[-0.03em] text-white max-md:text-[2rem]">{featuredItems[currentSlide].name}</h3>
-                <p className="m-0 mb-[18px] text-[clamp(1.2rem,2vw,1.65rem)] font-extrabold tracking-[-0.01em] text-blue-200">{featuredItems[currentSlide].price}</p>
-                <div className="flex flex-wrap gap-2.5" aria-label="Listing highlights">
-                  <span className="inline-flex items-center gap-[7px] rounded-[5px] border border-blue-300/20 bg-slate-950/70 px-[11px] py-2 text-[0.72rem] font-bold text-slate-100/80 max-md:px-2.5 max-md:py-[7px] max-md:text-[0.68rem]"><i className="fas fa-shield-alt text-blue-300"></i> Certified</span>
-                  <span className="inline-flex items-center gap-[7px] rounded-[5px] border border-blue-300/20 bg-slate-950/70 px-[11px] py-2 text-[0.72rem] font-bold text-slate-100/80 max-md:px-2.5 max-md:py-[7px] max-md:text-[0.68rem]"><i className="fas fa-gem text-blue-300"></i> Premium Grade</span>
-                  <span className="inline-flex items-center gap-[7px] rounded-[5px] border border-blue-300/20 bg-slate-950/70 px-[11px] py-2 text-[0.72rem] font-bold text-slate-100/80 max-md:px-2.5 max-md:py-[7px] max-md:text-[0.68rem]"><i className="fas fa-headset text-blue-300"></i> Concierge Support</span>
-                </div>
-              </div>
-              <button onClick={prevSlide} className="absolute left-3.5 top-1/2 z-[5] flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-blue-300/20 bg-slate-950/60 text-[0.85rem] text-white backdrop-blur transition hover:border-blue-100/60 hover:bg-blue-600/90" aria-label="Previous item">
-                <i className="fas fa-chevron-left"></i>
-              </button>
-              <button onClick={nextSlide} className="absolute right-3.5 top-1/2 z-[5] flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-blue-300/20 bg-slate-950/60 text-[0.85rem] text-white backdrop-blur transition hover:border-blue-100/60 hover:bg-blue-600/90" aria-label="Next item">
-                <i className="fas fa-chevron-right"></i>
-              </button>
-            </div>
-
-            {/* Item list */}
-            <div className="flex flex-col overflow-y-auto border-l border-blue-300/15 bg-gradient-to-b from-[#081631] to-slate-950 max-md:max-h-[280px] max-md:border-l-0 max-md:border-t max-md:border-white/10">
-              <p className="border-b border-slate-400/10 px-5 pb-4 pt-[22px] text-[0.68rem] font-bold uppercase tracking-[0.1em] text-blue-100/50">All Items</p>
-              {featuredItems.map((item, index) => (
+          {/* Tabs */}
+          <div className="mb-7 flex flex-wrap items-center justify-between gap-4">
+            <div className="flex flex-wrap gap-1 rounded-xl border border-slate-200 bg-white p-1 shadow-sm">
+              {stockTabs.map((tab) => (
                 <button
-                  key={item.name}
-                  onClick={() => goToSlide(index)}
-                  className={`flex w-full cursor-pointer items-center gap-3 border-0 border-b border-slate-400/10 border-l-[3px] px-5 py-4 text-left transition hover:bg-blue-400/10 ${currentSlide === index ? 'border-l-blue-400 bg-gradient-to-r from-blue-600/20 to-slate-900/20' : 'border-l-transparent bg-transparent'}`}
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`rounded-lg px-4 py-2 text-[0.82rem] font-semibold transition ${
+                    activeTab === tab
+                      ? 'bg-primary text-white shadow-[0_6px_18px_rgba(13,110,253,0.3)]'
+                      : 'text-slate-600 hover:bg-slate-100 hover:text-text-primary'
+                  }`}
                 >
-                  <img src={item.image} alt={item.name} className={`h-[50px] w-[68px] shrink-0 rounded-[5px] object-cover transition ${currentSlide === index ? 'scale-[1.02] opacity-100' : 'opacity-75 hover:opacity-100'}`} />
-                  <div className="min-w-0 flex-1">
-                    <span className={`mb-[3px] inline-block rounded px-[7px] py-px text-[0.58rem] font-bold uppercase tracking-[0.05em] ${itemTagClasses[item.type]}`}>{item.badge}</span>
-                    <p className={`m-0 mb-0.5 truncate text-[0.84rem] font-semibold transition ${currentSlide === index ? 'text-white' : 'text-slate-300'}`}>{item.name}</p>
-                    <p className={`m-0 text-[0.72rem] ${currentSlide === index ? 'text-blue-300' : 'text-slate-500'}`}>{item.price}</p>
-                  </div>
-                  <i className={`fas fa-chevron-right shrink-0 text-[0.65rem] transition ${currentSlide === index ? 'text-blue-300' : 'text-white/15'}`}></i>
+                  {tab}
                 </button>
               ))}
             </div>
+            <Link to="/sales" className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary no-underline hover:text-primary-700">
+              View All <i className="fas fa-arrow-right text-xs" aria-hidden="true"></i>
+            </Link>
+          </div>
+
+          {/* Product grid */}
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {filteredItems.length > 0 ? (
+              filteredItems.map((item) => (
+                <article
+                  key={item.name}
+                  className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_18px_48px_rgba(15,23,42,0.07)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_64px_rgba(15,23,42,0.13)]"
+                >
+                  <div className="relative h-52 shrink-0 overflow-hidden bg-slate-100">
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.05]"
+                      loading="lazy"
+                    />
+                    <span className="absolute left-3 top-3 rounded-md bg-white/95 px-3 py-1 text-[0.68rem] font-bold uppercase tracking-[0.06em] text-slate-700 shadow-sm backdrop-blur">
+                      {item.badge}
+                    </span>
+                    <span
+                      className={`absolute bottom-3 left-3 inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-[0.68rem] font-bold text-white shadow-sm ${
+                        item.status === 'In Stock' ? 'bg-success' : 'bg-sky-600'
+                      }`}
+                    >
+                      <i
+                        className={`fa-solid ${item.status === 'In Stock' ? 'fa-check-circle' : 'fa-shield-halved'}`}
+                        aria-hidden="true"
+                      ></i>
+                      {item.status}
+                    </span>
+                    <button
+                      aria-label={`Add ${item.name} to wishlist`}
+                      className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/95 text-slate-400 shadow-sm backdrop-blur transition hover:text-rose-500"
+                    >
+                      <i className="fa-regular fa-heart" aria-hidden="true"></i>
+                    </button>
+                  </div>
+
+                  <div className="flex flex-1 flex-col p-5">
+                    <h3 className="m-0 mb-1.5 text-[1.05rem] font-bold tracking-[-0.01em] text-text-primary">
+                      {item.color ? `${item.color} ${item.name}` : item.name}
+                    </h3>
+                    <p className="m-0 mb-4 text-[1.3rem] font-extrabold tracking-[-0.01em] text-primary">{item.price}</p>
+
+                    <div className="mb-4 flex flex-wrap gap-2">
+                      {item.tags.map((tag) => (
+                        <span key={tag} className="inline-flex items-center rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1 text-[0.7rem] font-semibold text-slate-600">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+
+                    {item.perks.length > 0 && (
+                      <div className="mb-4 flex flex-wrap gap-1.5">
+                        {item.perks.map((perk) => (
+                          <span key={perk} className="inline-flex items-center gap-1 text-[0.7rem] font-semibold text-success">
+                            <i className="fa-solid fa-circle-check text-[0.6rem]" aria-hidden="true"></i>
+                            {perk}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="mt-auto flex gap-2.5">
+                      <a
+                        href="https://wa.me/2347060882711"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-[0.82rem] font-bold text-white no-underline shadow-[0_12px_28px_rgba(13,110,253,0.3)] transition hover:bg-primary-700 hover:shadow-[0_16px_34px_rgba(13,110,253,0.4)]"
+                      >
+                        <i className="fab fa-whatsapp" aria-hidden="true"></i>
+                        Inquire Now
+                      </a>
+                      <button className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-[0.82rem] font-semibold text-slate-600 transition hover:border-primary hover:text-primary">
+                        Details <i className="fa-solid fa-arrow-right text-xs" aria-hidden="true"></i>
+                      </button>
+                    </div>
+                  </div>
+                </article>
+              ))
+            ) : (
+              <div className="col-span-full rounded-2xl border border-dashed border-slate-200 bg-white p-10 text-center text-sm text-slate-500">
+                No items match “{searchQuery}”. Try a different search.
+              </div>
+            )}
           </div>
         </section>
 
@@ -494,7 +562,10 @@ export default function HomePage() {
         <section className="container mx-auto px-4 md:px-6">
           <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
             {quickStats.map((stat) => (
-              <div key={stat.label} className="glass-card p-4 text-center sm:p-6">
+              <div key={stat.label} className="glass-card p-5 text-center sm:p-6">
+                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-primary-50 text-lg text-primary group-hover:bg-primary-100">
+                  <i className={stat.icon} aria-hidden="true"></i>
+                </div>
                 <p className="text-2xl font-bold text-text-primary sm:text-3xl">{stat.value}</p>
                 <p className="mt-2 text-[0.8rem] font-semibold leading-tight text-text-primary sm:text-sm">{stat.label}</p>
                 <p className="mt-1 text-[0.68rem] leading-snug text-text-muted sm:text-xs">{stat.detail}</p>
@@ -505,37 +576,39 @@ export default function HomePage() {
 
         {/* Featured Vehicles Section */}
         <section className="container mx-auto px-4 md:px-6">
-          <div className="flex items-center justify-between mb-8">
+          <div className="mb-8 flex items-center justify-between">
             <div>
-              <span className="badge-primary text-xs mb-2 inline-block">Premium Inventory</span>
+              <span className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-primary mb-2 inline-block">Premium Inventory</span>
               <h2 className="text-2xl md:text-3xl font-bold text-text-primary">Featured Vehicles</h2>
               <p className="text-text-secondary text-sm mt-1">Selected options for buyers who want fewer surprises</p>
             </div>
-            <Link to="/sales" className="text-primary font-semibold text-sm hover:underline flex items-center gap-1">
-              View All Inventory <i className="fas fa-arrow-right text-xs"></i>
+            <Link to="/sales" className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary no-underline hover:text-primary-700">
+              View All Inventory <i className="fas fa-arrow-right text-xs" aria-hidden="true"></i>
             </Link>
           </div>
           
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {featuredItems.filter(item => item.type === 'vehicle').map((vehicle) => (
-              <div key={vehicle.name} className="group relative flex flex-col overflow-hidden rounded-lg border border-slate-400/20 bg-gradient-to-b from-slate-900 to-[#030a18] shadow-[0_22px_58px_rgba(2,6,23,0.36)] transition duration-300 before:pointer-events-none before:absolute before:inset-0 before:z-[2] before:border-t before:border-white/10 hover:-translate-y-2 hover:border-blue-400/30 hover:shadow-[0_34px_80px_rgba(2,6,23,0.5),0_0_0_1px_rgba(96,165,250,0.18)]">
-                {/* Image with gradient bleed */}
-                <div className="relative h-56 shrink-0 overflow-hidden bg-slate-950 after:pointer-events-none after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[120px] after:bg-[linear-gradient(to_bottom,transparent_0%,rgba(2,6,23,0.2)_45%,#071225_100%)]">
-                  <img src={vehicle.image} alt={vehicle.name} className="block h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.06] [filter:saturate(0.92)_contrast(1.06)]" />
-                  <span className="absolute right-3.5 top-3.5 z-[2] rounded border border-blue-300/40 bg-slate-950/75 px-3 py-1 text-[0.65rem] font-bold uppercase tracking-[0.08em] text-blue-100 backdrop-blur">Available</span>
+              <div key={vehicle.name} className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_18px_48px_rgba(15,23,42,0.07)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_64px_rgba(15,23,42,0.13)]">
+                {/* Image */}
+                <div className="relative h-56 shrink-0 overflow-hidden bg-slate-100">
+                  <img src={vehicle.image} alt={vehicle.name} className="block h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.05]" />
+                  <span className="absolute left-3 top-3 rounded-md bg-white/95 px-3 py-1 text-[0.68rem] font-bold uppercase tracking-[0.06em] text-slate-700 shadow-sm backdrop-blur">{vehicle.color}</span>
+                  <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-md bg-success px-2.5 py-1 text-[0.68rem] font-bold text-white shadow-sm">
+                    <i className="fa-solid fa-circle-check text-[0.6rem]" aria-hidden="true"></i>
+                    Available
+                  </span>
                 </div>
 
                 {/* Card body */}
-                <div className="flex flex-1 flex-col px-[22px] pb-[22px]">
-                  <h3 className="m-0 mb-1.5 text-[1.08rem] font-bold tracking-[-0.01em] text-slate-50">{vehicle.name}</h3>
-                  <p className="m-0 mb-4 text-[1.45rem] font-extrabold tracking-[-0.02em] text-blue-200">{vehicle.price}</p>
+                <div className="flex flex-1 flex-col p-5">
+                  <h3 className="m-0 mb-1.5 text-[1.08rem] font-bold tracking-[-0.01em] text-text-primary">{vehicle.name}</h3>
+                  <p className="m-0 mb-4 text-[1.3rem] font-extrabold tracking-[-0.01em] text-primary">{vehicle.price}</p>
 
-                  <div className="mb-3.5 h-px bg-gradient-to-r from-blue-400/30 to-white/5" />
-
-                  <div className="mb-[18px] flex flex-wrap gap-2">
-                    <span className="inline-flex items-center gap-1 rounded-[5px] border border-slate-400/15 bg-slate-900/70 px-2.5 py-1 text-[0.7rem] text-slate-200/65 [&_i]:text-[0.65rem] [&_i]:text-blue-400"><i className="fas fa-gas-pump"></i> Petrol</span>
-                    <span className="inline-flex items-center gap-1 rounded-[5px] border border-slate-400/15 bg-slate-900/70 px-2.5 py-1 text-[0.7rem] text-slate-200/65 [&_i]:text-[0.65rem] [&_i]:text-blue-400"><i className="fas fa-cog"></i> Automatic</span>
-                    <span className="inline-flex items-center gap-1 rounded-[5px] border border-slate-400/15 bg-slate-900/70 px-2.5 py-1 text-[0.7rem] text-slate-200/65 [&_i]:text-[0.65rem] [&_i]:text-blue-400"><i className="fas fa-car"></i> Used</span>
+                  <div className="mb-4 flex flex-wrap gap-2">
+                    {vehicle.tags.map((tag) => (
+                      <span key={tag} className="inline-flex items-center rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1 text-[0.7rem] font-semibold text-slate-600">{tag}</span>
+                    ))}
                   </div>
 
                   <div className="mt-auto flex gap-2.5">
@@ -543,14 +616,14 @@ export default function HomePage() {
                       href="https://wa.me/2347060882711"
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex flex-1 items-center justify-center gap-[7px] rounded-md bg-gradient-to-br from-blue-700 to-blue-500 px-4 py-[11px] text-[0.82rem] font-bold tracking-[0.03em] text-white no-underline shadow-[0_12px_30px_rgba(37,99,235,0.3)] transition hover:-translate-y-px hover:text-white hover:brightness-110 hover:shadow-[0_16px_38px_rgba(37,99,235,0.42)]"
+                      className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-[0.82rem] font-bold text-white no-underline shadow-[0_12px_28px_rgba(13,110,253,0.3)] transition hover:bg-primary-700 hover:shadow-[0_16px_34px_rgba(13,110,253,0.4)]"
                     >
-                      <i className="fab fa-whatsapp"></i>
+                      <i className="fab fa-whatsapp" aria-hidden="true"></i>
                       Inquire Now
                     </a>
-                    <button className="inline-flex items-center justify-center gap-1.5 rounded-md border border-white/10 bg-transparent px-4 py-[11px] text-[0.82rem] font-semibold text-white/55 transition hover:border-blue-400/40 hover:text-blue-200">
-                      Details
-                    </button>
+                    <Link to="/sales" className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-[0.82rem] font-semibold text-slate-600 no-underline transition hover:border-primary hover:text-primary">
+                      Details <i className="fa-solid fa-arrow-right text-xs" aria-hidden="true"></i>
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -789,7 +862,7 @@ export default function HomePage() {
             {/* Brand */}
             <div className="md:col-span-1">
               <div className="flex items-center gap-2 mb-4">
-                <img src="/logo.jpg" alt="Biltronix" className="h-10 w-10 rounded-lg" />
+                <img src="/logo.jpg" alt="Biltronix" className="logo-brand-tint h-10 w-10 rounded-lg" />
                 <div>
                   <span className="text-lg font-bold">Biltronix</span>
                   <span className="text-primary ml-1">Automobile</span>

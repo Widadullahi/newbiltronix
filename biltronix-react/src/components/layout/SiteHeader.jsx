@@ -47,7 +47,7 @@ export default function SiteHeader() {
         <div className="container mx-auto flex items-center justify-between px-4 py-3">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
-            <img src="/logo.jpg" alt="Biltronix" className="h-10 w-10 rounded-lg border border-slate-200 object-cover" />
+            <img src="/logo.jpg" alt="Biltronix" className="logo-brand-tint h-10 w-10 rounded-lg border border-slate-200 object-cover" />
             <div>
               <span className="text-lg font-bold text-text-primary">Biltronix</span>
               <span className="text-primary ml-1 font-semibold">Automobile</span>

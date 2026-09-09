@@ -1,8 +1,8 @@
 node_modules/
 */node_modules/
-.env
-*/.env
 dist/
 */dist/
 npm-debug.log*
 *.log
+docker/dynamodb/*.db
+docker/dynamodb/*.db.*

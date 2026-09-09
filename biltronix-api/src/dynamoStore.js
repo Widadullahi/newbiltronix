@@ -9,6 +9,9 @@ import {
   UpdateCommand,
 } from '@aws-sdk/lib-dynamodb';
 import { randomUUID } from 'node:crypto';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const region = process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION || 'us-east-1';
 const endpoint = process.env.DYNAMODB_ENDPOINT || undefined;
