@@ -8,7 +8,7 @@ export default function InstallModal({ installModal, triggerInstallPrompt, onClo
       <div className="rounded-glass border border-glass-border bg-glass-surface shadow-glass backdrop-blur-glass transition hover:-translate-y-0.5 hover:bg-white/85 hover:shadow-glass-hover max-w-md w-full p-6 animate-slide-up" style={{ background: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(40px)', WebkitBackdropFilter: 'blur(40px)' }}>
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-primary-50 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center">
               <i className="fas fa-mobile-alt text-primary text-xl"></i>
             </div>
             <div>
@@ -33,7 +33,7 @@ export default function InstallModal({ installModal, triggerInstallPrompt, onClo
             <button
               type="button"
               onClick={triggerInstallPrompt}
-              className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-primary text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 py-2.5"
+              className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-primary text-white shadow-float transition hover:-translate-y-px hover:bg-slate-1000 py-2.5"
             >
               <i className="fas fa-download mr-2"></i>
               Install Now

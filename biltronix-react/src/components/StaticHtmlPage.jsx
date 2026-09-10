@@ -880,6 +880,11 @@ export default function StaticHtmlPage({ htmlPath, pageType }) {
             const inquireButton = item.soldOut
               ? '<span class="btn" style="background:#f3f6fb;color:#6b7f9f;border:1px solid #d9e3f2;cursor:not-allowed;">Sold Out</span>'
               : `<a class="btn whatsapp" target="_blank" href="https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`I want to inquire about ${item.name}`)}">Inquire</a>`;
+            const basePrice = Number(item.unitPrice) || 0;
+            const offerPrice = Number(item.offerPrice) || 0;
+            const priceMarkup = offerPrice > 0 && offerPrice !== basePrice
+              ? `<div class="price"><span style="text-decoration:line-through;opacity:.55;font-weight:600;">${escapeHtml(toCurrency(basePrice))}</span> <strong style="font-size:1.1em;">${escapeHtml(toCurrency(offerPrice))}</strong></div>`
+              : `<div class="price">${escapeHtml(toCurrency(basePrice))}</div>`;
             return `
               <article class="product-card" data-product-card data-category="${normalizedCategory}" data-images="${escapeHtml(extraImages)}">
                 ${imageMarkup}
@@ -888,7 +893,8 @@ export default function StaticHtmlPage({ htmlPath, pageType }) {
                   ${soldBadge}
                   <h3>${escapeHtml(item.name || 'Untitled Item')}</h3>
                   <p>${escapeHtml(item.description || 'No description available yet.')}</p>
-                  <div class="price">${escapeHtml(toCurrency(item.unitPrice))}</div>
+                  ${(item.color || item.mileage) ? `<div class="product-meta" style="display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 0;font-size:.8rem;color:#61779a;font-weight:600;">${item.color ? `<span>${escapeHtml(item.color)}</span>` : ''}${item.mileage ? `<span title="Mileage">⚡ ${escapeHtml(item.mileage)}</span>` : ''}</div>` : ''}
+                  ${priceMarkup}
                   <div class="actions">${detailsButton}${inquireButton}</div>
                 </div>
               </article>

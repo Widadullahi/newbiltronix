@@ -100,7 +100,7 @@ function normalizeOrder(row) {
 }
 
 function normalizeStockItem(row) {
-  return { _id: row.id, name: row.name || 'Untitled Item', description: row.description || '', primaryImageUrl: row.primaryImageUrl || '', featureImageUrl: row.featureImageUrl || '', otherImageUrls: Array.isArray(row.otherImageUrls) ? row.otherImageUrls : [], soldOut: Boolean(row.soldOut), category: row.category || 'car-parts', stock: toInt(row.stock), sold: toInt(row.sold), unitPrice: toInt(row.unitPrice), make: row.make || '', model: row.model || '', year: toInt(row.year), condition: row.condition || '', transmission: row.transmission || '', fuelType: row.fuelType || '' };
+  return { _id: row.id, name: row.name || 'Untitled Item', description: row.description || '', primaryImageUrl: row.primaryImageUrl || '', featureImageUrl: row.featureImageUrl || '', otherImageUrls: Array.isArray(row.otherImageUrls) ? row.otherImageUrls : [], soldOut: Boolean(row.soldOut), category: row.category || 'car-parts', stock: toInt(row.stock), sold: toInt(row.sold), unitPrice: toInt(row.unitPrice), offerPrice: toInt(row.offerPrice), color: row.color || '', mileage: row.mileage || '', make: row.make || '', model: row.model || '', year: toInt(row.year), condition: row.condition || '', transmission: row.transmission || '', fuelType: row.fuelType || '' };
 }
 
 function normalizeCarTip(row) {
@@ -379,6 +379,9 @@ app.post('/api/stock-items', requireAuth, requireRole('admin'), async (req, res)
       stock: toInt(req.body?.stock),
       sold: toInt(req.body?.sold),
       unitPrice: toInt(req.body?.unitPrice),
+      offerPrice: toInt(req.body?.offerPrice),
+      color: safeString(req.body?.color),
+      mileage: safeString(req.body?.mileage),
       make: safeString(req.body?.make),
       model: safeString(req.body?.model),
       year: toInt(req.body?.year),
@@ -407,6 +410,9 @@ app.patch('/api/stock-items/:id', requireAuth, requireRole('admin'), async (req,
       stock: req.body?.stock === undefined ? toInt(existing.stock) : toInt(req.body?.stock),
       sold: req.body?.sold === undefined ? toInt(existing.sold) : toInt(req.body?.sold),
       unitPrice: req.body?.unitPrice === undefined ? toInt(existing.unitPrice) : toInt(req.body?.unitPrice),
+      offerPrice: req.body?.offerPrice === undefined ? toInt(existing.offerPrice) : toInt(req.body?.offerPrice),
+      color: req.body?.color === undefined ? (existing.color || '') : safeString(req.body?.color),
+      mileage: req.body?.mileage === undefined ? (existing.mileage || '') : safeString(req.body?.mileage),
       make: req.body?.make === undefined ? (existing.make || '') : safeString(req.body?.make),
       model: req.body?.model === undefined ? (existing.model || '') : safeString(req.body?.model),
       year: req.body?.year === undefined ? toInt(existing.year) : toInt(req.body?.year),

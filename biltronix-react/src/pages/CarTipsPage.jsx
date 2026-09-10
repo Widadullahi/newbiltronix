@@ -88,23 +88,24 @@ export default function CarTipsPage() {
   }, [category, query, tips]);
 
   return (
-    <div className="min-h-screen bg-[#030712] text-white">
+    <div className="min-h-screen bg-white text-gray-900">
       <SiteHeader />
 
-      {/* ── Luxury Header Panel ── */}
-      <div className="relative overflow-hidden border-b border-blue-300/10 bg-gradient-to-br from-slate-950 via-[#071225] to-[#020617] px-0 py-16">
-        <div className="container mx-auto px-4 md:px-6">
-          <span className="mb-5 inline-flex items-center gap-2 rounded-full border border-blue-300/20 bg-blue-400/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-blue-100">
-            <span className="h-2 w-2 animate-pulse rounded-full bg-blue-300" aria-hidden="true" />
+      {/* ── Knowledge Base Header ── */}
+      <div className="relative overflow-hidden border-b border-slate-200 bg-cover bg-center px-0 py-16" style={{ backgroundImage: "url('/new_design/background2.png')" }}>
+        <div className="pointer-events-none absolute inset-0 bg-primary/30" aria-hidden="true" />
+        <div className="relative container mx-auto px-4 md:px-6">
+          <span className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-slate-100 backdrop-blur">
+            <span className="h-2 w-2 animate-pulse rounded-full bg-white" aria-hidden="true" />
             Knowledge Base
           </span>
 
           <h1 className="m-0 max-w-3xl font-heading text-[clamp(2.3rem,5vw,4.5rem)] font-extrabold leading-[1.05] tracking-[-0.04em] text-white">
             Car Tips &amp;{' '}
-            <span className="animate-[luxGoldShimmer_4s_linear_infinite] bg-[linear-gradient(90deg,#60a5fa,#93c5fd,#ffffff,#bfdbfe,#60a5fa)] bg-[length:300%_auto] bg-clip-text text-transparent">Expert Advice</span>
+            <span className="animate-[luxGoldShimmer_4s_linear_infinite] bg-[linear-gradient(90deg,#001F3F,#4a6fa5,#f0f4ff,#001F3F)] bg-[length:300%_auto] bg-clip-text text-transparent">Expert Advice</span>
           </h1>
 
-          <p className="mt-5 max-w-2xl text-base leading-8 text-slate-300/80">
+          <p className="mt-5 max-w-2xl text-base leading-8 text-slate-200/85">
             Professional automotive guidance written by certified technicians —
             keep your vehicle running at its peak.
           </p>
@@ -117,21 +118,21 @@ export default function CarTipsPage() {
                   key={item}
                   type="button"
                   onClick={() => setCategory(item)}
-                  className={`rounded-md border border-white/10 px-4 py-2 text-sm font-bold transition ${category === item ? 'bg-blue-500 text-white' : 'bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white'}`}
+                  className={`rounded-lg border px-4 py-2 text-sm font-bold transition ${category === item ? 'border-primary bg-primary text-white shadow-[0_6px_18px_rgba(10,31,77,0.24)]' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-gray-900'}`}
                 >
                   {item}
                 </button>
               ))}
             </div>
 
-            <div className="flex min-w-[260px] items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-slate-300">
-              <i className="fas fa-search" aria-hidden="true"></i>
+            <div className="flex min-w-[260px] items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 shadow-sm">
+              <i className="fas fa-search text-slate-400" aria-hidden="true"></i>
               <input
                 type="search"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search tips by keyword…"
-                className="w-full border-0 bg-transparent text-sm text-white outline-none placeholder:text-slate-500"
+                className="w-full border-0 bg-transparent text-sm text-gray-900 outline-none placeholder:text-slate-400"
                 aria-label="Search tips"
               />
             </div>
@@ -143,24 +144,24 @@ export default function CarTipsPage() {
       <main>
         <div className="container mx-auto px-4 pb-20 pt-[52px] md:px-6">
           {loading ? (
-            <div className="flex min-h-[260px] flex-col items-center justify-center gap-4 text-slate-300">
-              <div className="h-10 w-10 animate-spin rounded-full border-2 border-blue-300/20 border-t-blue-300" aria-hidden="true" />
+            <div className="flex min-h-[260px] flex-col items-center justify-center gap-4 text-slate-500">
+              <div className="h-10 w-10 animate-spin rounded-full border-2 border-slate-200 border-t-primary" aria-hidden="true" />
               <p>Loading expert tips…</p>
             </div>
           ) : filteredTips.length === 0 ? (
-            <div className="rounded-lg border border-white/10 bg-white/5 p-10 text-center text-slate-300">
-              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-white/10">
-                <i className="fas fa-lightbulb" style={{ color: '#c8962a', fontSize: '1.4rem' }}></i>
+            <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-10 text-center text-sm text-slate-500">
+              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-slate-100">
+                <i className="fas fa-lightbulb text-amber-500" aria-hidden="true"></i>
               </div>
-              <h3>No tips found</h3>
+              <h3 className="mb-1 text-base font-semibold text-gray-900">No tips found</h3>
               <p>Try a different search term or category</p>
             </div>
           ) : (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {filteredTips.map((tip, index) => (
                 <article
                   key={`${tip.title}-${index}`}
-                  className="group cursor-pointer overflow-hidden rounded-lg border border-slate-400/20 bg-gradient-to-b from-slate-900 to-[#030a18] shadow-[0_22px_58px_rgba(2,6,23,0.36)] transition hover:-translate-y-1 hover:border-blue-400/30"
+                  className="group cursor-pointer overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-shadow hover:shadow-md"
                   onClick={() => setSelectedTip(tip)}
                   role="button"
                   tabIndex={0}
@@ -168,29 +169,48 @@ export default function CarTipsPage() {
                   aria-label={`Read tip: ${tip.title}`}
                 >
                   {/* Image or placeholder */}
-                  {tip.imageUrl ? (
-                    <div className="h-52 overflow-hidden bg-slate-950">
+                  <div className="relative">
+                    {tip.imageUrl ? (
                       <img
                         src={tip.imageUrl}
                         alt={tip.title}
-                        className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                        className="h-48 w-full object-cover"
                         loading="lazy"
                       />
-                    </div>
-                  ) : (
-                    <div className="flex h-52 items-center justify-center bg-slate-900 text-5xl text-slate-700" aria-hidden="true">
-                      <i className="fas fa-car"></i>
-                    </div>
-                  )}
+                    ) : (
+                      <div className="flex h-48 w-full items-center justify-center bg-slate-50 text-5xl text-slate-200" aria-hidden="true">
+                        <i className="fas fa-car"></i>
+                      </div>
+                    )}
+
+                    <span className="absolute left-3 top-3 rounded-full bg-white/90 px-2.5 py-1 text-xs font-medium text-gray-700 backdrop-blur">
+                      {tip.category || 'General'}
+                    </span>
+
+                    <button
+                      className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 backdrop-blur transition hover:bg-white"
+                      onClick={(e) => e.stopPropagation()}
+                      aria-label={`Save tip: ${tip.title}`}
+                    >
+                      <svg className="h-4 w-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                        />
+                      </svg>
+                    </button>
+                  </div>
 
                   {/* Body */}
-                  <div className="p-5">
-                    <span className="inline-flex rounded-full border border-blue-300/20 bg-blue-400/10 px-3 py-1 text-xs font-bold uppercase tracking-wide text-blue-200">{tip.category || 'General'}</span>
-                    <h2 className="mt-3 text-xl font-bold text-white">{tip.title || 'Untitled Tip'}</h2>
-                    <p className="mt-2 text-sm leading-relaxed text-slate-300/75">{trimWords(tip.body || '', PREVIEW_WORD_LIMIT)}</p>
-                    <div className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-blue-300">
+                  <div className="p-4">
+                    <span className="mb-2 inline-flex rounded-md bg-gray-50 px-2 py-0.5 text-xs text-gray-500">{tip.category || 'General'}</span>
+                    <h2 className="mb-2 text-[15px] font-semibold leading-snug text-gray-900">{tip.title || 'Untitled Tip'}</h2>
+                    <p className="text-sm leading-relaxed text-gray-500">{trimWords(tip.body || '', PREVIEW_WORD_LIMIT)}</p>
+                    <div className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-primary">
                       Read Full Tip
-                      <i className="fas fa-arrow-right" style={{ fontSize: '0.7rem' }} aria-hidden="true"></i>
+                      <i className="fas fa-arrow-right text-xs" aria-hidden="true"></i>
                     </div>
                   </div>
                 </article>
@@ -211,12 +231,12 @@ export default function CarTipsPage() {
           aria-modal="true"
           aria-label={selectedTip.title}
         >
-          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg border border-white/10 bg-slate-950 p-6 shadow-glass-xl" onClick={(e) => e.stopPropagation()}>
+          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-gray-100 bg-white p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
             {/* Modal header */}
             <div className="mb-4 flex items-center justify-between">
-              <span className="inline-flex rounded-full border border-blue-300/20 bg-blue-400/10 px-3 py-1 text-xs font-bold uppercase tracking-wide text-blue-200">{selectedTip.category || 'General'}</span>
+              <span className="inline-flex rounded-md bg-gray-50 px-2 py-0.5 text-xs text-gray-500">{selectedTip.category || 'General'}</span>
               <button
-                className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition hover:bg-white/10"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-gray-500 transition hover:bg-slate-50 hover:text-gray-900"
                 onClick={() => setSelectedTip(null)}
                 aria-label="Close"
               >
@@ -229,21 +249,21 @@ export default function CarTipsPage() {
               <img
                 src={selectedTip.imageUrl}
                 alt={selectedTip.title}
-                className="mb-5 h-72 w-full rounded-lg object-cover"
+                className="mb-5 h-64 w-full rounded-xl object-cover"
               />
             ) : (
-              <div className="mb-5 flex h-56 items-center justify-center rounded-lg bg-slate-900 text-5xl text-slate-700" aria-hidden="true">
+              <div className="mb-5 flex h-48 items-center justify-center rounded-xl bg-slate-50 text-5xl text-slate-200" aria-hidden="true">
                 <i className="fas fa-car"></i>
               </div>
             )}
 
-            <h2 className="text-2xl font-bold text-white">{selectedTip.title || 'Untitled Tip'}</h2>
-            <p className="mt-3 whitespace-pre-line text-sm leading-7 text-slate-300">{selectedTip.body || 'No content available.'}</p>
+            <h2 className="text-2xl font-bold text-gray-900">{selectedTip.title || 'Untitled Tip'}</h2>
+            <p className="mt-3 whitespace-pre-line text-sm leading-7 text-slate-600">{selectedTip.body || 'No content available.'}</p>
 
-            <div className="mt-6 flex justify-end border-t border-white/10 pt-5">
+            <div className="mt-6 flex justify-end border-t border-slate-100 pt-5">
               <button
                 onClick={() => setSelectedTip(null)}
-                className="inline-flex items-center justify-center rounded-md border border-white/10 bg-transparent px-6 py-2.5 text-sm font-semibold text-white/70 transition hover:border-blue-400/40 hover:text-blue-200"
+                className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-6 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 hover:text-gray-900"
                 style={{ padding: '10px 24px' }}
               >
                 Close
@@ -254,7 +274,7 @@ export default function CarTipsPage() {
       )}
 
       {/* ── Footer ── */}
-      <footer className="border-t border-white/10 bg-slate-950 py-6 text-sm text-slate-400">
+      <footer className="border-t border-slate-200 bg-white py-6 text-sm text-slate-500">
         <div className="container mx-auto px-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <span>© {new Date().getFullYear()} Biltronix Automobile. All rights reserved.</span>

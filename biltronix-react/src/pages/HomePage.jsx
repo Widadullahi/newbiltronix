@@ -125,33 +125,37 @@ const heroServices = [
 const featuredItems = [
   {
     type: 'vehicle',
-    name: 'Mercedes-Benz GLE 350',
+    name: 'Mercedes-Benz S-Class',
     price: 'NGN 45,000,000',
-    image: '/hero-car-original-withbackground.jpeg',
+    offerPrice: 'NGN 42,500,000',
+    image: '/vehicle/Mercedes-Benz_S-class.png',
     badge: 'Vehicle',
     color: 'White',
+    mileage: '38,000 km',
     tags: ['Petrol', 'Automatic', 'Used'],
     status: 'Verified Stock',
     perks: ['Certified', 'Premium Grade', 'Concierge Support'],
   },
   {
     type: 'vehicle',
-    name: 'Lexus RX 350',
+    name: 'BMW M3 Competition',
     price: 'NGN 28,500,000',
-    image: '/hero-car-original-withbackground.jpeg',
+    image: '/vehicle/BMW_M$_Competition.png',
     badge: 'Vehicle',
     color: 'Black',
+    mileage: '24,500 km',
     tags: ['Petrol', 'Automatic', 'Used'],
     status: 'Verified Stock',
     perks: ['Certified', 'Premium Grade'],
   },
   {
     type: 'vehicle',
-    name: 'Toyota Land Cruiser',
+    name: 'Mercedes-Benz G-Wagon',
     price: 'NGN 85,000,000',
-    image: '/hero-car-original-withbackground.jpeg',
+    image: '/vehicle/Mercedes-Benz G-Wagon.png',
     badge: 'Vehicle',
     color: 'Black',
+    mileage: '52,000 km',
     tags: ['Diesel', 'Automatic', 'Used'],
     status: 'Verified Stock',
     perks: ['Certified', 'Premium Grade', 'Concierge Support'],
@@ -190,6 +194,7 @@ const featuredItems = [
 
 export default function HomePage() {
   const [heroAnimated, setHeroAnimated] = useState(false);
+  const [vehSlide, setVehSlide] = useState(0);
   const [activeTab, setActiveTab] = useState('All Items');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -197,6 +202,16 @@ export default function HomePage() {
   useEffect(() => {
     const t = setTimeout(() => setHeroAnimated(true), 150);
     return () => clearTimeout(t);
+  }, []);
+
+  const featuredVehicles = featuredItems.filter((item) => item.type === 'vehicle');
+
+  // Auto-rotate featured vehicles slides every 6s
+  useEffect(() => {
+    const t = setInterval(() => {
+      setVehSlide((i) => (i + 1) % featuredVehicles.length);
+    }, 3000);
+    return () => clearInterval(t);
   }, []);
 
   const stockTabs = ['All Items', 'Vehicles', 'Parts', 'Accessories'];
@@ -237,7 +252,7 @@ export default function HomePage() {
         {/* Left hero content */}
         <div className="relative z-20 w-full flex-[0_0_48%] pl-[7%] pr-4 max-[1100px]:flex-[0_0_52%] max-[900px]:mx-auto max-[900px]:max-w-3xl max-[900px]:flex-none max-[900px]:px-6 max-[900px]:text-center max-[640px]:px-[18px]">
           {/* Badge */}
-          <div className="mb-5 inline-flex translate-x-[-42px] items-center gap-2 rounded-full bg-primary px-4 py-2 opacity-0 shadow-[0_6px_20px_rgba(13,110,253,0.25)] [.lux-on_&]:animate-[heroTextIn_0.7s_cubic-bezier(0.22,1,0.36,1)_forwards] max-[900px]:mx-auto">
+          <div className="mb-5 inline-flex translate-x-[-42px] items-center gap-2 rounded-full bg-primary px-4 py-2 opacity-0 shadow-[0_6px_20px_rgba(10,31,77,0.28)] [.lux-on_&]:animate-[heroTextIn_0.7s_cubic-bezier(0.22,1,0.36,1)_forwards] max-[900px]:mx-auto">
             <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white text-[0.6rem] text-primary">
               <i className="fas fa-star" aria-hidden="true"></i>
             </span>
@@ -267,7 +282,7 @@ export default function HomePage() {
 
           {/* CTA buttons */}
           <div className="mb-8 flex translate-x-[-42px] flex-wrap items-center gap-3.5 opacity-0 [.lux-on_&]:animate-[heroTextIn_0.75s_cubic-bezier(0.22,1,0.36,1)_0.48s_forwards] max-[900px]:mb-6 max-[900px]:justify-center max-[640px]:mb-[18px] max-[640px]:grid max-[640px]:grid-cols-1 max-[640px]:gap-2.5">
-            <Link to="/sales" className="inline-flex items-center justify-center gap-2.5 rounded-lg bg-primary px-7 py-3.5 text-[0.82rem] font-bold text-white no-underline shadow-[0_10px_28px_rgba(13,110,253,0.3)] transition hover:-translate-y-0.5 hover:bg-primary-500 hover:text-white max-[640px]:w-full">
+            <Link to="/sales" className="inline-flex items-center justify-center gap-2.5 rounded-lg bg-primary px-7 py-3.5 text-[0.82rem] font-bold text-white no-underline shadow-[0_10px_28px_rgba(10,31,77,0.32)] transition hover:-translate-y-0.5 hover:bg-slate-1000 hover:text-white max-[640px]:w-full">
               Browse Inventory
               <i className="fas fa-arrow-right" aria-hidden="true"></i>
             </Link>
@@ -352,6 +367,8 @@ export default function HomePage() {
         {/* Fade into page background */}
         <div className="pointer-events-none absolute bottom-0 left-0 right-0 z-[15] h-[140px] bg-gradient-to-b from-transparent to-[#f8fafc]" aria-hidden="true" />
       </section>
+
+
 
       {/* ── Trusted Brands Carousel ── */}
       <section className="relative z-10 border-b border-slate-200/60 bg-white/70 py-7 backdrop-blur-sm" aria-label="Trusted brands">
@@ -458,7 +475,7 @@ export default function HomePage() {
                   onClick={() => setActiveTab(tab)}
                   className={`rounded-lg px-4 py-2 text-[0.82rem] font-semibold transition ${
                     activeTab === tab
-                      ? 'bg-primary text-white shadow-[0_6px_18px_rgba(13,110,253,0.3)]'
+                      ? 'bg-primary text-white shadow-[0_6px_18px_rgba(10,31,77,0.32)]'
                       : 'text-slate-600 hover:bg-slate-100 hover:text-text-primary'
                   }`}
                 >
@@ -474,82 +491,95 @@ export default function HomePage() {
           {/* Product grid */}
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {filteredItems.length > 0 ? (
-              filteredItems.map((item) => (
-                <article
-                  key={item.name}
-                  className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_18px_48px_rgba(15,23,42,0.07)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_64px_rgba(15,23,42,0.13)]"
-                >
-                  <div className="relative h-52 shrink-0 overflow-hidden bg-slate-100">
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.05]"
-                      loading="lazy"
-                    />
-                    <span className="absolute left-3 top-3 rounded-md bg-white/95 px-3 py-1 text-[0.68rem] font-bold uppercase tracking-[0.06em] text-slate-700 shadow-sm backdrop-blur">
-                      {item.badge}
-                    </span>
-                    <span
-                      className={`absolute bottom-3 left-3 inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-[0.68rem] font-bold text-white shadow-sm ${
-                        item.status === 'In Stock' ? 'bg-success' : 'bg-sky-600'
-                      }`}
-                    >
-                      <i
-                        className={`fa-solid ${item.status === 'In Stock' ? 'fa-check-circle' : 'fa-shield-halved'}`}
-                        aria-hidden="true"
-                      ></i>
-                      {item.status}
-                    </span>
-                    <button
-                      aria-label={`Add ${item.name} to wishlist`}
-                      className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/95 text-slate-400 shadow-sm backdrop-blur transition hover:text-rose-500"
-                    >
-                      <i className="fa-regular fa-heart" aria-hidden="true"></i>
-                    </button>
-                  </div>
+              filteredItems.map((item) => {
+                const showStockPill = item.status === 'In Stock';
+                const itemBadges = showStockPill ? item.perks : [item.status, ...item.perks];
 
-                  <div className="flex flex-1 flex-col p-5">
-                    <h3 className="m-0 mb-1.5 text-[1.05rem] font-bold tracking-[-0.01em] text-text-primary">
-                      {item.color ? `${item.color} ${item.name}` : item.name}
-                    </h3>
-                    <p className="m-0 mb-4 text-[1.3rem] font-extrabold tracking-[-0.01em] text-primary">{item.price}</p>
+                return (
+                  <article
+                    key={item.name}
+                    className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-shadow hover:shadow-md"
+                  >
+                    <div className="relative">
+                      <img
+                        src={item.image}
+                        alt={item.title}
+                        className="h-48 w-full object-cover"
+                        loading="lazy"
+                      />
 
-                    <div className="mb-4 flex flex-wrap gap-2">
-                      {item.tags.map((tag) => (
-                        <span key={tag} className="inline-flex items-center rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1 text-[0.7rem] font-semibold text-slate-600">
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
+                      <span className="absolute left-3 top-3 rounded-full bg-white/90 px-2.5 py-1 text-xs font-medium text-gray-700 backdrop-blur">
+                        {item.badge}
+                      </span>
 
-                    {item.perks.length > 0 && (
-                      <div className="mb-4 flex flex-wrap gap-1.5">
-                        {item.perks.map((perk) => (
-                          <span key={perk} className="inline-flex items-center gap-1 text-[0.7rem] font-semibold text-success">
-                            <i className="fa-solid fa-circle-check text-[0.6rem]" aria-hidden="true"></i>
-                            {perk}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-
-                    <div className="mt-auto flex gap-2.5">
-                      <a
-                        href="https://wa.me/2347060882711"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-[0.82rem] font-bold text-white no-underline shadow-[0_12px_28px_rgba(13,110,253,0.3)] transition hover:bg-primary-700 hover:shadow-[0_16px_34px_rgba(13,110,253,0.4)]"
-                      >
-                        <i className="fab fa-whatsapp" aria-hidden="true"></i>
-                        Inquire Now
-                      </a>
-                      <button className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-[0.82rem] font-semibold text-slate-600 transition hover:border-primary hover:text-primary">
-                        Details <i className="fa-solid fa-arrow-right text-xs" aria-hidden="true"></i>
+                      <button className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 backdrop-blur transition hover:bg-white">
+                        <svg
+                          className="h-4 w-4 text-gray-500"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                          />
+                        </svg>
                       </button>
                     </div>
-                  </div>
-                </article>
-              ))
+
+                    <div className="p-4">
+                      <h3 className="mb-1 text-[15px] font-semibold leading-snug text-gray-900">
+                        {item.color ? `${item.color} ${item.name}` : item.name}
+                      </h3>
+
+                      {item.mileage && (
+                        <p className="mb-2 flex items-center gap-1.5 text-xs font-medium text-gray-500">
+                          <i className="fas fa-tachometer-alt text-gray-400" aria-hidden="true"></i>
+                          {item.mileage}
+                        </p>
+                      )}
+
+                      {item.offerPrice ? (
+                        <p className="mb-3 flex items-baseline gap-2">
+                          <span className="text-sm font-medium text-gray-400 line-through">{item.price}</span>
+                          <span className="text-lg font-extrabold text-red-600">{item.offerPrice}</span>
+                        </p>
+                      ) : (
+                        <p className="mb-3 text-lg font-bold text-gray-900">
+                          {item.price}
+                        </p>
+                      )}
+
+                      {item.tags.length > 0 && (
+                        <div className="mb-3 flex flex-wrap gap-1.5">
+                          {item.tags.map((tag) => (
+                            <span key={tag} className="rounded-md bg-gray-50 px-2 py-0.5 text-xs text-gray-500">
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
+                      <div className="flex flex-wrap items-center gap-2">
+                        {itemBadges.map((badge) => (
+                          <span key={badge} className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">
+                            {badge}
+                          </span>
+                        ))}
+
+                        {showStockPill && (
+                          <span className="flex items-center gap-1 text-xs font-medium text-emerald-600">
+                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                            In Stock
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </article>
+                );
+              })
             ) : (
               <div className="col-span-full rounded-2xl border border-dashed border-slate-200 bg-white p-10 text-center text-sm text-slate-500">
                 No items match “{searchQuery}”. Try a different search.
@@ -563,7 +593,7 @@ export default function HomePage() {
           <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
             {quickStats.map((stat) => (
               <div key={stat.label} className="glass-card p-5 text-center sm:p-6">
-                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-primary-50 text-lg text-primary group-hover:bg-primary-100">
+                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-lg text-primary group-hover:bg-slate-200">
                   <i className={stat.icon} aria-hidden="true"></i>
                 </div>
                 <p className="text-2xl font-bold text-text-primary sm:text-3xl">{stat.value}</p>
@@ -574,126 +604,132 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Featured Vehicles Section */}
-        <section className="container mx-auto px-4 md:px-6">
-          <div className="mb-8 flex items-center justify-between">
-            <div>
-              <span className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-primary mb-2 inline-block">Premium Inventory</span>
-              <h2 className="text-2xl md:text-3xl font-bold text-text-primary">Featured Vehicles</h2>
-              <p className="text-text-secondary text-sm mt-1">Selected options for buyers who want fewer surprises</p>
+        {/* ── Premium Inventory / Featured Vehicles (Manga style) ── */}
+        <section className="relative flex h-screen min-h-[600px] w-full items-center justify-center overflow-hidden bg-brand-navy">
+          {/* Crossfading background image */}
+          <div className="absolute inset-0 z-0 will-change-transform">
+            <div className="absolute inset-0 z-10 bg-black/40 pointer-events-none"></div>
+            {featuredVehicles.map((vehicle, i) => (
+              <img
+                key={vehicle.name}
+                src={vehicle.image}
+                alt={vehicle.name}
+                className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-[1500ms] ease-in-out ${
+                  i === vehSlide ? 'opacity-100' : 'opacity-0'
+                }`}
+              />
+            ))}
+          </div>
+
+          {/* Center content */}
+          <div className="relative z-20 pointer-events-none container mx-auto flex h-full flex-col items-center justify-center px-6 text-center md:px-12">
+            <div className="flex min-h-[250px] flex-col items-center justify-center">
+              <div key={vehSlide} className="flex animate-[heroBlurFade_1s_ease-out_both] flex-col items-center">
+                <span className="mb-4 block font-luxury text-xs md:text-sm uppercase tracking-[0.3em] font-light text-white/80">
+                  Premium Inventory
+                </span>
+                <h2 className="mb-4 font-luxury text-5xl font-medium leading-tight tracking-tight text-white md:text-7xl">
+                  Featured Vehicles
+                </h2>
+                <span className="mb-6 block font-luxury text-xl font-normal italic tracking-normal text-brand-copper md:text-2xl">
+                  {featuredVehicles[vehSlide].name}
+                </span>
+                <p className="max-w-md text-sm leading-relaxed text-white/70 md:text-base">
+                  Selected options for buyers who want fewer surprises
+                </p>
+              </div>
             </div>
-            <Link to="/sales" className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary no-underline hover:text-primary-700">
-              View All Inventory <i className="fas fa-arrow-right text-xs" aria-hidden="true"></i>
+
+            <Link
+              to="/sales"
+              className="pointer-events-auto inline-block mt-2 border border-white/30 bg-transparent px-10 py-4 font-luxury text-xs uppercase tracking-[0.25em] text-white backdrop-blur-sm transition-all duration-500 hover:border-brand-copper hover:bg-brand-copper hover:text-brand-navy"
+            >
+              View Collection
             </Link>
           </div>
-          
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {featuredItems.filter(item => item.type === 'vehicle').map((vehicle) => (
-              <div key={vehicle.name} className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_18px_48px_rgba(15,23,42,0.07)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_64px_rgba(15,23,42,0.13)]">
-                {/* Image */}
-                <div className="relative h-56 shrink-0 overflow-hidden bg-slate-100">
-                  <img src={vehicle.image} alt={vehicle.name} className="block h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.05]" />
-                  <span className="absolute left-3 top-3 rounded-md bg-white/95 px-3 py-1 text-[0.68rem] font-bold uppercase tracking-[0.06em] text-slate-700 shadow-sm backdrop-blur">{vehicle.color}</span>
-                  <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-md bg-success px-2.5 py-1 text-[0.68rem] font-bold text-white shadow-sm">
-                    <i className="fa-solid fa-circle-check text-[0.6rem]" aria-hidden="true"></i>
-                    Available
-                  </span>
-                </div>
 
-                {/* Card body */}
-                <div className="flex flex-1 flex-col p-5">
-                  <h3 className="m-0 mb-1.5 text-[1.08rem] font-bold tracking-[-0.01em] text-text-primary">{vehicle.name}</h3>
-                  <p className="m-0 mb-4 text-[1.3rem] font-extrabold tracking-[-0.01em] text-primary">{vehicle.price}</p>
-
-                  <div className="mb-4 flex flex-wrap gap-2">
-                    {vehicle.tags.map((tag) => (
-                      <span key={tag} className="inline-flex items-center rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1 text-[0.7rem] font-semibold text-slate-600">{tag}</span>
-                    ))}
-                  </div>
-
-                  <div className="mt-auto flex gap-2.5">
-                    <a
-                      href="https://wa.me/2347060882711"
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-[0.82rem] font-bold text-white no-underline shadow-[0_12px_28px_rgba(13,110,253,0.3)] transition hover:bg-primary-700 hover:shadow-[0_16px_34px_rgba(13,110,253,0.4)]"
-                    >
-                      <i className="fab fa-whatsapp" aria-hidden="true"></i>
-                      Inquire Now
-                    </a>
-                    <Link to="/sales" className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-[0.82rem] font-semibold text-slate-600 no-underline transition hover:border-primary hover:text-primary">
-                      Details <i className="fa-solid fa-arrow-right text-xs" aria-hidden="true"></i>
-                    </Link>
-                  </div>
-                </div>
-              </div>
+          {/* Slide indicators */}
+          <div className="absolute bottom-24 z-30 flex space-x-4 md:bottom-32">
+            {featuredVehicles.map((vehicle, i) => (
+              <button
+                key={vehicle.name}
+                type="button"
+                onClick={() => setVehSlide(i)}
+                aria-label={`Go to ${vehicle.name}`}
+                className={`h-[2px] cursor-pointer transition-all duration-700 ${
+                  i === vehSlide ? 'w-12 bg-brand-copper' : 'w-4 bg-white/30 hover:bg-white'
+                }`}
+              />
             ))}
           </div>
+
+          {/* Bottom fade */}
+          <div className="pointer-events-none absolute bottom-0 left-0 z-10 h-48 w-full bg-gradient-to-t from-brand-navy via-brand-navy/60 to-transparent" aria-hidden="true" />
         </section>
 
-        {/* ── Our Services Section ── */}
-        <section className="container mx-auto px-4 md:px-6">
-          <div className="text-center mb-12">
-            <span className="badge-primary text-xs mb-2 inline-block">What We Offer</span>
-            <h2 className="text-2xl md:text-3xl font-bold text-text-primary">What We Handle</h2>
-            <p className="text-text-secondary mt-2">Sales, parts, inspections, and ownership support</p>
-          </div>
-          
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {serviceItems.map((service) => (
-              <div key={service.title} className="group overflow-hidden rounded-lg border border-slate-200/90 bg-white/80 shadow-[0_18px_48px_rgba(15,23,42,0.08)] transition duration-300 hover:-translate-y-[5px] hover:border-blue-600/30 hover:shadow-[0_26px_64px_rgba(15,23,42,0.14)]">
-                <div className="relative h-[178px] overflow-hidden bg-slate-900">
-                  <img src={service.image} alt={service.title} className="block h-full w-full scale-[1.01] object-cover transition duration-500 group-hover:scale-[1.07] [filter:saturate(0.96)_contrast(1.04)]" loading="lazy" />
-                  <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(2,6,23,0.72),rgba(2,6,23,0.05)_68%),linear-gradient(120deg,rgba(37,99,235,0.28),transparent_58%)]" />
-                  <div className="absolute bottom-4 left-[18px] inline-flex h-[46px] w-[46px] items-center justify-center rounded-lg border border-white/75 bg-white/95 text-primary shadow-[0_12px_30px_rgba(2,6,23,0.18)]">
-                    <i className={`${service.icon}`} aria-hidden="true"></i>
+        {/* ── Services + Why Choose Biltronix (single uniform background) ── */}
+        <section className="relative bg-cover bg-center bg-fixed py-20 md:py-24" style={{ backgroundImage: "url('/new_design/background3.png')" }}>
+          <div className="pointer-events-none absolute inset-0 bg-primary/20" aria-hidden="true" />
+          <div className="relative container mx-auto px-4 md:px-6">
+            <div className="text-center mb-12">
+              <span className="badge-primary text-xs mb-2 inline-block">What We Offer</span>
+              <h2 className="text-2xl md:text-3xl font-bold text-white">What We Handle</h2>
+              <p className="text-white/90 mt-2 font-semibold">Sales, parts, inspections, and ownership support</p>
+            </div>
+            
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {serviceItems.map((service) => (
+                <div key={service.title} className="group overflow-hidden rounded-lg border border-slate-200/90 bg-white/80 shadow-[0_18px_48px_rgba(15,23,42,0.08)] transition duration-300 hover:-translate-y-[5px] hover:border-primary-600/30 hover:shadow-[0_26px_64px_rgba(15,23,42,0.14)]">
+                  <div className="relative h-[178px] overflow-hidden bg-slate-900">
+                    <img src={service.image} alt={service.title} className="block h-full w-full scale-[1.01] object-cover transition duration-500 group-hover:scale-[1.07] [filter:saturate(0.96)_contrast(1.04)]" loading="lazy" />
+                    <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(2,6,23,0.72),rgba(2,6,23,0.05)_68%),linear-gradient(120deg,rgba(37,99,235,0.28),transparent_58%)]" />
+                    <div className="absolute bottom-4 left-[18px] inline-flex h-[46px] w-[46px] items-center justify-center rounded-lg border border-white/75 bg-white/95 text-primary shadow-[0_12px_30px_rgba(2,6,23,0.18)]">
+                      <i className={`${service.icon}`} aria-hidden="true"></i>
+                    </div>
+                  </div>
+                  <div className="p-5">
+                    <h3 className="m-0 mb-2 text-[1.05rem] font-extrabold tracking-normal text-text-primary">{service.title}</h3>
+                    <p className="m-0 mb-[18px] min-h-[72px] text-[0.88rem] leading-[1.65] text-text-secondary">{service.description}</p>
+                    {service.link.startsWith('http') ? (
+                      <a
+                        href={service.link}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-[7px] text-[0.86rem] font-extrabold text-primary no-underline [&_i]:text-[0.72rem] [&_i]:transition-transform hover:[&_i]:translate-x-[3px]"
+                      >
+                        {service.linkText}
+                        <i className="fas fa-arrow-right" aria-hidden="true"></i>
+                      </a>
+                    ) : (
+                      <Link
+                        to={service.link}
+                        className="inline-flex items-center gap-[7px] text-[0.86rem] font-extrabold text-primary no-underline [&_i]:text-[0.72rem] [&_i]:transition-transform hover:[&_i]:translate-x-[3px]"
+                      >
+                        {service.linkText}
+                        <i className="fas fa-arrow-right" aria-hidden="true"></i>
+                      </Link>
+                    )}
                   </div>
                 </div>
-                <div className="p-5">
-                  <h3 className="m-0 mb-2 text-[1.05rem] font-extrabold tracking-normal text-text-primary">{service.title}</h3>
-                  <p className="m-0 mb-[18px] min-h-[72px] text-[0.88rem] leading-[1.65] text-text-secondary">{service.description}</p>
-                  {service.link.startsWith('http') ? (
-                    <a
-                      href={service.link}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-[7px] text-[0.86rem] font-extrabold text-primary no-underline [&_i]:text-[0.72rem] [&_i]:transition-transform hover:[&_i]:translate-x-[3px]"
-                    >
-                      {service.linkText}
-                      <i className="fas fa-arrow-right" aria-hidden="true"></i>
-                    </a>
-                  ) : (
-                    <Link
-                      to={service.link}
-                      className="inline-flex items-center gap-[7px] text-[0.86rem] font-extrabold text-primary no-underline [&_i]:text-[0.72rem] [&_i]:transition-transform hover:[&_i]:translate-x-[3px]"
-                    >
-                      {service.linkText}
-                      <i className="fas fa-arrow-right" aria-hidden="true"></i>
-                    </Link>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
+              ))}
+            </div>
 
-        {/* Features Section */}
-        <section className="container mx-auto px-4 md:px-6">
-          <div className="text-center mb-10">
-            <h2 className="text-2xl md:text-3xl font-bold text-text-primary">Why Choose Biltronix</h2>
-            <p className="text-text-secondary mt-2">A calmer way to buy, maintain, and inspect</p>
-          </div>
-          
-          <div className="grid gap-6 md:grid-cols-3">
-            {featureBoxes.map((feature) => (
-              <div key={feature.title} className="glass-card p-6 group hover:shadow-glass-hover">
-                <div className="w-12 h-12 rounded-lg bg-primary-50 flex items-center justify-center mb-4 group-hover:bg-primary-100 transition-colors">
-                  <i className={`${feature.icon} text-primary text-lg`}></i>
+            <div className="text-center mt-20 mb-10">
+              <h2 className="text-2xl md:text-3xl font-bold text-white">Why Choose Biltronix</h2>
+              <p className="text-white/90 mt-2 font-semibold">A calmer way to buy, maintain, and inspect</p>
+            </div>
+            
+            <div className="grid gap-6 md:grid-cols-3">
+              {featureBoxes.map((feature) => (
+                <div key={feature.title} className="glass-card p-6 group hover:shadow-glass-hover">
+                  <div className="w-12 h-12 rounded-lg bg-slate-100 flex items-center justify-center mb-4 group-hover:bg-slate-200 transition-colors">
+                    <i className={`${feature.icon} text-primary text-lg`}></i>
+                  </div>
+                  <h3 className="text-lg font-bold text-white">{feature.title}</h3>
+                  <p className="text-sm text-white/90 mt-2 leading-relaxed font-bold">{feature.copy}</p>
                 </div>
-                <h3 className="text-lg font-semibold text-text-primary">{feature.title}</h3>
-                <p className="text-sm text-text-secondary mt-2 leading-relaxed">{feature.copy}</p>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </section>
 
@@ -767,7 +803,7 @@ export default function HomePage() {
               { icon: 'fas fa-file-pdf', title: 'Instant PDF Reports', desc: 'Generate professional reports instantly' },
             ].map((item) => (
               <div key={item.title} className="glass-card p-6 text-center group hover:shadow-glass-hover">
-                <div className="w-14 h-14 rounded-xl bg-primary-50 flex items-center justify-center mx-auto mb-4 group-hover:bg-primary-100 transition-colors">
+                <div className="w-14 h-14 rounded-xl bg-slate-100 flex items-center justify-center mx-auto mb-4 group-hover:bg-slate-200 transition-colors">
                   <i className={`${item.icon} text-primary text-xl`}></i>
                 </div>
                 <h3 className="text-lg font-semibold text-text-primary">{item.title}</h3>
@@ -822,7 +858,7 @@ export default function HomePage() {
               className="absolute inset-0 w-full h-full object-cover"
             />
             {/* Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-r from-slate-950/95 via-slate-900/86 to-blue-950/60"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-950/95 via-slate-900/86 to-primary-900/60"></div>
             
             {/* Content */}
             <div className="relative z-10 h-full flex items-center justify-center text-center px-4">
@@ -862,10 +898,10 @@ export default function HomePage() {
             {/* Brand */}
             <div className="md:col-span-1">
               <div className="flex items-center gap-2 mb-4">
-                <img src="/logo.jpg" alt="Biltronix" className="logo-brand-tint h-10 w-10 rounded-lg" />
+                <img src="/whitelogo.png" alt="Biltronix" className="h-10 w-10 rounded-lg" />
                 <div>
-                  <span className="text-lg font-bold">Biltronix</span>
-                  <span className="text-primary ml-1">Automobile</span>
+                  <span className="text-lg font-bold text-white">Biltronix</span>
+                  <span className="text-slate-300 ml-1">Automobile</span>
                 </div>
               </div>
               <p className="text-slate-400 text-sm leading-relaxed">

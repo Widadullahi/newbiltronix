@@ -10,19 +10,19 @@ export default {
         'glass-border': 'rgba(255, 255, 255, 0.5)',
         'glass-shadow': 'rgba(0, 0, 0, 0.08)',
         
-        // Primary - Professional Blue
-        'primary': '#0d6efd',
-        'primary-light': '#3b82f6',
-        'primary-50': '#eff6ff',
-        'primary-100': '#dbeafe',
-        'primary-200': '#bfdbfe',
-        'primary-300': '#93c5fd',
-        'primary-400': '#60a5fa',
-        'primary-500': '#3b82f6',
-        'primary-600': '#2563eb',
-        'primary-700': '#1d4ed8',
-        'primary-800': '#1e40af',
-        'primary-900': '#1e3a8a',
+        // Primary - Uniform Luxury Navy
+        'primary': '#001F3F',
+        'primary-light': '#001F3F',
+        'primary-50': '#001F3F',
+        'primary-100': '#001F3F',
+        'primary-200': '#001F3F',
+        'primary-300': '#001F3F',
+        'primary-400': '#001F3F',
+        'primary-500': '#001F3F',
+        'primary-600': '#001F3F',
+        'primary-700': '#001F3F',
+        'primary-800': '#001F3F',
+        'primary-900': '#001F3F',
         
         // Slate neutrals
         'slate-50': '#f8fafc',
@@ -48,17 +48,26 @@ export default {
         'text-primary': '#0f172a',
         'text-secondary': '#475569',
         'text-muted': '#94a3b8',
+
+        // Luxury brand tokens (navy + gold)
+        'brand-navy': '#001F3F',
+        'brand-navy-deep': '#001326',
+        'brand-bone': '#f5f5f0',
+        'brand-copper': '#cfa78a',
+        'brand-copper-light': '#e0c3a7',
+        'brand-copper-dark': '#b3876a',
       },
       fontFamily: {
         sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-        heading: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+        heading: ['"Times New Roman"', 'Times', 'Georgia', 'serif'],
+        luxury: ['"Times New Roman"', 'Times', 'Georgia', 'serif'],
       },
       boxShadow: {
         'glass': '0 8px 32px rgba(0, 0, 0, 0.08)',
         'glass-lg': '0 16px 48px rgba(0, 0, 0, 0.1)',
         'glass-xl': '0 24px 64px rgba(0, 0, 0, 0.12)',
         'glass-hover': '0 12px 40px rgba(0, 0, 0, 0.12)',
-        'float': '0 4px 16px rgba(59, 130, 246, 0.15)',
+        'float': '0 4px 16px rgba(10, 31, 77, 0.18)',
       },
       borderRadius: {
         'glass': '16px',

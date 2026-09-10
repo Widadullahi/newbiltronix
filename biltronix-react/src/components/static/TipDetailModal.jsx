@@ -16,7 +16,7 @@ export default function TipDetailModal({ modal, onClose }) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start justify-between mb-4">
-          <span className="inline-block rounded-full border border-primary-300 bg-primary-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary text-xs">
+          <span className="inline-block rounded-full border border-primary-300 bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary text-xs">
             {modal.category || 'General'}
           </span>
           <button

@@ -96,15 +96,19 @@ async function filesToDataUrls(files) {
 }
 
 async function api(path, options = {}) {
+  if (options.auth) {
+    let accessToken = getAccessToken(options.auth);
+    if (!accessToken && getRefreshToken(options.auth)) {
+      const refreshed = await refreshAccessToken(options.auth);
+      accessToken = refreshed ? getAccessToken(options.auth) : '';
+    }
+    if (accessToken) options = { ...options, headers: { ...(options.headers || {}), Authorization: `Bearer ${accessToken}` } };
+  }
+
   const headers = {
     'Content-Type': 'application/json',
     ...(options.headers || {}),
   };
-
-  if (options.auth) {
-    const accessToken = getAccessToken(options.auth);
-    if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
-  }
 
   const response = await fetch(`${apiBase}${path}`, {
     method: options.method || 'GET',
@@ -120,6 +124,7 @@ async function api(path, options = {}) {
     if (refreshed) {
       return api(path, { ...options, retrying: true });
     }
+    throw new Error('Session expired. Please log in again.');
   }
 
   if (!response.ok) {
@@ -128,6 +133,12 @@ async function api(path, options = {}) {
   }
 
   return payload;
+}
+
+export function hasAuthError(error, kind) {
+  if (!(error instanceof Error)) return false;
+  if (kind === 'session') return error.message === 'Session expired. Please log in again.';
+  return error.message === 'Session expired. Please log in again.' || /token|unauthorized|login/i.test(error.message);
 }
 
 export const hasSanityConfig = true;
@@ -242,6 +253,9 @@ export async function createStockItem(payload) {
       stock: toNumber(payload.stock),
       sold: toNumber(payload.sold),
       unitPrice: toNumber(payload.unitPrice),
+      offerPrice: payload.offerPrice === undefined ? 0 : toNumber(payload.offerPrice),
+      color: payload.color || '',
+      mileage: payload.mileage || '',
       make: payload.make || '',
       model: payload.model || '',
       year: toNumber(payload.year),

@@ -673,7 +673,7 @@ export default function InspectionPortalPage() {
             <input type='file' accept='image/*' onChange={(e) => uploadSignature(e.target.files?.[0])} className='hidden' />
           </label>
           {registration.signatureDataUrl && <img className='h-20 w-20 rounded-2xl border border-white/10 bg-slate-900 object-contain' src={registration.signatureDataUrl} alt='Signature preview' />}
-          <button className='w-full rounded-2xl bg-primary px-5 py-3.5 text-sm font-semibold text-white shadow-[0_12px_32px_rgba(59,130,246,0.24)] transition hover:bg-primary-600' type='submit'>Create Account</button>
+          <button className='w-full rounded-2xl bg-primary px-5 py-3.5 text-sm font-semibold text-white shadow-[0_12px_32px_rgba(0,31,63,0.28)] transition hover:bg-primary-600' type='submit'>Create Account</button>
         </form>
       ) : (
         <>
@@ -683,12 +683,12 @@ export default function InspectionPortalPage() {
               <input className='w-full rounded-2xl border border-white/10 bg-slate-900/80 px-4 py-3 pr-12 text-sm text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20' required type={showLoginPassword ? 'text' : 'password'} placeholder='Password' value={loginData.password} onChange={(e) => setLoginData((p) => ({ ...p, password: e.target.value }))} />
               <PasswordVisibilityToggle visible={showLoginPassword} onToggle={() => setShowLoginPassword((prev) => !prev)} />
             </div>
-            <button className='w-full rounded-2xl bg-primary px-5 py-3.5 text-sm font-semibold text-white shadow-[0_12px_32px_rgba(59,130,246,0.24)] transition hover:bg-primary-600' type='submit'>Login to Dashboard</button>
+            <button className='w-full rounded-2xl bg-primary px-5 py-3.5 text-sm font-semibold text-white shadow-[0_12px_32px_rgba(0,31,63,0.28)] transition hover:bg-primary-600' type='submit'>Login to Dashboard</button>
           </form>
           <div className='mt-4 space-y-3 rounded-2xl border border-white/10 bg-white/5 p-4'>
             <h4 className='text-sm font-semibold text-white'>Forgot Password</h4>
             <input className='w-full rounded-2xl border border-white/10 bg-slate-900/80 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20' type='email' placeholder='Your account email' value={resetEmail} onChange={(e) => setResetEmail(e.target.value)} disabled={resetBusy} />
-            <button className='w-full rounded-2xl bg-primary px-5 py-3.5 text-sm font-semibold text-white shadow-[0_12px_32px_rgba(59,130,246,0.24)] transition hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-60' type='button' onClick={requestPasswordReset} disabled={resetBusy}>{resetBusy ? 'Please wait...' : 'Request OTP'}</button>
+            <button className='w-full rounded-2xl bg-primary px-5 py-3.5 text-sm font-semibold text-white shadow-[0_12px_32px_rgba(0,31,63,0.28)] transition hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-60' type='button' onClick={requestPasswordReset} disabled={resetBusy}>{resetBusy ? 'Please wait...' : 'Request OTP'}</button>
             <input className='w-full rounded-2xl border border-white/10 bg-slate-900/80 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20' type='text' placeholder='Enter OTP' value={resetOtp} onChange={(e) => setResetOtp(e.target.value)} disabled={resetBusy} />
             <div className='relative'>
               <input className='w-full rounded-2xl border border-white/10 bg-slate-900/80 px-4 py-3 pr-12 text-sm text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20' type={showResetPassword ? 'text' : 'password'} placeholder='New password' value={resetPassword} onChange={(e) => setResetPassword(e.target.value)} disabled={resetBusy} />
@@ -698,7 +698,7 @@ export default function InspectionPortalPage() {
               <input className='w-full rounded-2xl border border-white/10 bg-slate-900/80 px-4 py-3 pr-12 text-sm text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20' type={showResetConfirmPassword ? 'text' : 'password'} placeholder='Confirm new password' value={resetConfirmPassword} onChange={(e) => setResetConfirmPassword(e.target.value)} disabled={resetBusy} />
               <PasswordVisibilityToggle visible={showResetConfirmPassword} onToggle={() => setShowResetConfirmPassword((prev) => !prev)} />
             </div>
-            <button className='w-full rounded-2xl bg-primary px-5 py-3.5 text-sm font-semibold text-white shadow-[0_12px_32px_rgba(59,130,246,0.24)] transition hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-60' type='button' onClick={confirmPasswordReset} disabled={resetBusy}>{resetBusy ? 'Please wait...' : 'Reset Password'}</button>
+            <button className='w-full rounded-2xl bg-primary px-5 py-3.5 text-sm font-semibold text-white shadow-[0_12px_32px_rgba(0,31,63,0.28)] transition hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-60' type='button' onClick={confirmPasswordReset} disabled={resetBusy}>{resetBusy ? 'Please wait...' : 'Reset Password'}</button>
           </div>
         </>
       )}
@@ -718,7 +718,7 @@ export default function InspectionPortalPage() {
             </Link>
             <div className='flex gap-2'>
               <button type='button' onClick={() => openAuth('login')} className='rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-primary hover:text-primary'>Sign In</button>
-              <button type='button' onClick={() => openAuth('register')} className='rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white shadow-[0_10px_30px_rgba(59,130,246,0.2)] transition hover:bg-primary-600'>Create Account</button>
+              <button type='button' onClick={() => openAuth('register')} className='rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white shadow-[0_10px_30px_rgba(0,31,63,0.24)] transition hover:bg-primary-600'>Create Account</button>
             </div>
           </div>
         </header>
@@ -822,7 +822,7 @@ export default function InspectionPortalPage() {
       </header>
 
       <div className='mx-auto max-w-7xl px-6 py-8'>
-        <section className='mb-6 rounded-[30px] border border-slate-200/80 bg-[linear-gradient(135deg,#0f172a_0%,#172554_45%,#1d4ed8_100%)] p-6 text-white shadow-[0_24px_80px_rgba(15,23,42,0.14)]'>
+        <section className='mb-6 rounded-[30px] border border-slate-200/80 bg-[linear-gradient(135deg,#0f172a_0%,#001F3F_45%,#001F3F_100%)] p-6 text-white shadow-[0_24px_80px_rgba(15,23,42,0.14)]'>
           <div className='flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between'>
             <div className='max-w-2xl'>
               <div className='inline-flex items-center rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.3em] text-slate-200'>
@@ -1012,7 +1012,7 @@ export default function InspectionPortalPage() {
                                 <p className='text-sm font-semibold text-slate-900'>{report.vehicleLabel}</p>
                                 <p className='mt-1 text-sm text-slate-600'>{new Date(report.inspectedAt).toLocaleString()}</p>
                               </div>
-                              <span className='rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary'>{report.overallVerdict}</span>
+                              <span className='rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-primary'>{report.overallVerdict}</span>
                             </div>
                           </div>
                         ))
@@ -1023,12 +1023,12 @@ export default function InspectionPortalPage() {
                   <div className='rounded-[24px] border border-slate-200 bg-slate-50 p-5'>
                     <div className='flex items-center justify-between'>
                       <h3 className='text-lg font-semibold text-slate-900'>Weekly momentum</h3>
-                      <span className='rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary'>+18% vs last week</span>
+                      <span className='rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-primary'>+18% vs last week</span>
                     </div>
                     <div className='mt-6 flex h-40 items-end gap-3'>
                       {[48, 72, 58, 88, 69, 92].map((height, index) => (
                         <div key={index} className='flex flex-1 flex-col items-center gap-2'>
-                          <div className='w-full rounded-t-[16px] bg-[linear-gradient(180deg,#60a5fa_0%,#2563eb_100%)]' style={{ height: `${height}%` }} />
+                          <div className='w-full rounded-t-[16px] bg-[linear-gradient(180deg,#001F3F_0%,#001F3F_100%)]' style={{ height: `${height}%` }} />
                           <span className='text-xs font-medium text-slate-500'>{['M', 'T', 'W', 'T', 'F', 'S'][index]}</span>
                         </div>
                       ))}
@@ -1116,7 +1116,7 @@ export default function InspectionPortalPage() {
                   <div className='rounded-[24px] border border-slate-200 bg-slate-50/70 p-5'>
                     <div className='mb-4 flex items-center justify-between'>
                       <h3 className='text-lg font-semibold text-slate-900'>Inspection Checklist</h3>
-                      <span className='rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary'>Rate each item</span>
+                      <span className='rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-primary'>Rate each item</span>
                     </div>
                     <p className='mb-4 text-sm leading-7 text-slate-600'>Rate each item and add comments where faults or concerns are observed.</p>
                     <div className='space-y-4'>
@@ -1158,7 +1158,7 @@ export default function InspectionPortalPage() {
                     )}
                   </div>
 
-                  <button className='w-full rounded-2xl bg-primary px-6 py-3.5 text-sm font-semibold text-white shadow-[0_12px_32px_rgba(59,130,246,0.24)] transition hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-60' type='submit'>Save Inspection & Download PDF</button>
+                  <button className='w-full rounded-2xl bg-primary px-6 py-3.5 text-sm font-semibold text-white shadow-[0_12px_32px_rgba(0,31,63,0.28)] transition hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-60' type='submit'>Save Inspection & Download PDF</button>
                 </form>
               </section>
             )}
@@ -1184,7 +1184,7 @@ export default function InspectionPortalPage() {
                           <p className='mt-1 text-sm text-slate-600'>{new Date(report.inspectedAt).toLocaleString()}</p>
                         </div>
                         <div className='flex items-center gap-3'>
-                          <span className='inline-flex rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary'>{report.overallVerdict}</span>
+                          <span className='inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-primary'>{report.overallVerdict}</span>
                           <button className='rounded-2xl bg-primary px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-600' type='button' onClick={() => createReportPdf(report, account)}>Download PDF</button>
                         </div>
                       </article>
@@ -1219,7 +1219,7 @@ export default function InspectionPortalPage() {
                     <input type='file' accept='image/*' onChange={(e) => uploadSettingsSignature(e.target.files?.[0])} className='hidden' />
                   </label>
                   {settings.signatureDataUrl && <img className='h-20 w-20 rounded-2xl border border-slate-200 bg-white object-contain' src={settings.signatureDataUrl} alt='Updated signature preview' />}
-                  <button className='rounded-2xl bg-primary px-6 py-3.5 text-sm font-semibold text-white shadow-[0_12px_32px_rgba(59,130,246,0.24)] transition hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-60 md:col-span-2' type='submit' disabled={savingSettings}>
+                  <button className='rounded-2xl bg-primary px-6 py-3.5 text-sm font-semibold text-white shadow-[0_12px_32px_rgba(0,31,63,0.28)] transition hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-60 md:col-span-2' type='submit' disabled={savingSettings}>
                     {savingSettings ? 'Saving...' : 'Save Settings'}
                   </button>
                 </form>

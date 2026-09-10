@@ -10,6 +10,7 @@ import {
   fetchAdminDashboardData,
   fetchCarTips,
   hasAdminSession,
+  hasAuthError,
   fetchStockItems,
   setStockItemSoldStatus,
   updateCarTip,
@@ -47,6 +48,20 @@ const naira = new Intl.NumberFormat('en-NG', {
   maximumFractionDigits: 0,
 });
 
+function PriceCell({ item }) {
+  const base = item.unitPrice || 0;
+  const offer = item.offerPrice || 0;
+  if (offer > 0 && offer !== base) {
+    return (
+      <div className='flex flex-col'>
+        <span className='text-text-muted line-through'>{naira.format(base)}</span>
+        <span className='font-bold text-success'>{naira.format(offer)}</span>
+      </div>
+    );
+  }
+  return <span>{naira.format(base)}</span>;
+}
+
 export default function AdminDashboardPage() {
   const [activePanel, setActivePanel] = useState('overview');
   const [isAuthenticated, setIsAuthenticated] = useState(() => hasAdminSession());
@@ -79,6 +94,7 @@ export default function AdminDashboardPage() {
   const [newItemName, setNewItemName] = useState('');
   const [newItemDescription, setNewItemDescription] = useState('');
   const [newItemUnitPrice, setNewItemUnitPrice] = useState('');
+  const [newItemOfferPrice, setNewItemOfferPrice] = useState('');
   const [newPrimaryImageFile, setNewPrimaryImageFile] = useState(null);
   const [newOtherImageFiles, setNewOtherImageFiles] = useState([]);
   const [newVehicleMake, setNewVehicleMake] = useState('');
@@ -87,6 +103,8 @@ export default function AdminDashboardPage() {
   const [customNewVehicleModel, setCustomNewVehicleModel] = useState('');
   const [newVehicleDescription, setNewVehicleDescription] = useState('');
   const [newVehicleYear, setNewVehicleYear] = useState(String(new Date().getFullYear()));
+  const [newVehicleColor, setNewVehicleColor] = useState('');
+  const [newVehicleMileage, setNewVehicleMileage] = useState('');
   const [newVehicleCondition, setNewVehicleCondition] = useState(VEHICLE_CONDITIONS[0]);
   const [newVehicleTransmission, setNewVehicleTransmission] = useState(VEHICLE_TRANSMISSIONS[0]);
   const [newVehicleFuelType, setNewVehicleFuelType] = useState(VEHICLE_FUEL_TYPES[0]);
@@ -112,8 +130,10 @@ export default function AdminDashboardPage() {
       const data = await fetchAdminDashboardData();
       setDashboardData(data);
     } catch (loadError) {
-      setDashboardData({ bookings: [], orders: [] });
-      setError(loadError instanceof Error ? loadError.message : 'Failed to load dashboard data from API.');
+      if (!handleAuthFailure(loadError)) {
+        setDashboardData({ bookings: [], orders: [] });
+        setError(loadError instanceof Error ? loadError.message : 'Failed to load dashboard data from API.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -132,8 +152,10 @@ export default function AdminDashboardPage() {
       const items = await fetchStockItems();
       setStockItems(items);
     } catch (loadError) {
-      setStockItems([]);
-      setStockError(loadError instanceof Error ? loadError.message : 'Failed to load items.');
+      if (!handleAuthFailure(loadError)) {
+        setStockItems([]);
+        setStockError(loadError instanceof Error ? loadError.message : 'Failed to load items.');
+      }
     } finally {
       setStockLoading(false);
     }
@@ -151,8 +173,10 @@ export default function AdminDashboardPage() {
       const tips = await fetchCarTips(200);
       setCarTips(tips);
     } catch (loadError) {
-      setCarTips([]);
-      setTipsError(loadError instanceof Error ? loadError.message : 'Failed to load car tips.');
+      if (!handleAuthFailure(loadError)) {
+        setCarTips([]);
+        setTipsError(loadError instanceof Error ? loadError.message : 'Failed to load car tips.');
+      }
     } finally {
       setTipsLoading(false);
     }
@@ -203,6 +227,23 @@ export default function AdminDashboardPage() {
       { label: 'Total Accessories', value: String(accessoriesCount), icon: 'fa-toolbox' },
     ];
   }, [stockItems]);
+
+  const overviewKpis = useMemo(() => {
+    const totalBookings = bookings.length;
+    const pendingBookings = bookings.filter((booking) => booking.status === 'Pending').length;
+    const totalOrders = orders.length;
+    const totalRevenue = orders.reduce((sum, order) => sum + order.amountValue, 0);
+    const recent = (count) => (items) => items.slice(0, count);
+
+    return {
+      totalRevenue,
+      kpis: [
+        { label: 'Total Bookings', value: String(totalBookings), sub: `${pendingBookings} pending review`, icon: 'fa-calendar-check', tone: 'text-primary bg-slate-100' },
+        { label: 'Total Orders', value: String(totalOrders), sub: 'All channels combined', icon: 'fa-receipt', tone: 'text-primary bg-slate-100' },
+        { label: 'Total Revenue', value: naira.format(totalRevenue), sub: `${orders.length} transactions`, icon: 'fa-sack-dollar', tone: 'text-primary bg-slate-100' },
+      ],
+    };
+  }, [bookings, orders]);
 
   const revenueByChannel = useMemo(() => {
     const totals = orders.reduce((acc, order) => {
@@ -286,6 +327,9 @@ export default function AdminDashboardPage() {
           soldOut: false,
           category: activeStockCategory,
           unitPrice: newItemUnitPrice,
+          offerPrice: newItemOfferPrice,
+          color: newVehicleColor,
+          mileage: newVehicleMileage,
           make: resolvedVehicleMake,
           model: resolvedVehicleModel,
           year: newVehicleYear,
@@ -315,6 +359,7 @@ export default function AdminDashboardPage() {
       setNewItemName('');
       setNewItemDescription('');
       setNewItemUnitPrice('');
+      setNewItemOfferPrice('');
       setNewPrimaryImageFile(null);
       setNewOtherImageFiles([]);
       setNewVehicleMake('');
@@ -323,6 +368,8 @@ export default function AdminDashboardPage() {
       setCustomNewVehicleModel('');
       setNewVehicleDescription('');
       setNewVehicleYear(String(new Date().getFullYear()));
+      setNewVehicleColor('');
+      setNewVehicleMileage('');
       setNewVehicleCondition(VEHICLE_CONDITIONS[0]);
       setNewVehicleTransmission(VEHICLE_TRANSMISSIONS[0]);
       setNewVehicleFuelType(VEHICLE_FUEL_TYPES[0]);
@@ -333,7 +380,7 @@ export default function AdminDashboardPage() {
     } catch (createError) {
       const fallbackMessage = 'Could not add item.';
       const rawMessage = createError instanceof Error ? createError.message : fallbackMessage;
-      setStockError(rawMessage || fallbackMessage);
+      if (!handleAuthFailure(createError)) setStockError(rawMessage || fallbackMessage);
     } finally {
       setSavingItemId('');
     }
@@ -348,7 +395,7 @@ export default function AdminDashboardPage() {
       setStockItems((prev) => prev.map((entry) => (entry._id === updated._id ? updated : entry)));
       setStockMessage(`${updated.name} marked as ${updated.soldOut ? 'Sold' : 'Available'}.`);
     } catch (toggleError) {
-      setStockError(toggleError instanceof Error ? toggleError.message : 'Could not update sold status.');
+      if (!handleAuthFailure(toggleError)) setStockError(toggleError instanceof Error ? toggleError.message : 'Could not update sold status.');
     } finally {
       setSavingItemId('');
     }
@@ -363,7 +410,7 @@ export default function AdminDashboardPage() {
       setStockItems((prev) => prev.filter((entry) => entry._id !== itemId));
       setStockMessage(`${itemName} deleted.`);
     } catch (deleteError) {
-      setStockError(deleteError instanceof Error ? deleteError.message : 'Could not delete item.');
+      if (!handleAuthFailure(deleteError)) setStockError(deleteError instanceof Error ? deleteError.message : 'Could not delete item.');
     } finally {
       setSavingItemId('');
     }
@@ -393,7 +440,7 @@ export default function AdminDashboardPage() {
       setShowTipForm(false);
       setTipsMessage('Car tip added.');
     } catch (saveError) {
-      setTipsError(saveError instanceof Error ? saveError.message : 'Could not add car tip.');
+      if (!handleAuthFailure(saveError)) setTipsError(saveError instanceof Error ? saveError.message : 'Could not add car tip.');
     } finally {
       setSavingTipId('');
     }
@@ -427,7 +474,7 @@ export default function AdminDashboardPage() {
       setNewTipImageFile(null);
       setShowTipForm(false);
     } catch (saveError) {
-      setTipsError(saveError instanceof Error ? saveError.message : 'Could not update car tip.');
+      if (!handleAuthFailure(saveError)) setTipsError(saveError instanceof Error ? saveError.message : 'Could not update car tip.');
     } finally {
       setSavingTipId('');
     }
@@ -442,7 +489,7 @@ export default function AdminDashboardPage() {
       setCarTips((prev) => prev.filter((entry) => entry._id !== tipId));
       setTipsMessage('Car tip deleted.');
     } catch (deleteError) {
-      setTipsError(deleteError instanceof Error ? deleteError.message : 'Could not delete car tip.');
+      if (!handleAuthFailure(deleteError)) setTipsError(deleteError instanceof Error ? deleteError.message : 'Could not delete car tip.');
     } finally {
       setSavingTipId('');
     }
@@ -515,6 +562,16 @@ export default function AdminDashboardPage() {
     setLoginError('');
   };
 
+  const handleAuthFailure = (error) => {
+    if (hasAuthError(error) && isAuthenticated) {
+      clearAdminSession();
+      setIsAuthenticated(false);
+      setLoginError('Session expired. Please log in again.');
+      return true;
+    }
+    return false;
+  };
+
   const handlePanelChange = (panel) => {
     setActivePanel(panel);
     if (panel !== 'vehicle') setShowVehicleForm(false);
@@ -528,8 +585,8 @@ export default function AdminDashboardPage() {
 
   if (!isAuthenticated) {
     return (
-      <main className='mx-auto mt-[8vh] min-h-screen max-w-[420px] bg-glass-bg px-4'>
-        <section className='mb-6 rounded-glass border border-glass-border bg-glass-surface p-6 shadow-glass backdrop-blur-glass [&_h2]:mb-4 [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:text-text-primary'>
+      <main className='relative flex min-h-screen items-center justify-center bg-cover bg-center bg-fixed px-4' style={{ backgroundImage: "url('/new_design/background3.png')" }}>
+        <section className='mb-6 w-full max-w-[420px] rounded-glass border border-glass-border bg-glass-surface p-6 shadow-glass backdrop-blur-2xl [&_h2]:mb-4 [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:text-text-primary'>
           <h2>Admin Login</h2>
           <p>Use your admin email and password to access the dashboard.</p>
           <form className='flex flex-col gap-4' onSubmit={handleAdminLogin}>
@@ -556,7 +613,7 @@ export default function AdminDashboardPage() {
               />
             </div>
             {loginError && <p className='mt-2 text-sm text-error'>{loginError}</p>}
-            <button className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0' type='submit'>Login</button>
+            <button className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-slate-1000 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0' type='submit'>Login</button>
           </form>
         </section>
       </main>
@@ -566,33 +623,43 @@ export default function AdminDashboardPage() {
   return (
     <div className='flex min-h-screen bg-glass-bg'>
       <aside className={`fixed z-50 h-screen w-[260px] translate-x-0 overflow-y-auto border-r border-glass-border bg-glass-surface px-4 py-6 backdrop-blur-2xl transition-transform duration-300 max-[960px]:-translate-x-full ${sidebarOpen ? 'max-[960px]:translate-x-0' : ''}`}>
-        <div className='mb-8 px-3 font-heading text-xl font-bold text-text-primary'>Biltronix Admin</div>
+        <div className='mb-8 flex items-center justify-between px-3'>
+          <div className='font-heading text-xl font-bold text-text-primary'>Biltronix Admin</div>
+          <button
+            className='flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-glass-border bg-glass-surface text-text-secondary transition hover:bg-slate-100 hover:text-text-primary min-[961px]:hidden'
+            type='button'
+            onClick={() => setSidebarOpen(false)}
+            aria-label='Close navigation'
+          >
+            <i className='fas fa-xmark' />
+          </button>
+        </div>
         <button
-          className={`mb-1 flex w-full cursor-pointer items-center gap-3 rounded-xl border-0 px-4 py-3 text-left text-[0.9375rem] font-medium transition [&_i]:w-5 [&_i]:text-center ${activePanel === 'overview' ? 'bg-primary-50 text-primary' : 'bg-transparent text-text-secondary hover:bg-slate-100 hover:text-text-primary'}`}
+          className={`mb-1 flex w-full cursor-pointer items-center gap-3 rounded-xl border-0 px-4 py-3 text-left text-[0.9375rem] font-medium transition [&_i]:w-5 [&_i]:text-center ${activePanel === 'overview' ? 'bg-slate-100 text-primary' : 'bg-transparent text-text-secondary hover:bg-slate-100 hover:text-text-primary'}`}
           onClick={() => handlePanelChange('overview')}
         >
           <i className='fas fa-gauge-high' /> Overview
         </button>
         <button
-          className={`mb-1 flex w-full cursor-pointer items-center gap-3 rounded-xl border-0 px-4 py-3 text-left text-[0.9375rem] font-medium transition [&_i]:w-5 [&_i]:text-center ${activePanel === 'vehicle' ? 'bg-primary-50 text-primary' : 'bg-transparent text-text-secondary hover:bg-slate-100 hover:text-text-primary'}`}
+          className={`mb-1 flex w-full cursor-pointer items-center gap-3 rounded-xl border-0 px-4 py-3 text-left text-[0.9375rem] font-medium transition [&_i]:w-5 [&_i]:text-center ${activePanel === 'vehicle' ? 'bg-slate-100 text-primary' : 'bg-transparent text-text-secondary hover:bg-slate-100 hover:text-text-primary'}`}
           onClick={() => handlePanelChange('vehicle')}
         >
           <i className='fas fa-car-side' /> Vehicle
         </button>
         <button
-          className={`mb-1 flex w-full cursor-pointer items-center gap-3 rounded-xl border-0 px-4 py-3 text-left text-[0.9375rem] font-medium transition [&_i]:w-5 [&_i]:text-center ${activePanel === 'car-parts' ? 'bg-primary-50 text-primary' : 'bg-transparent text-text-secondary hover:bg-slate-100 hover:text-text-primary'}`}
+          className={`mb-1 flex w-full cursor-pointer items-center gap-3 rounded-xl border-0 px-4 py-3 text-left text-[0.9375rem] font-medium transition [&_i]:w-5 [&_i]:text-center ${activePanel === 'car-parts' ? 'bg-slate-100 text-primary' : 'bg-transparent text-text-secondary hover:bg-slate-100 hover:text-text-primary'}`}
           onClick={() => handlePanelChange('car-parts')}
         >
           <i className='fas fa-cogs' /> Car Parts
         </button>
         <button
-          className={`mb-1 flex w-full cursor-pointer items-center gap-3 rounded-xl border-0 px-4 py-3 text-left text-[0.9375rem] font-medium transition [&_i]:w-5 [&_i]:text-center ${activePanel === 'accessories' ? 'bg-primary-50 text-primary' : 'bg-transparent text-text-secondary hover:bg-slate-100 hover:text-text-primary'}`}
+          className={`mb-1 flex w-full cursor-pointer items-center gap-3 rounded-xl border-0 px-4 py-3 text-left text-[0.9375rem] font-medium transition [&_i]:w-5 [&_i]:text-center ${activePanel === 'accessories' ? 'bg-slate-100 text-primary' : 'bg-transparent text-text-secondary hover:bg-slate-100 hover:text-text-primary'}`}
           onClick={() => handlePanelChange('accessories')}
         >
           <i className='fas fa-toolbox' /> Accessories
         </button>
         <button
-          className={`mb-1 flex w-full cursor-pointer items-center gap-3 rounded-xl border-0 px-4 py-3 text-left text-[0.9375rem] font-medium transition [&_i]:w-5 [&_i]:text-center ${activePanel === 'car-tips' ? 'bg-primary-50 text-primary' : 'bg-transparent text-text-secondary hover:bg-slate-100 hover:text-text-primary'}`}
+          className={`mb-1 flex w-full cursor-pointer items-center gap-3 rounded-xl border-0 px-4 py-3 text-left text-[0.9375rem] font-medium transition [&_i]:w-5 [&_i]:text-center ${activePanel === 'car-tips' ? 'bg-slate-100 text-primary' : 'bg-transparent text-text-secondary hover:bg-slate-100 hover:text-text-primary'}`}
           onClick={() => handlePanelChange('car-tips')}
         >
           <i className='fas fa-lightbulb' /> Car Tips
@@ -608,7 +675,7 @@ export default function AdminDashboardPage() {
       </aside>
       {sidebarOpen && <button className='fixed inset-0 z-40 bg-slate-950/30 min-[961px]:hidden' onClick={() => setSidebarOpen(false)} aria-label='Close navigation' />}
 
-      <main className='min-h-screen bg-glass-bg p-8 max-[960px]:p-5'>
+      <main className='min-h-screen bg-glass-bg p-8 max-[960px]:p-5 min-[961px]:pl-[276px]'>
         <header className='mb-8 [&_h1]:m-0 [&_h1]:flex-1 [&_h1]:text-[1.75rem] [&_h1]:font-bold [&_h1]:text-text-primary [&_p]:m-0 [&_p]:text-[0.9375rem] [&_p]:text-text-secondary'>
           <div className='mb-2 flex items-center gap-4'>
             <button
@@ -620,7 +687,7 @@ export default function AdminDashboardPage() {
               <i className='fas fa-bars' />
             </button>
             <h1>Operations Dashboard</h1>
-            <button className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0' type='button' onClick={handleAdminLogout}>
+            <button className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-slate-1000 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0' type='button' onClick={handleAdminLogout}>
               Logout
             </button>
           </div>
@@ -630,10 +697,11 @@ export default function AdminDashboardPage() {
 
         {activePanel === 'overview' && (
           <>
+            {/* Inventory metric cards */}
             <section className='mb-6 grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-5 max-[640px]:grid-cols-1'>
               {metrics.map((metric) => (
                 <article key={metric.label} className='mb-6 flex items-center gap-4 rounded-glass border border-glass-border bg-glass-surface p-6 shadow-glass backdrop-blur-glass'>
-                  <div className='flex h-12 w-12 items-center justify-center rounded-xl bg-primary-50 text-xl text-primary'>
+                  <div className='flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-xl text-primary'>
                     <i className={`fas ${metric.icon}`} />
                   </div>
                   <div>
@@ -643,6 +711,164 @@ export default function AdminDashboardPage() {
                 </article>
               ))}
             </section>
+
+            {/* KPI + revenue row */}
+            <div className='mb-6 grid gap-6 xl:grid-cols-3'>
+              {/* Bookings / Orders / Revenue KPIs */}
+              <section className='rounded-glass border border-glass-border bg-glass-surface p-6 shadow-glass backdrop-blur-glass [&_h2]:mb-5 [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:text-text-primary'>
+                <h2>Activity Snapshot</h2>
+                <div className='flex flex-col gap-4'>
+                  {overviewKpis.kpis.map((kpi) => (
+                    <div key={kpi.label} className='flex items-center gap-4 rounded-xl border border-glass-border bg-glass-bg/40 p-4'>
+                      <div className='flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-lg text-primary'>
+                        <i className={`fas ${kpi.icon}`} />
+                      </div>
+                      <div className='min-w-0'>
+                        <div className='truncate text-lg font-bold text-text-primary'>{kpi.value}</div>
+                        <div className='text-xs font-medium uppercase tracking-wide text-text-muted'>{kpi.label}</div>
+                        <div className='text-xs text-text-muted'>{kpi.sub}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              {/* Revenue by channel */}
+              <section className='rounded-glass border border-glass-border bg-glass-surface p-6 shadow-glass backdrop-blur-glass [&_h2]:mb-5 [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:text-text-primary'>
+                <h2>Revenue by Channel</h2>
+                {revenueByChannel.length === 0 ? (
+                  <p className='py-10 text-center text-sm text-text-muted'>No orders yet — revenue will appear here.</p>
+                ) : (
+                  <div className='flex flex-col gap-5'>
+                    {revenueByChannel.map((entry) => (
+                      <div key={entry.channel}>
+                        <div className='mb-1.5 flex items-center justify-between text-sm'>
+                          <span className='font-semibold text-text-primary'>{entry.channel}</span>
+                          <span className='font-medium text-text-muted'>{naira.format(entry.value)}</span>
+                        </div>
+                        <div className='h-2.5 w-full overflow-hidden rounded-full bg-slate-100'>
+                          <div className='h-full rounded-full bg-primary transition-all duration-700' style={{ width: `${entry.percentage}%` }} />
+                        </div>
+                        <div className='mt-1 text-xs text-text-muted'>{entry.percentage}% of total revenue</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </section>
+
+              {/* Quick actions */}
+              <section className='rounded-glass border border-glass-border bg-glass-surface p-6 shadow-glass backdrop-blur-glass [&_h2]:mb-5 [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:text-text-primary'>
+                <h2>Quick Actions</h2>
+                <div className='flex flex-col gap-3'>
+                  <button
+                    className='flex cursor-pointer items-center justify-between gap-2 rounded-xl border border-glass-border bg-glass-bg/40 px-4 py-3.5 text-left text-sm font-semibold text-text-primary transition hover:border-primary/40 hover:bg-slate-100'
+                    type='button'
+                    onClick={() => { setShowVehicleForm(true); setShowCarPartForm(false); setShowAccessoriesForm(false); setActivePanel('vehicle'); }}
+                  >
+                    Add a Vehicle
+                    <i className='fas fa-arrow-right text-xs text-primary' />
+                  </button>
+                  <button
+                    className='flex cursor-pointer items-center justify-between gap-2 rounded-xl border border-glass-border bg-glass-bg/40 px-4 py-3.5 text-left text-sm font-semibold text-text-primary transition hover:border-primary/40 hover:bg-slate-100'
+                    type='button'
+                    onClick={() => setActivePanel('car-parts')}
+                  >
+                    Manage Car Parts
+                    <i className='fas fa-arrow-right text-xs text-primary' />
+                  </button>
+                  <button
+                    className='flex cursor-pointer items-center justify-between gap-2 rounded-xl border border-glass-border bg-glass-bg/40 px-4 py-3.5 text-left text-sm font-semibold text-text-primary transition hover:border-primary/40 hover:bg-slate-100'
+                    type='button'
+                    onClick={() => setActivePanel('car-tips')}
+                  >
+                    Publish a Car Tip
+                    <i className='fas fa-arrow-right text-xs text-primary' />
+                  </button>
+                  <a
+                    href='https://wa.me/2347060882711'
+                    target='_blank'
+                    rel='noreferrer'
+                    className='flex items-center justify-between gap-2 rounded-xl border border-glass-border bg-glass-bg/40 px-4 py-3.5 text-left text-sm font-semibold text-text-primary no-underline transition hover:border-primary/40 hover:bg-slate-100'
+                  >
+                    Contact via WhatsApp
+                    <i className='fab fa-whatsapp text-base text-primary' />
+                  </a>
+                </div>
+              </section>
+            </div>
+
+            {/* Recent bookings + orders */}
+            <div className='grid gap-6 xl:grid-cols-2'>
+              <section className='rounded-glass border border-glass-border bg-glass-surface p-6 shadow-glass backdrop-blur-glass [&_h2]:mb-4 [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:text-text-primary'>
+                <div className='mb-4 flex items-center justify-between'>
+                  <h2>Recent Bookings</h2>
+                  <button className='cursor-pointer border-0 bg-transparent p-0 text-sm font-semibold text-primary hover:underline' type='button' onClick={() => setActivePanel('bookings')}>
+                    View all
+                  </button>
+                </div>
+                <div className='overflow-x-auto'>
+                  <table className='w-full border-separate border-spacing-0 [&_th]:border-b [&_th]:border-slate-200 [&_th]:px-3 [&_th]:py-2.5 [&_th]:text-left [&_th]:text-xs [&_th]:font-semibold [&_th]:uppercase [&_th]:tracking-wide [&_th]:text-text-muted [&_td]:border-b [&_td]:border-slate-100 [&_td]:px-3 [&_td]:py-3 [&_td]:text-sm [&_td]:text-text-primary [&_tbody_tr:hover_td]:bg-slate-50'>
+                    <thead>
+                      <tr>
+                        <th>Customer</th>
+                        <th>Service</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {bookings.slice(0, 5).map((booking) => (
+                        <tr key={booking.id}>
+                          <td className='font-medium'>{booking.customer}</td>
+                          <td>{booking.service}</td>
+                          <td>
+                            <span className='inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-primary'>{booking.status}</span>
+                          </td>
+                        </tr>
+                      ))}
+                      {bookings.length === 0 && (
+                        <tr>
+                          <td colSpan={3} className='py-10 text-center text-text-muted'>No bookings yet.</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+
+              <section className='rounded-glass border border-glass-border bg-glass-surface p-6 shadow-glass backdrop-blur-glass [&_h2]:mb-4 [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:text-text-primary'>
+                <div className='mb-4 flex items-center justify-between'>
+                  <h2>Recent Orders</h2>
+                  <button className='cursor-pointer border-0 bg-transparent p-0 text-sm font-semibold text-primary hover:underline' type='button' onClick={() => setActivePanel('orders')}>
+                    View all
+                  </button>
+                </div>
+                <div className='overflow-x-auto'>
+                  <table className='w-full border-separate border-spacing-0 [&_th]:border-b [&_th]:border-slate-200 [&_th]:px-3 [&_th]:py-2.5 [&_th]:text-left [&_th]:text-xs [&_th]:font-semibold [&_th]:uppercase [&_th]:tracking-wide [&_th]:text-text-muted [&_td]:border-b [&_td]:border-slate-100 [&_td]:px-3 [&_td]:py-3 [&_td]:text-sm [&_td]:text-text-primary [&_tbody_tr:hover_td]:bg-slate-50'>
+                    <thead>
+                      <tr>
+                        <th>Item</th>
+                        <th>Customer</th>
+                        <th>Amount</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {orders.slice(0, 5).map((order) => (
+                        <tr key={order.id}>
+                          <td className='font-medium'>{order.item}</td>
+                          <td>{order.customer}</td>
+                          <td>{order.amountLabel}</td>
+                        </tr>
+                      ))}
+                      {orders.length === 0 && (
+                        <tr>
+                          <td colSpan={3} className='py-10 text-center text-text-muted'>No orders yet.</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+            </div>
           </>
         )}
 
@@ -683,7 +909,7 @@ export default function AdminDashboardPage() {
                     <td>{booking.service}</td>
                     <td>{formatDate(booking.date)}</td>
                     <td>
-                      <span className='inline-flex items-center rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary'>{booking.status}</span>
+                      <span className='inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-primary'>{booking.status}</span>
                     </td>
                   </tr>
                 ))}
@@ -751,21 +977,43 @@ export default function AdminDashboardPage() {
         )}
 
         {(activePanel === 'vehicle' || activePanel === 'car-parts' || activePanel === 'accessories') && (
-          <section className='mb-6 rounded-glass border border-glass-border bg-glass-surface p-6 shadow-glass backdrop-blur-glass [&_h2]:mb-4 [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:text-text-primary'>
-            <h2>{activeStockMeta?.label} Manager</h2>
-            <p className='mb-5 text-[0.9375rem] text-text-secondary'>
-              {activePanel === 'vehicle'
-                ? 'Add vehicles.'
-                : activePanel === 'car-parts'
-                ? 'Add car parts.'
-                : 'Add accessories.'}
-            </p>
+          <>
+            {/* Inventory category tabs (one row on desktop) */}
+            <div className='mb-6 flex flex-row gap-2 overflow-x-auto max-[640px]:flex-nowrap'>
+              {STOCK_CATEGORIES.map((category) => (
+                <button
+                  key={category.panel}
+                  type='button'
+                  onClick={() => handlePanelChange(category.panel)}
+                  className={`inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition ${
+                    activePanel === category.panel
+                      ? 'border-primary bg-primary text-white shadow-float'
+                      : 'border-glass-border bg-glass-surface text-text-secondary hover:border-primary/40 hover:bg-slate-100 hover:text-text-primary'
+                  }`}
+                >
+                  <i className={`fas ${{ vehicle: 'fa-car-side', 'car-parts': 'fa-cogs', accessories: 'fa-toolbox' }[category.panel]}`} />
+                  <span className='hidden min-[961px]:inline'>{category.label}</span>
+                  <span className='min-[961px]:hidden'>{category.label.split(' ')[0]}</span>
+                </button>
+              ))}
+            </div>
+
+            <div className='mb-6'>
+              <h2 className='m-0 text-xl font-semibold text-text-primary'>{activeStockMeta?.label} Manager</h2>
+              <p className='mb-0 mt-1 text-[0.9375rem] text-text-secondary'>
+                {activePanel === 'vehicle'
+                  ? 'Add and manage vehicles in your inventory.'
+                  : activePanel === 'car-parts'
+                  ? 'Add and manage car parts in your inventory.'
+                  : 'Add and manage accessories in your inventory.'}
+              </p>
+            </div>
 
             {activePanel === 'vehicle' ? (
               <>
                 <div className='mb-5 flex gap-3 max-[640px]:flex-col'>
                   <button
-                    className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0'
+                    className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-slate-1000 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0'
                     type='button'
                     onClick={() => {
                       setNewPrimaryImageFile(null);
@@ -778,45 +1026,45 @@ export default function AdminDashboardPage() {
                   >
                     Add Vehicle
                   </button>
-                  <button className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0' type='button' onClick={loadStockItems} disabled={stockLoading}>
+                  <button className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-slate-1000 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0' type='button' onClick={loadStockItems} disabled={stockLoading}>
                     {stockLoading ? 'Refreshing...' : 'Refresh List'}
                   </button>
                 </div>
-                <section className='mb-6 grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-5 max-[640px]:grid-cols-1'>
-                  <article className='mb-6 flex items-center gap-4 rounded-glass border border-glass-border bg-glass-surface p-6 shadow-glass backdrop-blur-glass'>
-                    <div className='flex h-12 w-12 items-center justify-center rounded-xl bg-primary-50 text-xl text-primary'>
+                <section className='mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4'>
+                  <article className='flex items-center gap-3 rounded-lg border border-glass-border bg-glass-surface p-3.5 shadow-sm backdrop-blur-glass'>
+                    <div className='flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-sm text-primary'>
                       <i className='fas fa-car-side' />
                     </div>
                     <div>
-                      <div className='text-[1.75rem] font-bold text-text-primary'>{vehicleStats.totalVehicles}</div>
-                      <div className='text-sm font-medium text-text-muted'>Number of Vehicles</div>
+                      <div className='text-lg font-bold text-text-primary'>{vehicleStats.totalVehicles}</div>
+                      <div className='text-xs font-medium text-text-muted'>Number of Vehicles</div>
                     </div>
                   </article>
-                  <article className='mb-6 flex items-center gap-4 rounded-glass border border-glass-border bg-glass-surface p-6 shadow-glass backdrop-blur-glass'>
-                    <div className='flex h-12 w-12 items-center justify-center rounded-xl bg-primary-50 text-xl text-primary'>
+                  <article className='flex items-center gap-3 rounded-lg border border-glass-border bg-glass-surface p-3.5 shadow-sm backdrop-blur-glass'>
+                    <div className='flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-sm text-primary'>
                       <i className='fas fa-certificate' />
                     </div>
                     <div>
-                      <div className='text-[1.75rem] font-bold text-text-primary'>{vehicleStats.newCount}</div>
-                      <div className='text-sm font-medium text-text-muted'>New</div>
+                      <div className='text-lg font-bold text-text-primary'>{vehicleStats.newCount}</div>
+                      <div className='text-xs font-medium text-text-muted'>New</div>
                     </div>
                   </article>
-                  <article className='mb-6 flex items-center gap-4 rounded-glass border border-glass-border bg-glass-surface p-6 shadow-glass backdrop-blur-glass'>
-                    <div className='flex h-12 w-12 items-center justify-center rounded-xl bg-primary-50 text-xl text-primary'>
+                  <article className='flex items-center gap-3 rounded-lg border border-glass-border bg-glass-surface p-3.5 shadow-sm backdrop-blur-glass'>
+                    <div className='flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-sm text-primary'>
                       <i className='fas fa-globe-africa' />
                     </div>
                     <div>
-                      <div className='text-[1.75rem] font-bold text-text-primary'>{vehicleStats.foreignUsedCount}</div>
-                      <div className='text-sm font-medium text-text-muted'>Foreign Used</div>
+                      <div className='text-lg font-bold text-text-primary'>{vehicleStats.foreignUsedCount}</div>
+                      <div className='text-xs font-medium text-text-muted'>Foreign Used</div>
                     </div>
                   </article>
-                  <article className='mb-6 flex items-center gap-4 rounded-glass border border-glass-border bg-glass-surface p-6 shadow-glass backdrop-blur-glass'>
-                    <div className='flex h-12 w-12 items-center justify-center rounded-xl bg-primary-50 text-xl text-primary'>
+                  <article className='flex items-center gap-3 rounded-lg border border-glass-border bg-glass-surface p-3.5 shadow-sm backdrop-blur-glass'>
+                    <div className='flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-sm text-primary'>
                       <i className='fas fa-flag' />
                     </div>
                     <div>
-                      <div className='text-[1.75rem] font-bold text-text-primary'>{vehicleStats.nigerianUsedCount}</div>
-                      <div className='text-sm font-medium text-text-muted'>Nigerian Used</div>
+                      <div className='text-lg font-bold text-text-primary'>{vehicleStats.nigerianUsedCount}</div>
+                      <div className='text-xs font-medium text-text-muted'>Nigerian Used</div>
                     </div>
                   </article>
                 </section>
@@ -824,7 +1072,7 @@ export default function AdminDashboardPage() {
             ) : (
               <div className='mb-5 flex gap-3 max-[640px]:flex-col'>
                 <button
-                  className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0'
+                  className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-slate-1000 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0'
                   type='button'
                   onClick={() => {
                     setNewPrimaryImageFile(null);
@@ -842,7 +1090,7 @@ export default function AdminDashboardPage() {
                 >
                   {activeStockMeta?.addLabel || 'Add Item'}
                 </button>
-                <button className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0' type='button' onClick={loadStockItems} disabled={stockLoading}>
+                <button className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-slate-1000 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0' type='button' onClick={loadStockItems} disabled={stockLoading}>
                   {stockLoading ? 'Refreshing...' : 'Refresh List'}
                 </button>
               </div>
@@ -851,94 +1099,105 @@ export default function AdminDashboardPage() {
             {stockMessage && <p className='mt-2 text-sm text-success'>{stockMessage}</p>}
             {stockError && <p className='mt-2 text-sm text-error'>{stockError}</p>}
 
-            <table className='w-full border-separate border-spacing-0 [&_th]:border-b [&_th]:border-slate-200 [&_th]:px-4 [&_th]:py-3 [&_th]:text-left [&_th]:text-xs [&_th]:font-semibold [&_th]:uppercase [&_th]:tracking-wide [&_th]:text-text-muted [&_td]:border-b [&_td]:border-slate-100 [&_td]:px-4 [&_td]:py-3.5 [&_td]:text-sm [&_td]:text-text-primary [&_tbody_tr:hover_td]:bg-slate-50'>
-              <thead>
-                {activePanel === 'vehicle' ? (
-                  <tr>
-                    <th>Vehicle</th>
-                    <th>Description</th>
-                    <th>Condition</th>
-                    <th>Transmission</th>
-                    <th>Fuel</th>
-                    <th>Status</th>
-                    <th>Unit Price</th>
-                    <th>Action</th>
-                  </tr>
-                ) : (
-                  <tr>
-                    <th>Item</th>
-                    <th>Description</th>
-                    <th>Status</th>
-                    <th>Unit Price</th>
-                    <th>Action</th>
-                  </tr>
-                )}
-              </thead>
-              <tbody>
-                {stockItemsByCategory.map((item) => (
-                  activePanel === 'vehicle' ? (
-                    <tr key={item._id}>
-                      <td>{item.name}</td>
-                      <td>{item.description || '-'}</td>
-                      <td>{item.condition || '-'}</td>
-                      <td>{item.transmission || '-'}</td>
-                      <td>{item.fuelType || '-'}</td>
-                      <td>
-                        <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${item.soldOut ? 'bg-error-light text-error' : 'bg-success-light text-success'}`}>{item.soldOut ? 'Sold' : 'Available'}</span>
-                      </td>
-                      <td>{naira.format(item.unitPrice || 0)}</td>
-                      <td>
-                        <div className='flex gap-2 max-[640px]:flex-col'>
-                          <button className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0' type='button' onClick={() => toggleSoldStatus(item)} disabled={savingItemId === item._id}>
-                            {savingItemId === item._id ? 'Saving...' : item.soldOut ? 'Mark Available' : 'Mark Sold'}
-                          </button>
-                          <button
-                            className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-error px-5 py-2.5 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(239,68,68,0.2)] transition hover:-translate-y-px hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0'
-                            type='button'
-                            onClick={() => openDeleteModal('stock', item._id, item.name || 'this item')}
-                            disabled={savingItemId === item._id}
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </td>
+            <div className='overflow-x-auto'>
+              <table className='w-full border-separate border-spacing-0 [&_th]:border-b [&_th]:border-slate-200 [&_th]:px-4 [&_th]:py-3 [&_th]:text-left [&_th]:text-xs [&_th]:font-semibold [&_th]:uppercase [&_th]:tracking-wide [&_th]:text-text-muted [&_td]:border-b [&_td]:border-slate-100 [&_td]:px-4 [&_td]:py-3.5 [&_td]:text-sm [&_td]:text-text-primary [&_tbody_tr:hover_td]:bg-slate-50'>
+                <thead>
+                  {activePanel === 'vehicle' ? (
+                    <tr>
+                      <th>Vehicle</th>
+                      <th>Details</th>
+                      <th>Condition</th>
+                      <th>Transmission</th>
+                      <th>Fuel</th>
+                      <th>Status</th>
+                      <th>Price</th>
+                      <th>Action</th>
                     </tr>
                   ) : (
-                    <tr key={item._id}>
-                      <td>{item.name}</td>
-                      <td>{item.description || '-'}</td>
-                      <td>
-                        <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${item.soldOut ? 'bg-error-light text-error' : 'bg-success-light text-success'}`}>{item.soldOut ? 'Sold' : 'Available'}</span>
-                      </td>
-                      <td>{naira.format(item.unitPrice || 0)}</td>
-                      <td>
-                        <div className='flex gap-2 max-[640px]:flex-col'>
-                          <button className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0' type='button' onClick={() => toggleSoldStatus(item)} disabled={savingItemId === item._id}>
-                            {savingItemId === item._id ? 'Saving...' : item.soldOut ? 'Mark Available' : 'Mark Sold'}
-                          </button>
-                          <button
-                            className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-error px-5 py-2.5 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(239,68,68,0.2)] transition hover:-translate-y-px hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0'
-                            type='button'
-                            onClick={() => openDeleteModal('stock', item._id, item.name || 'this item')}
-                            disabled={savingItemId === item._id}
-                          >
-                            Delete
-                          </button>
-                        </div>
+                    <tr>
+                      <th>Item</th>
+                      <th>Description</th>
+                      <th>Status</th>
+                      <th>Unit Price</th>
+                      <th>Action</th>
+                    </tr>
+                  )}
+                </thead>
+                <tbody>
+                  {stockItemsByCategory.map((item) =>
+                    activePanel === 'vehicle' ? (
+                      <tr key={item._id}>
+                        <td>
+                          <div className='font-semibold'>{item.name}</div>
+                          {(item.color || item.mileage) && (
+                            <div className='mt-0.5 flex flex-wrap gap-2 text-xs text-text-muted'>
+                              {item.year && <span>{item.year}</span>}
+                              {item.color && <span className='inline-flex items-center gap-1'><span className='h-2 w-2 rounded-full ring-1 ring-slate-200' style={{ background: item.color.toLowerCase() }} />{item.color}</span>}
+                              {item.mileage && <span>{item.mileage}</span>}
+                            </div>
+                          )}
+                        </td>
+                        <td>{item.description || '-'}</td>
+                        <td>{item.condition || '-'}</td>
+                        <td>{item.transmission || '-'}</td>
+                        <td>{item.fuelType || '-'}</td>
+                        <td>
+                          <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${item.soldOut ? 'bg-error-light text-error' : 'bg-success-light text-success'}`}>{item.soldOut ? 'Sold' : 'Available'}</span>
+                        </td>
+                        <td><PriceCell item={item} /></td>
+                        <td>
+                          <div className='flex gap-2 max-[640px]:flex-col'>
+                            <button className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-slate-1000 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0' type='button' onClick={() => toggleSoldStatus(item)} disabled={savingItemId === item._id}>
+                              {savingItemId === item._id ? 'Saving...' : item.soldOut ? 'Mark Available' : 'Mark Sold'}
+                            </button>
+                            <button
+                              className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-error px-5 py-2.5 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(239,68,68,0.2)] transition hover:-translate-y-px hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0'
+                              type='button'
+                              onClick={() => openDeleteModal('stock', item._id, item.name || 'this item')}
+                              disabled={savingItemId === item._id}
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ) : (
+                      <tr key={item._id}>
+                        <td>{item.name}</td>
+                        <td>{item.description || '-'}</td>
+                        <td>
+                          <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${item.soldOut ? 'bg-error-light text-error' : 'bg-success-light text-success'}`}>{item.soldOut ? 'Sold' : 'Available'}</span>
+                        </td>
+                        <td><PriceCell item={item} /></td>
+                        <td>
+                          <div className='flex gap-2 max-[640px]:flex-col'>
+                            <button className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-slate-1000 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0' type='button' onClick={() => toggleSoldStatus(item)} disabled={savingItemId === item._id}>
+                              {savingItemId === item._id ? 'Saving...' : item.soldOut ? 'Mark Available' : 'Mark Sold'}
+                            </button>
+                            <button
+                              className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-error px-5 py-2.5 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(239,68,68,0.2)] transition hover:-translate-y-px hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0'
+                              type='button'
+                              onClick={() => openDeleteModal('stock', item._id, item.name || 'this item')}
+                              disabled={savingItemId === item._id}
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    )
+                  )}
+                  {stockItemsByCategory.length === 0 && !stockLoading && (
+                    <tr>
+                      <td colSpan={activePanel === 'vehicle' ? 8 : 5} className='py-12 text-center text-text-muted'>
+                        No items yet for this category.
                       </td>
                     </tr>
-                  )
-                ))}
-                {stockItemsByCategory.length === 0 && !stockLoading && (
-                  <tr>
-                    <td colSpan={activePanel === 'vehicle' ? 8 : 5} className='py-12 text-center text-text-muted'>
-                      No items yet for this category.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </section>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
 
         {activePanel === 'car-tips' && (
@@ -948,7 +1207,7 @@ export default function AdminDashboardPage() {
 
             <div className='mb-5 flex gap-3 max-[640px]:flex-col'>
               <button
-                className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0'
+                className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-slate-1000 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0'
                 type='button'
                 onClick={() => {
                   setEditingTipId('');
@@ -962,7 +1221,7 @@ export default function AdminDashboardPage() {
               >
                 Add Tip
               </button>
-              <button className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0' type='button' onClick={loadCarTips} disabled={tipsLoading}>
+              <button className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-slate-1000 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0' type='button' onClick={loadCarTips} disabled={tipsLoading}>
                 {tipsLoading ? 'Refreshing...' : 'Refresh Tips'}
               </button>
             </div>
@@ -994,7 +1253,7 @@ export default function AdminDashboardPage() {
                     <td>
                       <div className='flex gap-2 max-[640px]:flex-col'>
                         <button
-                          className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0'
+                          className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-slate-1000 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0'
                           type='button'
                           onClick={() => {
                             setEditingTipId(tip._id);
@@ -1094,7 +1353,7 @@ export default function AdminDashboardPage() {
             </div>
             <div className='mt-6 flex gap-3'>
               <button
-                className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0'
+                className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-slate-1000 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0'
                 type='button'
                 onClick={editingTipId ? saveEditingTip : addCarTip}
                 disabled={isTipSaving}
@@ -1107,7 +1366,7 @@ export default function AdminDashboardPage() {
                   ? 'Save Changes'
                   : 'Add Tip'}
               </button>
-              <button className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0' type='button' onClick={() => setShowTipForm(false)} disabled={isTipSaving}>
+              <button className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-slate-1000 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0' type='button' onClick={() => setShowTipForm(false)} disabled={isTipSaving}>
                 Cancel
               </button>
             </div>
@@ -1116,9 +1375,17 @@ export default function AdminDashboardPage() {
       )}
       {showVehicleForm && activePanel === 'vehicle' && (
         <div className='fixed inset-0 z-[1000] flex items-center justify-center bg-slate-900/50 p-6 backdrop-blur' onClick={() => (savingItemId === 'new' ? null : setShowVehicleForm(false))}>
-          <div className='max-h-[90vh] w-full max-w-[560px] overflow-y-auto rounded-glass-lg border border-glass-border bg-white/95 p-8 shadow-glass-xl backdrop-blur-3xl max-[960px]:p-6' onClick={(event) => event.stopPropagation()}>
-            <div className='mb-4 flex items-center justify-between [&_h3]:m-0 [&_h3]:text-xl [&_h3]:font-semibold [&_h3]:text-text-primary'>
-              <h3>Add New Vehicle</h3>
+          <div className='max-h-[90vh] w-full max-w-[680px] overflow-y-auto rounded-2xl border border-glass-border bg-white/95 shadow-glass-xl backdrop-blur-3xl max-[960px]:p-6' onClick={(event) => event.stopPropagation()}>
+            <div className='sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-slate-100 bg-white/95 px-7 py-5 backdrop-blur max-[960px]:px-5'>
+              <div className='flex items-center gap-3'>
+                <div className='flex h-11 w-11 items-center justify-center rounded-xl bg-primary text-white shadow-float'>
+                  <i className='fas fa-car' aria-hidden='true'></i>
+                </div>
+                <div>
+                  <h3 className='m-0 text-lg font-bold leading-tight text-text-primary'>Add New Vehicle</h3>
+                  <p className='m-0 mt-0.5 text-[0.8rem] text-text-muted'>Enter all the details buyers need to know</p>
+                </div>
+              </div>
               <button
                 type='button'
                 className='flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl border-0 bg-slate-100 text-text-secondary transition hover:bg-slate-200 hover:text-text-primary'
@@ -1129,147 +1396,289 @@ export default function AdminDashboardPage() {
                 <i className='fas fa-times' />
               </button>
             </div>
-            <p>Enter vehicle details and unit price.</p>
-            <div className='grid grid-cols-2 gap-4 max-[960px]:grid-cols-1 [&_textarea]:col-span-2 max-[960px]:[&_textarea]:col-span-1'>
-              <select
-                value={newVehicleMake}
-                onChange={(event) => {
-                  setNewVehicleMake(event.target.value);
-                  setNewVehicleModel('');
-                  setCustomNewVehicleMake('');
-                  setCustomNewVehicleModel('');
-                }}
-                disabled={savingItemId === 'new'}
-              >
-                <option value=''>Select Make</option>
-                {VEHICLE_MAKES.map((make) => (
-                  <option key={make} value={make}>
-                    {make}
-                  </option>
-                ))}
-                <option value={OTHER_OPTION}>Other</option>
-              </select>
-              {newVehicleMake === OTHER_OPTION && (
-                <input
-                  type='text'
-                  placeholder='Enter Vehicle Make'
-                  value={customNewVehicleMake}
-                  onChange={(event) => setCustomNewVehicleMake(event.target.value)}
-                  disabled={savingItemId === 'new'}
-                />
-              )}
-              <select
-                value={newVehicleModel}
-                onChange={(event) => {
-                  setNewVehicleModel(event.target.value);
-                  setCustomNewVehicleModel('');
-                }}
-                disabled={savingItemId === 'new' || !newVehicleMake || newVehicleMake === OTHER_OPTION}
-              >
-                <option value=''>{newVehicleMake ? 'Select Model' : 'Select Make First'}</option>
-                {adminVehicleModelOptions.map((model) => (
-                  <option key={model} value={model}>
-                    {model}
-                  </option>
-                ))}
-                {newVehicleMake && newVehicleMake !== OTHER_OPTION && <option value={OTHER_OPTION}>Other</option>}
-              </select>
-              {(newVehicleMake === OTHER_OPTION || newVehicleModel === OTHER_OPTION) && (
-                <input
-                  type='text'
-                  placeholder='Enter Vehicle Model'
-                  value={customNewVehicleModel}
-                  onChange={(event) => setCustomNewVehicleModel(event.target.value)}
-                  disabled={savingItemId === 'new'}
-                />
-              )}
-              <input
-                type='number'
-                min='1990'
-                max='2100'
-                placeholder='Year'
-                value={newVehicleYear}
-                onChange={(event) => setNewVehicleYear(event.target.value)}
-                disabled={savingItemId === 'new'}
-              />
-              <div className='flex flex-col gap-1.5 [&_label]:text-sm [&_label]:font-semibold [&_label]:text-text-secondary [&_input]:rounded-xl [&_input]:border [&_input]:border-glass-border [&_input]:bg-glass-surface [&_input]:px-4 [&_input]:py-3 [&_input]:text-[0.9375rem] [&_input]:text-text-primary [&_input]:outline-none [&_input:focus]:border-primary [&_select]:rounded-xl [&_select]:border [&_select]:border-glass-border [&_select]:bg-glass-surface [&_select]:px-4 [&_select]:py-3 [&_select]:outline-none [&_textarea]:rounded-xl [&_textarea]:border [&_textarea]:border-glass-border [&_textarea]:bg-glass-surface [&_textarea]:px-4 [&_textarea]:py-3 [&_textarea]:outline-none'>
-                <label>Description</label>
+
+            <div className='flex flex-col gap-6 px-7 py-6 max-[960px]:px-5'>
+              {/* Vehicle identity */}
+              <div>
+                <h4 className='mb-3 flex items-center gap-2 text-[0.8rem] font-bold uppercase tracking-wider text-text-muted'>
+                  <i className='fas fa-tag text-primary' aria-hidden='true'></i> Vehicle Identity
+                </h4>
+                <div className='grid grid-cols-2 gap-4 max-[960px]:grid-cols-1'>
+                  <div className='flex flex-col gap-1.5'>
+                    <label className='text-sm font-semibold text-text-secondary'>Make</label>
+                    <select
+                      value={newVehicleMake}
+                      onChange={(event) => {
+                        setNewVehicleMake(event.target.value);
+                        setNewVehicleModel('');
+                        setCustomNewVehicleMake('');
+                        setCustomNewVehicleModel('');
+                      }}
+                      disabled={savingItemId === 'new'}
+                      className='rounded-xl border border-glass-border bg-glass-surface px-4 py-3 text-[0.9375rem] text-text-primary outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20'
+                    >
+                      <option value=''>Select Make</option>
+                      {VEHICLE_MAKES.map((make) => (
+                        <option key={make} value={make}>
+                          {make}
+                        </option>
+                      ))}
+                      <option value={OTHER_OPTION}>Other</option>
+                    </select>
+                    {newVehicleMake === OTHER_OPTION && (
+                      <input
+                        type='text'
+                        placeholder='Enter Vehicle Make'
+                        value={customNewVehicleMake}
+                        onChange={(event) => setCustomNewVehicleMake(event.target.value)}
+                        disabled={savingItemId === 'new'}
+                        className='rounded-xl border border-glass-border bg-glass-surface px-4 py-3 text-[0.9375rem] text-text-primary outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20'
+                      />
+                    )}
+                  </div>
+                  <div className='flex flex-col gap-1.5'>
+                    <label className='text-sm font-semibold text-text-secondary'>Model</label>
+                    <select
+                      value={newVehicleModel}
+                      onChange={(event) => {
+                        setNewVehicleModel(event.target.value);
+                        setCustomNewVehicleModel('');
+                      }}
+                      disabled={savingItemId === 'new' || !newVehicleMake || newVehicleMake === OTHER_OPTION}
+                      className='rounded-xl border border-glass-border bg-glass-surface px-4 py-3 text-[0.9375rem] text-text-primary outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20'
+                    >
+                      <option value=''>{newVehicleMake ? 'Select Model' : 'Select Make First'}</option>
+                      {adminVehicleModelOptions.map((model) => (
+                        <option key={model} value={model}>
+                          {model}
+                        </option>
+                      ))}
+                      {newVehicleMake && newVehicleMake !== OTHER_OPTION && <option value={OTHER_OPTION}>Other</option>}
+                    </select>
+                    {(newVehicleMake === OTHER_OPTION || newVehicleModel === OTHER_OPTION) && (
+                      <input
+                        type='text'
+                        placeholder='Enter Vehicle Model'
+                        value={customNewVehicleModel}
+                        onChange={(event) => setCustomNewVehicleModel(event.target.value)}
+                        disabled={savingItemId === 'new'}
+                        className='rounded-xl border border-glass-border bg-glass-surface px-4 py-3 text-[0.9375rem] text-text-primary outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20'
+                      />
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Specifications */}
+              <div>
+                <h4 className='mb-3 flex items-center gap-2 text-[0.8rem] font-bold uppercase tracking-wider text-text-muted'>
+                  <i className='fas fa-sliders-h text-primary' aria-hidden='true'></i> Specifications
+                </h4>
+                <div className='grid grid-cols-3 gap-4 max-[960px]:grid-cols-2 max-[460px]:grid-cols-1'>
+                  <div className='flex flex-col gap-1.5'>
+                    <label className='text-sm font-semibold text-text-secondary'>Year</label>
+                    <input
+                      type='number'
+                      min='1990'
+                      max='2100'
+                      placeholder='2024'
+                      value={newVehicleYear}
+                      onChange={(event) => setNewVehicleYear(event.target.value)}
+                      disabled={savingItemId === 'new'}
+                      className='rounded-xl border border-glass-border bg-glass-surface px-4 py-3 text-[0.9375rem] text-text-primary outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20'
+                    />
+                  </div>
+                  <div className='flex flex-col gap-1.5'>
+                    <label className='text-sm font-semibold text-text-secondary'>Color</label>
+                    <input
+                      type='text'
+                      placeholder='e.g. White'
+                      value={newVehicleColor}
+                      onChange={(event) => setNewVehicleColor(event.target.value)}
+                      disabled={savingItemId === 'new'}
+                      className='rounded-xl border border-glass-border bg-glass-surface px-4 py-3 text-[0.9375rem] text-text-primary outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20'
+                    />
+                  </div>
+                  <div className='flex flex-col gap-1.5'>
+                    <label className='text-sm font-semibold text-text-secondary'>Mileage (km)</label>
+                    <input
+                      type='text'
+                      placeholder='e.g. 45,000 km'
+                      value={newVehicleMileage}
+                      onChange={(event) => setNewVehicleMileage(event.target.value)}
+                      disabled={savingItemId === 'new'}
+                      className='rounded-xl border border-glass-border bg-glass-surface px-4 py-3 text-[0.9375rem] text-text-primary outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20'
+                    />
+                  </div>
+                  <div className='flex flex-col gap-1.5'>
+                    <label className='text-sm font-semibold text-text-secondary'>Condition</label>
+                    <select value={newVehicleCondition} onChange={(event) => setNewVehicleCondition(event.target.value)} disabled={savingItemId === 'new'} className='rounded-xl border border-glass-border bg-glass-surface px-4 py-3 text-[0.9375rem] text-text-primary outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20'>
+                      {VEHICLE_CONDITIONS.map((condition) => (
+                        <option key={condition} value={condition}>
+                          {condition}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className='flex flex-col gap-1.5'>
+                    <label className='text-sm font-semibold text-text-secondary'>Transmission</label>
+                    <select value={newVehicleTransmission} onChange={(event) => setNewVehicleTransmission(event.target.value)} disabled={savingItemId === 'new'} className='rounded-xl border border-glass-border bg-glass-surface px-4 py-3 text-[0.9375rem] text-text-primary outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20'>
+                      {VEHICLE_TRANSMISSIONS.map((transmission) => (
+                        <option key={transmission} value={transmission}>
+                          {transmission}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className='flex flex-col gap-1.5'>
+                    <label className='text-sm font-semibold text-text-secondary'>Fuel Type</label>
+                    <select value={newVehicleFuelType} onChange={(event) => setNewVehicleFuelType(event.target.value)} disabled={savingItemId === 'new'} className='rounded-xl border border-glass-border bg-glass-surface px-4 py-3 text-[0.9375rem] text-text-primary outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20'>
+                      {VEHICLE_FUEL_TYPES.map((fuel) => (
+                        <option key={fuel} value={fuel}>
+                          {fuel}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Pricing */}
+              <div>
+                <h4 className='mb-3 flex items-center gap-2 text-[0.8rem] font-bold uppercase tracking-wider text-text-muted'>
+                  <i className='fas fa-tag text-primary' aria-hidden='true'></i> Pricing
+                </h4>
+                <div className='grid grid-cols-2 gap-4 max-[460px]:grid-cols-1'>
+                  <div className='flex flex-col gap-1.5'>
+                    <label className='text-sm font-semibold text-text-secondary'>
+                      Unit Price (NGN) <span className='text-error'>*</span>
+                    </label>
+                    <input
+                      type='number'
+                      min='0'
+                      placeholder='e.g. 45000000'
+                      value={newItemUnitPrice}
+                      onChange={(event) => setNewItemUnitPrice(event.target.value)}
+                      disabled={savingItemId === 'new'}
+                      className='rounded-xl border border-glass-border bg-glass-surface px-4 py-3 text-[0.9375rem] text-text-primary outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20'
+                    />
+                  </div>
+                  <div className='flex flex-col gap-1.5'>
+                    <label className='text-sm font-semibold text-text-secondary'>
+                      New Price (Optional) <span className='text-success'>{newItemOfferPrice ? 'Active' : ''}</span>
+                    </label>
+                    <input
+                      type='number'
+                      min='0'
+                      placeholder='Leave empty if no discount'
+                      value={newItemOfferPrice}
+                      onChange={(event) => setNewItemOfferPrice(event.target.value)}
+                      disabled={savingItemId === 'new'}
+                      className='rounded-xl border border-glass-border bg-glass-surface px-4 py-3 text-[0.9375rem] text-text-primary outline-none transition focus:border-success focus:ring-2 focus:ring-success/30'
+                    />
+                    <p className='text-[0.72rem] leading-snug text-text-muted'>When set, the old price is shown struck-through and the new price appears bold on the site.</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Description */}
+              <div>
+                <h4 className='mb-3 flex items-center gap-2 text-[0.8rem] font-bold uppercase tracking-wider text-text-muted'>
+                  <i className='fas fa-align-left text-primary' aria-hidden='true'></i> Description
+                </h4>
                 <textarea
-                  placeholder='Short vehicle description'
+                  rows='3'
+                  placeholder='Short description of the vehicle, condition, and any highlights'
                   value={newVehicleDescription}
                   onChange={(event) => setNewVehicleDescription(event.target.value)}
                   disabled={savingItemId === 'new'}
+                  className='w-full rounded-xl border border-glass-border bg-glass-surface px-4 py-3 text-[0.9375rem] text-text-primary outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20'
                 />
               </div>
-              <select value={newVehicleCondition} onChange={(event) => setNewVehicleCondition(event.target.value)} disabled={savingItemId === 'new'}>
-                {VEHICLE_CONDITIONS.map((condition) => (
-                  <option key={condition} value={condition}>
-                    {condition}
-                  </option>
-                ))}
-              </select>
-              <select value={newVehicleTransmission} onChange={(event) => setNewVehicleTransmission(event.target.value)} disabled={savingItemId === 'new'}>
-                {VEHICLE_TRANSMISSIONS.map((transmission) => (
-                  <option key={transmission} value={transmission}>
-                    {transmission}
-                  </option>
-                ))}
-              </select>
-              <select value={newVehicleFuelType} onChange={(event) => setNewVehicleFuelType(event.target.value)} disabled={savingItemId === 'new'}>
-                {VEHICLE_FUEL_TYPES.map((fuel) => (
-                  <option key={fuel} value={fuel}>
-                    {fuel}
-                  </option>
-                ))}
-              </select>
-              <div className='flex flex-col gap-1.5 [&_label]:text-sm [&_label]:font-semibold [&_label]:text-text-secondary [&_input]:rounded-xl [&_input]:border [&_input]:border-glass-border [&_input]:bg-glass-surface [&_input]:px-4 [&_input]:py-3 [&_input]:text-[0.9375rem] [&_input]:text-text-primary [&_input]:outline-none [&_input:focus]:border-primary [&_select]:rounded-xl [&_select]:border [&_select]:border-glass-border [&_select]:bg-glass-surface [&_select]:px-4 [&_select]:py-3 [&_select]:outline-none [&_textarea]:rounded-xl [&_textarea]:border [&_textarea]:border-glass-border [&_textarea]:bg-glass-surface [&_textarea]:px-4 [&_textarea]:py-3 [&_textarea]:outline-none'>
-                <label>Unit Price (NGN)</label>
-                <input
-                  type='number'
-                  min='0'
-                  placeholder='Unit Price (NGN)'
-                  value={newItemUnitPrice}
-                  onChange={(event) => setNewItemUnitPrice(event.target.value)}
+
+              {/* Photos */}
+              <div>
+                <h4 className='mb-3 flex items-center gap-2 text-[0.8rem] font-bold uppercase tracking-wider text-text-muted'>
+                  <i className='fas fa-images text-primary' aria-hidden='true'></i> Photos
+                </h4>
+                <div className='grid grid-cols-2 gap-4 max-[460px]:grid-cols-1'>
+                  <div className='flex flex-col gap-1.5'>
+                    <label className='text-sm font-semibold text-text-secondary'>
+                      Primary Image <span className='text-error'>*</span>
+                    </label>
+                    <label className={`flex min-h-[92px] cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed px-4 py-4 text-center transition ${newPrimaryImageFile ? 'border-success bg-success-light/30' : 'border-glass-border bg-glass-surface hover:border-primary'}`}>
+                      <i className={`fas fa-cloud-upload-alt text-xl ${newPrimaryImageFile ? 'text-success' : 'text-primary'}`} aria-hidden='true'></i>
+                      <span className='text-[0.8rem] font-semibold text-text-primary'>{newPrimaryImageFile ? newPrimaryImageFile.name : 'Click to upload'}</span>
+                      <span className='text-[0.72rem] text-text-muted'>Main cover image for the vehicle</span>
+                      <input
+                        type='file'
+                        accept='image/*'
+                        className='sr-only'
+                        onChange={(event) => setNewPrimaryImageFile(event.target.files?.[0] || null)}
+                        disabled={savingItemId === 'new'}
+                      />
+                    </label>
+                  </div>
+                  <div className='flex flex-col gap-1.5'>
+                    <label className='text-sm font-semibold text-text-secondary'>Gallery Images <span className='text-text-muted'>({newOtherImageFiles.length})</span></label>
+                    <label className={`flex min-h-[92px] cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed px-4 py-4 text-center transition ${newOtherImageFiles.length ? 'border-success bg-success-light/30' : 'border-glass-border bg-glass-surface hover:border-primary'}`}>
+                      <i className={`fas fa-layer-group text-xl ${newOtherImageFiles.length ? 'text-success' : 'text-primary'}`} aria-hidden='true'></i>
+                      <span className='text-[0.8rem] font-semibold text-text-primary'>{newOtherImageFiles.length ? `${newOtherImageFiles.length} image(s) selected` : 'Click to add multiple images'}</span>
+                      <span className='text-[0.72rem] text-text-muted'>Hold Ctrl to pick several, or pick again to add more</span>
+                      <input
+                        type='file'
+                        accept='image/*'
+                        multiple
+                        className='sr-only'
+                        onChange={(event) => {
+                          const picked = Array.from(event.target.files || []);
+                          if (picked.length) setNewOtherImageFiles((prev) => [...(Array.isArray(prev) ? prev : []), ...picked]);
+                          event.target.value = '';
+                        }}
+                        disabled={savingItemId === 'new'}
+                      />
+                    </label>
+                    {newOtherImageFiles.length > 0 && (
+                      <div className='mt-1 grid grid-cols-5 gap-2 max-[460px]:grid-cols-3'>
+                        {newOtherImageFiles.map((file, index) => (
+                          <div key={`${file.name}-${index}`} className='group relative aspect-square overflow-hidden rounded-lg border border-glass-border'>
+                            <img src={URL.createObjectURL(file)} alt={file.name} className='h-full w-full object-cover' />
+                            <button
+                              type='button'
+                              className='absolute right-0.5 top-0.5 flex h-5 w-5 cursor-pointer items-center justify-center rounded-full bg-slate-900/70 text-[0.6rem] text-white transition hover:bg-error'
+                              onClick={() => setNewOtherImageFiles((prev) => (Array.isArray(prev) ? prev.filter((_, i) => i !== index) : []))}
+                              disabled={savingItemId === 'new'}
+                              aria-label={`Remove ${file.name}`}
+                            >
+                              <i className='fas fa-times' aria-hidden='true'></i>
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className='mt-2 flex justify-end gap-3 border-t border-slate-100 pt-5'>
+                <button
+                  className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-text-secondary transition hover:-translate-y-px hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0'
+                  type='button'
+                  onClick={() => setShowVehicleForm(false)}
                   disabled={savingItemId === 'new'}
-                />
-              </div>
-              <div className='flex flex-col gap-1.5 [&_label]:text-sm [&_label]:font-semibold [&_label]:text-text-secondary [&_input]:rounded-xl [&_input]:border [&_input]:border-glass-border [&_input]:bg-glass-surface [&_input]:px-4 [&_input]:py-3 [&_input]:text-[0.9375rem] [&_input]:text-text-primary [&_input]:outline-none [&_input:focus]:border-primary [&_select]:rounded-xl [&_select]:border [&_select]:border-glass-border [&_select]:bg-glass-surface [&_select]:px-4 [&_select]:py-3 [&_select]:outline-none [&_textarea]:rounded-xl [&_textarea]:border [&_textarea]:border-glass-border [&_textarea]:bg-glass-surface [&_textarea]:px-4 [&_textarea]:py-3 [&_textarea]:outline-none'>
-                <label>Primary Image</label>
-                <input
-                  type='file'
-                  accept='image/*'
-                  onChange={(event) => setNewPrimaryImageFile(event.target.files?.[0] || null)}
+                >
+                  Cancel
+                </button>
+                <button
+                  className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-6 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-slate-1000 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0'
+                  type='button'
+                  onClick={addStockItem}
                   disabled={savingItemId === 'new'}
-                />
+                >
+                  <i className='fas fa-check' aria-hidden='true'></i>
+                  {savingItemId === 'new' ? 'Adding...' : 'Add Vehicle'}
+                </button>
               </div>
-              <div className='flex flex-col gap-1.5 [&_label]:text-sm [&_label]:font-semibold [&_label]:text-text-secondary [&_input]:rounded-xl [&_input]:border [&_input]:border-glass-border [&_input]:bg-glass-surface [&_input]:px-4 [&_input]:py-3 [&_input]:text-[0.9375rem] [&_input]:text-text-primary [&_input]:outline-none [&_input:focus]:border-primary [&_select]:rounded-xl [&_select]:border [&_select]:border-glass-border [&_select]:bg-glass-surface [&_select]:px-4 [&_select]:py-3 [&_select]:outline-none [&_textarea]:rounded-xl [&_textarea]:border [&_textarea]:border-glass-border [&_textarea]:bg-glass-surface [&_textarea]:px-4 [&_textarea]:py-3 [&_textarea]:outline-none'>
-                <label>Other Images</label>
-                <input
-                  type='file'
-                  accept='image/*'
-                  multiple
-                  onChange={(event) => setNewOtherImageFiles(Array.from(event.target.files || []))}
-                  disabled={savingItemId === 'new'}
-                />
-              </div>
-            </div>
-            <div className='mt-6 flex gap-3'>
-              <button
-                className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0'
-                type='button'
-                onClick={addStockItem}
-                disabled={savingItemId === 'new'}
-              >
-                {savingItemId === 'new' ? 'Adding...' : activeStockMeta?.addLabel || 'Add Item'}
-              </button>
-              <button
-                className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0'
-                type='button'
-                onClick={() => setShowVehicleForm(false)}
-                disabled={savingItemId === 'new'}
-              >
-                Cancel
-              </button>
             </div>
           </div>
         </div>
@@ -1342,10 +1751,10 @@ export default function AdminDashboardPage() {
               </div>
             </div>
             <div className='mt-6 flex gap-3'>
-              <button className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0' type='button' onClick={addStockItem} disabled={savingItemId === 'new'}>
+              <button className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-slate-1000 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0' type='button' onClick={addStockItem} disabled={savingItemId === 'new'}>
                 {savingItemId === 'new' ? 'Adding...' : 'Add Car Part'}
               </button>
-              <button className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0' type='button' onClick={() => setShowCarPartForm(false)} disabled={savingItemId === 'new'}>
+              <button className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-slate-1000 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0' type='button' onClick={() => setShowCarPartForm(false)} disabled={savingItemId === 'new'}>
                 Cancel
               </button>
             </div>
@@ -1420,10 +1829,10 @@ export default function AdminDashboardPage() {
               </div>
             </div>
             <div className='mt-6 flex gap-3'>
-              <button className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0' type='button' onClick={addStockItem} disabled={savingItemId === 'new'}>
+              <button className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-slate-1000 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0' type='button' onClick={addStockItem} disabled={savingItemId === 'new'}>
                 {savingItemId === 'new' ? 'Adding...' : 'Add Accessories'}
               </button>
-              <button className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0' type='button' onClick={() => setShowAccessoriesForm(false)} disabled={savingItemId === 'new'}>
+              <button className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-slate-1000 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0' type='button' onClick={() => setShowAccessoriesForm(false)} disabled={savingItemId === 'new'}>
                 Cancel
               </button>
             </div>
@@ -1452,7 +1861,7 @@ export default function AdminDashboardPage() {
               <button className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-error px-5 py-2.5 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(239,68,68,0.2)] transition hover:-translate-y-px hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0' type='button' onClick={confirmDelete} disabled={deleteModal.processing}>
                 {deleteModal.processing ? 'Deleting...' : 'Delete'}
               </button>
-              <button className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0' type='button' onClick={closeDeleteModal} disabled={deleteModal.processing}>
+              <button className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-slate-1000 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0' type='button' onClick={closeDeleteModal} disabled={deleteModal.processing}>
                 Cancel
               </button>
             </div>

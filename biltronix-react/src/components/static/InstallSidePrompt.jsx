@@ -18,7 +18,7 @@ export default function InstallSidePrompt({ visible, onInstall, onClose }) {
         <i className="fas fa-times text-sm"></i>
       </button>
 
-      <div className="w-12 h-12 rounded-xl bg-primary-50 flex items-center justify-center mb-4">
+      <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center mb-4">
         <i className="fas fa-mobile-alt text-primary text-xl"></i>
       </div>
 
@@ -32,7 +32,7 @@ export default function InstallSidePrompt({ visible, onInstall, onClose }) {
       <button
         type="button"
         onClick={onInstall}
-        className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-primary text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500 mt-4 py-2.5 text-sm"
+        className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-primary text-white shadow-float transition hover:-translate-y-px hover:bg-slate-1000 mt-4 py-2.5 text-sm"
       >
         <i className="fas fa-download mr-2"></i>
         Install Now

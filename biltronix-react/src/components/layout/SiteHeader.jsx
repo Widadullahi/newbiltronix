@@ -32,7 +32,7 @@ export default function SiteHeader() {
       <div className="bg-slate-900 text-slate-300 text-xs sm:text-sm">
         <div className="container mx-auto flex flex-wrap items-center justify-between px-4 py-2">
           <span className="flex items-center gap-2">
-            <i className="fas fa-clock text-primary-400"></i>
+            <i className="fas fa-clock text-slate-400"></i>
             Mon - Sat - 09:00 AM - 07:00 PM
           </span>
           <span className="font-medium flex items-center gap-2">
@@ -46,11 +46,11 @@ export default function SiteHeader() {
       <nav className="sticky top-0 z-[100] border-b border-glass-border bg-white/80 backdrop-blur-2xl" ref={menuRef}>
         <div className="container mx-auto flex items-center justify-between px-4 py-3">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
-            <img src="/logo.jpg" alt="Biltronix" className="logo-brand-tint h-10 w-10 rounded-lg border border-slate-200 object-cover" />
-            <div>
-              <span className="text-lg font-bold text-text-primary">Biltronix</span>
-              <span className="text-primary ml-1 font-semibold">Automobile</span>
+          <Link to="/" className="flex items-center gap-2.5">
+            <img src="/logo.jpg" alt="Biltronix" className="logo-brand-tint h-10 w-10 shrink-0 rounded-lg border border-slate-200 object-cover" />
+            <div className="leading-tight">
+              <span className="block font-luxury text-lg font-bold tracking-[0.12em] text-text-primary">BILTRONIX</span>
+              <span className="block font-luxury text-xs font-bold tracking-[0.3em] text-primary">AUTOMOBILE</span>
             </div>
           </Link>
 
@@ -60,16 +60,16 @@ export default function SiteHeader() {
               <Link
                 key={link.to}
                 to={link.to}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                className={`px-4 py-2 rounded-lg font-luxury text-sm font-semibold transition-all ${
                   location.pathname === link.to
-                    ? 'bg-primary-50 text-primary'
-                    : 'text-text-secondary hover:text-text-primary hover:bg-slate-50'
+                    ? 'bg-primary text-white'
+                    : 'text-slate-600 hover:bg-primary hover:text-white'
                 }`}
               >
                 {link.label}
               </Link>
             ))}
-            <a href="#install" className="ml-2 inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-primary-500">
+            <a href="#install" className="ml-2 inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2 text-sm font-semibold text-white shadow-float transition hover:-translate-y-px hover:bg-slate-1000">
               <i className="fas fa-download mr-1.5"></i>
               Install App
             </a>
@@ -98,7 +98,7 @@ export default function SiteHeader() {
                 to={link.to}
                 role="menuitem"
                 onClick={() => setMobileMenuOpen(false)}
-                className={`flex items-center gap-3 px-4 py-3 text-sm font-semibold no-underline transition ${location.pathname === link.to ? 'bg-primary-50 text-primary' : 'text-text-secondary hover:bg-slate-50 hover:text-text-primary'}`}
+                className={`flex items-center gap-3 px-4 py-3 font-luxury text-sm font-semibold no-underline transition ${location.pathname === link.to ? 'bg-primary text-white' : 'text-slate-600 hover:bg-primary hover:text-white'}`}
               >
                 <i className={`fas ${link.icon} w-5 text-center`} aria-hidden="true"></i>
                 {link.label}
