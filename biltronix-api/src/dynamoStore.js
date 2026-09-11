@@ -36,6 +36,7 @@ export const tables = {
   carTips: process.env.DYNAMODB_CAR_TIPS_TABLE || `${tablePrefix}-car-tips`,
   storeHighlights: process.env.DYNAMODB_STORE_HIGHLIGHTS_TABLE || `${tablePrefix}-store-highlights`,
   inspectorAccounts: process.env.DYNAMODB_INSPECTOR_ACCOUNTS_TABLE || `${tablePrefix}-inspector-accounts`,
+  inspectionReports: process.env.DYNAMODB_INSPECTION_REPORTS_TABLE || `${tablePrefix}-inspection-reports`,
   refreshTokens: process.env.DYNAMODB_REFRESH_TOKENS_TABLE || `${tablePrefix}-refresh-tokens`,
   passwordResetOtps: process.env.DYNAMODB_PASSWORD_RESET_OTPS_TABLE || `${tablePrefix}-password-reset-otps`,
 };

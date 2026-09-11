@@ -1,0 +1,76 @@
+# Biltronix production stack (no AWS) — monorepo deploy via Docker Compose
+#
+# Runs on a single VPS:
+#   dynamodb-local  -> DynamoDB-compatible database (Amazon's official local binary)
+#   init-db         -> one-shot bootstrap that creates the 8 tables (idempotent)
+#   api             -> Node/Express backend (biltronix-api)
+#   web             -> nginx serving the built React app + proxying /api -> api:4000
+#
+# Setup on the VPS:
+#   1. Install Docker + Docker Compose plugin (https://docs.docker.com/engine/install/)
+#      e.g. Ubuntu:  curl -fsSL https://get.docker.com | sh
+#   2. Clone the repo:  git clone <your-repo-url>.git
+#   3. Copy your API env in:  cp biltronix-api/.env.example biltronix-api/.env   (or your real one)
+#      IMPORTANT: set a strong JWT_SECRET (openssl rand -hex 32) and change ADMIN_PASSWORD.
+#   4. Build & run:  docker compose -f docker-compose.prod.yml up -d --build
+#   5. Open http://<VPS-IP/domain>  (port 80). First load wakes the stack; give init-db ~10s.
+#   6. Update:      docker compose -f docker-compose.prod.yml up -d --build
+#   7. Logs:        docker compose -f docker-compose.prod.yml logs -f api web
+#
+# Optional: point a domain name at the VPS IP and add a Caddy/Traefik proxy for HTTPS.
+
+x-dynamo-env: &dynamo-env
+  AWS_REGION: ${AWS_REGION:-us-east-1}
+  AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-dummy}
+  AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-dummy}
+  DYNAMODB_TABLE_PREFIX: ${DYNAMODB_TABLE_PREFIX:-biltronix}
+  DYNAMODB_ENDPOINT: http://dynamodb-local:8000
+
+name: biltronix
+
+services:
+  dynamodb-local:
+    image: amazon/dynamodb-local:latest
+    restart: unless-stopped
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath /home/dynamodblocal/data"
+    volumes:
+      - dynamodb-data:/home/dynamodblocal/data
+
+  init-db:
+    build:
+      context: ./biltronix-api
+    environment:
+      <<: *dynamo-env
+    depends_on:
+      - dynamodb-local
+    restart: "no"
+    command: ["node", "scripts/create-tables.js"]
+
+  api:
+    build:
+      context: ./biltronix-api
+    restart: unless-stopped
+    env_file:
+      - ./biltronix-api/.env
+    environment:
+      <<: *dynamo-env
+      NODE_ENV: production
+      PORT: 4000
+    depends_on:
+      - dynamodb-local
+    expose:
+      - "4000"
+
+  web:
+    build:
+      context: ./biltronix-react
+      args:
+        VITE_API_BASE_URL: /api
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+
+volumes:
+  dynamodb-data:
