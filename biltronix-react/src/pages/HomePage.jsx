@@ -251,14 +251,6 @@ export default function HomePage() {
 
         {/* Left hero content */}
         <div className="relative z-20 w-full flex-[0_0_48%] pl-[7%] pr-4 max-[1100px]:flex-[0_0_52%] max-[900px]:mx-auto max-[900px]:max-w-3xl max-[900px]:flex-none max-[900px]:px-6 max-[900px]:text-center max-[640px]:px-[18px]">
-          {/* Badge */}
-          <div className="mb-5 inline-flex translate-x-[-42px] items-center gap-2 rounded-full bg-primary px-4 py-2 opacity-0 shadow-[0_6px_20px_rgba(10,31,77,0.28)] [.lux-on_&]:animate-[heroTextIn_0.7s_cubic-bezier(0.22,1,0.36,1)_forwards] max-[900px]:mx-auto">
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white text-[0.6rem] text-primary">
-              <i className="fas fa-star" aria-hidden="true"></i>
-            </span>
-            <span className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-white">Premium Automobile Solutions</span>
-          </div>
-
           <h1 className="m-0 mb-5 max-w-[680px] translate-x-[-42px] font-heading text-[clamp(2.5rem,5vw,4.2rem)] font-extrabold leading-[1.08] opacity-0 text-text-primary [.lux-on_&]:animate-[heroTextIn_0.75s_cubic-bezier(0.22,1,0.36,1)_0.12s_forwards] max-[900px]:mx-auto max-[640px]:text-[clamp(2rem,10vw,2.75rem)]">
             Find Your Dream Car at{' '}
             <span className="text-primary">Biltronix</span>
