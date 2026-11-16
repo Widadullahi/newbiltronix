@@ -28,20 +28,6 @@ export default function SiteHeader() {
 
   return (
     <header>
-      {/* Top Bar */}
-      <div className="bg-slate-900 text-slate-300 text-xs sm:text-sm">
-        <div className="container mx-auto flex flex-wrap items-center justify-between px-4 py-2">
-          <span className="flex items-center gap-2">
-            <i className="fas fa-clock text-slate-400"></i>
-            Mon - Sat - 09:00 AM - 07:00 PM
-          </span>
-          <span className="font-medium flex items-center gap-2">
-            <i className="fab fa-whatsapp text-success"></i>
-            +234 706 088 2711
-          </span>
-        </div>
-      </div>
-
       {/* Navigation */}
       <nav className="sticky top-0 z-[100] border-b border-glass-border bg-white/80 backdrop-blur-2xl" ref={menuRef}>
         <div className="container mx-auto flex items-center justify-between px-4 py-3">
