@@ -313,37 +313,37 @@ export default function HomePage() {
             />
           </div>
 
-          {/* Floating card: Rating */}
-          <div className="absolute right-[8%] top-[18%] z-[10] rounded-xl border border-slate-200/80 bg-white px-5 py-3.5 opacity-0 shadow-[0_8px_30px_rgba(0,0,0,0.12)] [.lux-on_&]:animate-[heroTextIn_0.7s_cubic-bezier(0.22,1,0.36,1)_0.85s_forwards] max-[1100px]:right-[4%] max-[900px]:hidden">
-            <div className="mb-1 flex gap-0.5">
-              {[...Array(5)].map((_, i) => (
-                <i key={i} className="fas fa-star text-[0.7rem] text-primary"></i>
-              ))}
+          {/* Vehicle assurance cards */}
+          <div className="absolute right-[3%] top-[16%] z-[10] flex w-[190px] flex-col gap-3 max-[1100px]:right-[2%] max-[1100px]:w-[175px] max-[900px]:hidden">
+            <div className="w-full rounded-xl border border-slate-200/80 bg-white px-4 py-3 opacity-0 shadow-[0_8px_30px_rgba(0,0,0,0.12)] [.lux-on_&]:animate-[heroTextIn_0.7s_cubic-bezier(0.22,1,0.36,1)_0.85s_forwards]">
+              <div className="mb-1 flex gap-0.5">
+                {[...Array(5)].map((_, i) => (
+                  <i key={i} className="fas fa-star text-[0.7rem] text-primary"></i>
+                ))}
+              </div>
+              <p className="m-0 text-[0.95rem] font-bold text-text-primary">4.9/5</p>
+              <p className="m-0 text-[0.68rem] text-slate-500">Customer Rating</p>
+              <p className="m-0 text-[0.62rem] text-slate-400">Based on 1.2k+ reviews</p>
             </div>
-            <p className="m-0 text-[0.95rem] font-bold text-text-primary">4.9/5</p>
-            <p className="m-0 text-[0.68rem] text-slate-500">Customer Rating</p>
-            <p className="m-0 text-[0.62rem] text-slate-400">Based on 1.2k+ reviews</p>
-          </div>
 
-          {/* Floating card: Verified Stock */}
-          <div className="absolute right-[2%] top-[38%] z-[10] flex items-center gap-3 rounded-xl border border-slate-200/80 bg-white px-4 py-3 opacity-0 shadow-[0_8px_30px_rgba(0,0,0,0.12)] [.lux-on_&]:animate-[heroTextIn_0.7s_cubic-bezier(0.22,1,0.36,1)_1s_forwards] max-[1100px]:right-0 max-[900px]:hidden">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-100">
-              <i className="fas fa-check text-[0.8rem] text-primary"></i>
+            <div className="flex w-full items-center gap-3 rounded-xl border border-slate-200/80 bg-white px-4 py-3 opacity-0 shadow-[0_8px_30px_rgba(0,0,0,0.12)] [.lux-on_&]:animate-[heroTextIn_0.7s_cubic-bezier(0.22,1,0.36,1)_1s_forwards]">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-100">
+                <i className="fas fa-check text-[0.8rem] text-primary"></i>
+              </div>
+              <div>
+                <p className="m-0 text-[0.78rem] font-bold text-text-primary">Verified Stock</p>
+                <p className="m-0 text-[0.62rem] text-slate-500">Authentic & Inspected</p>
+              </div>
             </div>
-            <div>
-              <p className="m-0 text-[0.78rem] font-bold text-text-primary">Verified Stock</p>
-              <p className="m-0 text-[0.62rem] text-slate-500">Authentic & Inspected</p>
-            </div>
-          </div>
 
-          {/* Floating card: Inspection Passed */}
-          <div className="absolute right-[6%] bottom-[20%] z-[10] flex items-center gap-3 rounded-xl border border-slate-200/80 bg-white px-4 py-3 opacity-0 shadow-[0_8px_30px_rgba(0,0,0,0.12)] [.lux-on_&]:animate-[heroTextIn_0.7s_cubic-bezier(0.22,1,0.36,1)_1.15s_forwards] max-[1100px]:right-[2%] max-[900px]:hidden">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-100">
-              <i className="fas fa-check-double text-[0.8rem] text-primary"></i>
-            </div>
-            <div>
-              <p className="m-0 text-[0.78rem] font-bold text-text-primary">Inspection Passed</p>
-              <p className="m-0 text-[0.62rem] text-slate-500">150+ Point Checklist</p>
+            <div className="flex w-full items-center gap-3 rounded-xl border border-slate-200/80 bg-white px-4 py-3 opacity-0 shadow-[0_8px_30px_rgba(0,0,0,0.12)] [.lux-on_&]:animate-[heroTextIn_0.7s_cubic-bezier(0.22,1,0.36,1)_1.15s_forwards]">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-100">
+                <i className="fas fa-check-double text-[0.8rem] text-primary"></i>
+              </div>
+              <div>
+                <p className="m-0 text-[0.78rem] font-bold text-text-primary">Inspection Passed</p>
+                <p className="m-0 text-[0.62rem] text-slate-500">150+ Point Checklist</p>
+              </div>
             </div>
           </div>
         </div>
