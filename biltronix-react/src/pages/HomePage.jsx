@@ -326,16 +326,6 @@ export default function HomePage() {
               <p className="m-0 text-[0.62rem] text-slate-400">Based on 1.2k+ reviews</p>
             </div>
 
-            <div className="flex w-full items-center gap-3 rounded-xl border border-slate-200/80 bg-white px-4 py-3 opacity-0 shadow-[0_8px_30px_rgba(0,0,0,0.12)] [.lux-on_&]:animate-[heroTextIn_0.7s_cubic-bezier(0.22,1,0.36,1)_1s_forwards]">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-100">
-                <i className="fas fa-check text-[0.8rem] text-primary"></i>
-              </div>
-              <div>
-                <p className="m-0 text-[0.78rem] font-bold text-text-primary">Verified Stock</p>
-                <p className="m-0 text-[0.62rem] text-slate-500">Authentic & Inspected</p>
-              </div>
-            </div>
-
             <div className="flex w-full items-center gap-3 rounded-xl border border-slate-200/80 bg-white px-4 py-3 opacity-0 shadow-[0_8px_30px_rgba(0,0,0,0.12)] [.lux-on_&]:animate-[heroTextIn_0.7s_cubic-bezier(0.22,1,0.36,1)_1.15s_forwards]">
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-100">
                 <i className="fas fa-check-double text-[0.8rem] text-primary"></i>
@@ -344,6 +334,16 @@ export default function HomePage() {
                 <p className="m-0 text-[0.78rem] font-bold text-text-primary">Inspection Passed</p>
                 <p className="m-0 text-[0.62rem] text-slate-500">150+ Point Checklist</p>
               </div>
+            </div>
+          </div>
+
+          <div className="absolute left-[1%] top-[42%] z-[10] flex w-[190px] items-center gap-3 rounded-xl border border-slate-200/80 bg-white px-4 py-3 opacity-0 shadow-[0_8px_30px_rgba(0,0,0,0.12)] [.lux-on_&]:animate-[heroTextIn_0.7s_cubic-bezier(0.22,1,0.36,1)_1s_forwards] max-[1100px]:w-[175px] max-[900px]:hidden">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-100">
+              <i className="fas fa-check text-[0.8rem] text-primary"></i>
+            </div>
+            <div>
+              <p className="m-0 text-[0.78rem] font-bold text-text-primary">Verified Stock</p>
+              <p className="m-0 text-[0.62rem] text-slate-500">Authentic & Inspected</p>
             </div>
           </div>
         </div>
