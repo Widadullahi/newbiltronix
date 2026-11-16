@@ -293,7 +293,7 @@ export default function HomePage() {
           </div>
 
           {/* Trust badges */}
-          <div className="flex translate-x-[-42px] flex-wrap gap-5 opacity-0 [.lux-on_&]:animate-[heroTextIn_0.75s_cubic-bezier(0.22,1,0.36,1)_0.6s_forwards] max-[900px]:mb-0 max-[900px]:grid max-[900px]:grid-cols-3 max-[900px]:gap-2.5">
+          <div className="flex translate-x-[-42px] flex-wrap gap-5 opacity-0 [.lux-on_&]:animate-[heroTextIn_0.75s_cubic-bezier(0.22,1,0.36,1)_0.6s_forwards] max-[900px]:hidden">
             <span className="flex items-center gap-2 text-[0.8rem] text-text-primary/80 max-[900px]:justify-center max-[900px]:rounded-lg max-[900px]:border max-[900px]:border-primary-200 max-[900px]:bg-white/60 max-[900px]:px-3 max-[900px]:py-2.5 max-[900px]:text-[0.72rem] max-[900px]:text-text-primary [&_i]:text-[0.9rem] [&_i]:text-primary">
                 <i className="fas fa-shield-alt" aria-hidden="true"></i>
                 <span><strong>Certified</strong> <span className="text-[0.7rem] text-slate-500">Quality Assured</span></span>
